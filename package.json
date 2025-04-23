@@ -1,5 +1,5 @@
 {
-	"name": "dugongjs",
+	"name": "@dugongjs/root",
 	"private": true,
 	"scripts": {
 		"build": "turbo run build",
