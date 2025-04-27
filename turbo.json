@@ -3,15 +3,14 @@
 	"ui": "tui",
 	"tasks": {
 		"build": {
-			"dependsOn": ["^build"],
-			"inputs": ["$TURBO_DEFAULT$", ".env*"],
-			"outputs": [".next/**", "!.next/cache/**"]
+			"dependsOn": ["^build"]
 		},
 		"lint": {
 			"dependsOn": ["^lint"]
 		},
-		"check-types": {
-			"dependsOn": ["^check-types"]
+		"test:watch": {},
+		"test:typecheck": {
+			"dependsOn": ["^test:typecheck"]
 		},
 		"dev": {
 			"cache": false,

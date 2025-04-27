@@ -6,7 +6,8 @@
 		"dev": "turbo run dev",
 		"lint": "turbo run lint",
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
-		"check-types": "turbo run check-types",
+		"test:watch": "turbo run test:watch",
+		"test:typecheck": "turbo run test:typecheck",
 		"commit": "cz",
 		"prepare": "husky"
 	},
