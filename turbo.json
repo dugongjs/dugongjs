@@ -1,20 +1,20 @@
 {
-	"$schema": "https://turbo.build/schema.json",
-	"ui": "tui",
-	"tasks": {
-		"build": {
-			"dependsOn": ["^build"]
-		},
-		"lint": {
-			"dependsOn": ["^lint"]
-		},
-		"test:watch": {},
-		"test:typecheck": {
-			"dependsOn": ["^test:typecheck"]
-		},
-		"dev": {
-			"cache": false,
-			"persistent": true
-		}
-	}
+    "$schema": "https://turbo.build/schema.json",
+    "ui": "tui",
+    "tasks": {
+        "build": {
+            "dependsOn": ["^build"]
+        },
+        "lint": {
+            "dependsOn": ["^lint"]
+        },
+        "test:watch": {},
+        "test:typecheck": {
+            "dependsOn": ["^test:typecheck"]
+        },
+        "dev": {
+            "cache": false,
+            "persistent": true
+        }
+    }
 }
