@@ -8,9 +8,20 @@
         "lint": {
             "dependsOn": ["^lint"]
         },
-        "test:watch": {},
         "test:typecheck": {
             "dependsOn": ["^test:typecheck"]
+        },
+        "test:unit:run": {
+            "dependsOn": ["^test:typecheck"]
+        },
+        "test:unit:watch": {
+            "dependsOn": ["test:typecheck"]
+        },
+        "test:e2e:run": {
+            "dependsOn": ["^test:typecheck"]
+        },
+        "test:e2e:watch": {
+            "dependsOn": ["test:typecheck"]
         },
         "dev": {
             "cache": false,
