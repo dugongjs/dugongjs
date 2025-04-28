@@ -1,3 +1,4 @@
+import { Type } from "class-transformer";
 import { v4 as uuid } from "uuid";
 import type { SerializableObject } from "../../types/serializable-object.type.js";
 import type { AbstractDomainEvent } from "../abstract-domain-event/abstract-domain-event.js";
@@ -13,6 +14,7 @@ export abstract class AbstractAggregateRoot extends AbstractEventSourcedAggregat
     private [IsInProcessContext]: boolean = false;
     private [IsInCreationContext]: boolean = false;
 
+    @Type(() => Map)
     private readonly stagedEvents = new Map<number, InstanceType<DomainEventClass>>();
 
     /**
