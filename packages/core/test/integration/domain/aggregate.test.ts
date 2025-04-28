@@ -1,9 +1,9 @@
 import { faker } from "@faker-js/faker";
-import { aggregateDomainEventApplier } from "../../../domain/aggregate-domain-event-applier/aggregate-domain-event-applier.js";
-import { AggregateIdMismatchError } from "../../../domain/aggregate-domain-event-applier/errors/aggregate-id-mismatch.error.js";
-import { DomainEventSequenceNumberMismatchError } from "../../../domain/aggregate-domain-event-applier/errors/domain-event-sequence-number-mismatch.error.js";
-import { aggregateMetadataRegistry } from "../../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
-import { UserAggregate, UserCreatedEvent } from "../test-classes/user.aggregate.js";
+import { aggregateDomainEventApplier } from "../../../src/domain/aggregate-domain-event-applier/aggregate-domain-event-applier.js";
+import { AggregateIdMismatchError } from "../../../src/domain/aggregate-domain-event-applier/errors/aggregate-id-mismatch.error.js";
+import { DomainEventSequenceNumberMismatchError } from "../../../src/domain/aggregate-domain-event-applier/errors/domain-event-sequence-number-mismatch.error.js";
+import { aggregateMetadataRegistry } from "../../../src/domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
+import { UserAggregate, UserCreatedEvent } from "../use-cases/user.aggregate.js";
 
 describe("Aggregate and Domain Event Integration", () => {
     afterAll(() => {

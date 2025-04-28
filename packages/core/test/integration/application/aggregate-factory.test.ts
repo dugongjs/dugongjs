@@ -1,15 +1,15 @@
 import { faker } from "@faker-js/faker";
 import { mock, mockReset } from "vitest-mock-extended";
-import { AggregateFactory } from "../../../application/aggregate-factory/aggregate-factory.js";
-import { AggregateMetadataNotFoundError } from "../../../application/aggregate-factory/errors/aggregate-metadata-not-found.error.js";
-import type { ILogger } from "../../../application/logger/i-logger.js";
-import { AbstractEventSourcedAggregateRoot } from "../../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
-import type { IDomainEventRepository } from "../../../ports/outbound/repository/i-domain-event-repository.js";
+import { AggregateFactory } from "../../../src/application/aggregate-factory/aggregate-factory.js";
+import { AggregateMetadataNotFoundError } from "../../../src/application/aggregate-factory/errors/aggregate-metadata-not-found.error.js";
+import type { ILogger } from "../../../src/application/logger/i-logger.js";
+import { AbstractEventSourcedAggregateRoot } from "../../../src/domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
+import type { IDomainEventRepository } from "../../../src/ports/outbound/repository/i-domain-event-repository.js";
 import type {
     ISnapshotRepository,
     SerializedSnapshot
-} from "../../../ports/outbound/repository/i-snapshot-repository.js";
-import { UserAggregate, UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent } from "../test-classes/user.aggregate.js";
+} from "../../../src/ports/outbound/repository/i-snapshot-repository.js";
+import { UserAggregate, UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent } from "../use-cases/user.aggregate.js";
 
 describe("AggregateFactory", () => {
     let factory: AggregateFactory<typeof UserAggregate>;

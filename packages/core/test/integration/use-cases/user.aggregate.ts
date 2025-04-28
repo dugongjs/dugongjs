@@ -1,13 +1,13 @@
-import { AbstractAggregateRoot } from "../../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
+import { AbstractAggregateRoot } from "../../../src/domain/abstract-aggregate-root/abstract-aggregate-root.js";
 import {
     AbstractDomainEvent,
     type DomainEventPayload
-} from "../../../domain/abstract-domain-event/abstract-domain-event.js";
-import { Aggregate } from "../../../domain/aggregate-decorators/aggregate.js";
-import { Apply } from "../../../domain/aggregate-decorators/apply.js";
-import { Process } from "../../../domain/aggregate-decorators/process.js";
-import { Snapshotable } from "../../../domain/aggregate-decorators/snapshotable.js";
-import { DomainEvent } from "../../../domain/domain-event-decorators/domain-event.js";
+} from "../../../src/domain/abstract-domain-event/abstract-domain-event.js";
+import { Aggregate } from "../../../src/domain/aggregate-decorators/aggregate.js";
+import { Apply } from "../../../src/domain/aggregate-decorators/apply.js";
+import { Process } from "../../../src/domain/aggregate-decorators/process.js";
+import { Snapshotable } from "../../../src/domain/aggregate-decorators/snapshotable.js";
+import { DomainEvent } from "../../../src/domain/domain-event-decorators/domain-event.js";
 
 class AbstractUserDomainEvent<TPayload extends DomainEventPayload = null> extends AbstractDomainEvent<TPayload> {
     public static readonly origin = "IAM.UserService";
