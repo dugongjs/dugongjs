@@ -28,3 +28,5 @@ export interface IMessageConsumer<TMessage> extends IMessageChannelParticipant {
         onMessage?: (message: TMessage) => Promise<void>
     ): Promise<void>;
 }
+
+export const IMessageConsumer = "IMessageConsumer" as const;

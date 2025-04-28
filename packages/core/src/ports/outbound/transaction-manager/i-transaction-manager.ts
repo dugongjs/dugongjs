@@ -5,3 +5,5 @@ export type RunInTransaction<TResult> = (context: TransactionContext) => Promise
 export interface ITransactionManager {
     transaction<TResult = unknown>(runInTransaction: RunInTransaction<TResult>): Promise<TResult>;
 }
+
+export const ITransactionManager = "ITransactionManager" as const;

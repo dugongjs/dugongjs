@@ -37,3 +37,5 @@ export interface ISnapshotRepository {
      */
     saveSnapshot(transactionContext: TransactionContext | null, snapshot: SerializedSnapshot): Promise<void>;
 }
+
+export const ISnapshotRepository = "ISnapshotRepository" as const;

@@ -12,3 +12,5 @@ export interface IMessageExtractor<TMessage> {
      */
     extractSerializedDomainEventFromMessage(message: TMessage): SerializedDomainEvent;
 }
+
+export const IMessageExtractor = "IMessageExtractor" as const;

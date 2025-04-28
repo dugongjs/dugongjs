@@ -31,3 +31,5 @@ export interface IConsumedMessageRepository {
         consumerId: string
     ): Promise<void>;
 }
+
+export const IConsumedMessageRepository = "IConsumedMessageRepository" as const;

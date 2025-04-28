@@ -33,3 +33,5 @@ export interface IDomainEventRepository {
      */
     saveDomainEvents(transactionContext: TransactionContext | null, events: SerializedDomainEvent[]): Promise<void>;
 }
+
+export const IDomainEventRepository = "IDomainEventRepository" as const;

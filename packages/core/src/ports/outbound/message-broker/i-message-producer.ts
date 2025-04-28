@@ -20,3 +20,5 @@ export interface IMessageProducer extends IMessageChannelParticipant {
         messageChannelId: string
     ): Promise<void>;
 }
+
+export const IMessageProducer = "IMessageProducer" as const;
