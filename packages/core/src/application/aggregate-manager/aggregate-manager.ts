@@ -58,7 +58,7 @@ export class AggregateManager<
         const stagedDomainEvents = aggregate.getStagedDomainEvents();
 
         if (stagedDomainEvents.length === 0) {
-            this.logger.verbose(logContext, "No staged domain events to commit");
+            this.logger.verbose(logContext, `No staged domain events to commit for aggregate ${aggregateId}`);
             return;
         }
 
@@ -79,11 +79,17 @@ export class AggregateManager<
 
         const serializedEvents = stagedDomainEvents.map((domainEvent) => domainEvent.serialize());
 
-        this.logger.verbose(logContext, `Committing ${serializedEvents.length} staged domain events to event log`);
+        this.logger.verbose(
+            logContext,
+            `Committing ${serializedEvents.length} staged domain events to event log for ${this.aggregateType} aggregate ${aggregateId}`
+        );
 
         await this.domainEventRepository.saveDomainEvents(this.transactionContext, serializedEvents);
 
-        this.logger.verbose(logContext, `Staged domain events committed to event log`);
+        this.logger.verbose(
+            logContext,
+            `${serializedEvents.length} staged domain events committed to event log for ${this.aggregateType} aggregate ${aggregateId}`
+        );
 
         if (this.messageProducer) {
             const channelId = this.messageProducer.generateMessageChannelIdForAggregate(
@@ -102,7 +108,10 @@ export class AggregateManager<
                 channelId
             );
 
-            this.logger.verbose(logContext, `Staged domain events published to message broker`);
+            this.logger.verbose(
+                logContext,
+                `${serializedEvents.length} staged domain events published to message broker on channel ${channelId}`
+            );
         }
 
         aggregate.clearStagedDomainEvents();
@@ -138,7 +147,7 @@ export class AggregateManager<
 
         this.logger.verbose(
             logContext,
-            `Creating snapshot for aggregate ${aggregateId} at sequence number ${currentDomainEventSequenceNumber}`
+            `Creating snapshot for ${this.aggregateType} aggregate ${aggregateId} at sequence number ${currentDomainEventSequenceNumber}`
         );
 
         const snapshot = aggregateSnapshotTransformer.takeSnapshot(this.aggregateOrigin, this.aggregateType, aggregate);
@@ -147,7 +156,7 @@ export class AggregateManager<
 
         this.logger.verbose(
             logContext,
-            `Snapshot for aggregate ${aggregateId} created at sequence number ${currentDomainEventSequenceNumber}`
+            `Snapshot for ${this.aggregateType} aggregate ${aggregateId} created at sequence number ${currentDomainEventSequenceNumber}`
         );
     }
 }

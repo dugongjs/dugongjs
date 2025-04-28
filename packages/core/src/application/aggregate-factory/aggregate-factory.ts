@@ -51,22 +51,28 @@ export class AggregateFactory<
         let aggregate: InstanceType<TAggregateRootClass> | null = null;
 
         if (this.isSnapshotable && !options.skipSnapshot) {
-            this.logger.verbose(logContext, "Aggregate is snapshotable, attempting to build from snapshot");
+            this.logger.verbose(
+                logContext,
+                `${this.aggregateType} aggregate is snapshotable, attempting to build from snapshot`
+            );
             aggregate = await this.buildFromLatestSnapshot(aggregateId);
         }
 
         if (!aggregate) {
-            this.logger.verbose(logContext, "Could not build from snapshot, attempting to build from event log");
+            this.logger.verbose(
+                logContext,
+                `Could not build ${this.aggregateType} aggregate ${aggregateId} from snapshot, attempting to build from event log`
+            );
             aggregate = await this.buildFromEventLog(aggregateId);
         }
 
         if (!aggregate) {
-            this.logger.verbose(logContext, "Aggregate not found");
+            this.logger.verbose(logContext, `${this.aggregateType} aggregate ${aggregateId} not found`);
             return null;
         }
 
         if (aggregate.isDeleted()) {
-            this.logger.verbose(logContext, "Aggregate is deleted");
+            this.logger.verbose(logContext, `${this.aggregateType} aggregate ${aggregateId} is deleted`);
 
             if (options.returnDeleted) {
                 return aggregate;
@@ -83,9 +89,12 @@ export class AggregateFactory<
 
         const logContext = this.getLogContext(aggregateId);
 
-        this.logger.verbose(logContext, "Building aggregate from event log");
+        this.logger.verbose(logContext, `Building ${this.aggregateType} aggregate ${aggregateId} from event log`);
 
-        this.logger.verbose(logContext, "Fetching domain events from event log");
+        this.logger.verbose(
+            logContext,
+            `Fetching domain events from event log for ${this.aggregateType} aggregate ${aggregateId}`
+        );
         const serializedDomainEvents = await this.domainEventRepository.getAggregateDomainEvents(
             this.transactionContext,
             this.aggregateOrigin,
@@ -94,7 +103,10 @@ export class AggregateFactory<
         );
 
         if (serializedDomainEvents.length === 0) {
-            this.logger.verbose(logContext, "No domain events found in event log");
+            this.logger.verbose(
+                logContext,
+                `No domain events found for ${this.aggregateType} aggregate ${aggregateId} in event log`
+            );
 
             if (this.isInternalAggregate) {
                 return null;
@@ -104,7 +116,10 @@ export class AggregateFactory<
             return null;
         }
 
-        this.logger.verbose(logContext, `Found ${serializedDomainEvents.length} domain events in event log`);
+        this.logger.verbose(
+            logContext,
+            `Found ${serializedDomainEvents.length} domain events for ${this.aggregateType} aggregate ${aggregateId} in event log`
+        );
 
         const aggregate = new this.aggregateClass().setId(aggregateId) as InstanceType<TAggregateRootClass>;
 
@@ -116,9 +131,7 @@ export class AggregateFactory<
 
         const logContext = this.getLogContext(aggregateId);
 
-        this.logger.verbose(logContext, "Building aggregate from latest snapshot");
-
-        this.logger.verbose(logContext, "Fetching latest snapshot");
+        this.logger.verbose(logContext, `Fetching latest snapshot for ${this.aggregateType} aggregate ${aggregateId}`);
 
         const latestSnapshot = await this.snapshotRepository.getLatestSnapshot(
             this.transactionContext,
@@ -128,13 +141,13 @@ export class AggregateFactory<
         );
 
         if (!latestSnapshot) {
-            this.logger.verbose(logContext, "No snapshot found");
+            this.logger.verbose(logContext, `No snapshot found for ${this.aggregateType} aggregate ${aggregateId}`);
             return null;
         }
 
         this.logger.verbose(
             logContext,
-            `Snapshot found, sequence number is ${latestSnapshot.domainEventSequenceNumber}`
+            `Snapshot found for ${this.aggregateType} aggregate ${aggregateId}, sequence number is ${latestSnapshot.domainEventSequenceNumber}`
         );
 
         const aggregate = aggregateSnapshotTransformer.restoreFromSnapshot(this.aggregateClass, latestSnapshot);
@@ -143,7 +156,7 @@ export class AggregateFactory<
 
         this.logger.verbose(
             logContext,
-            `Fetching domain events from event log from sequence number ${fromSequenceNumber}`
+            `Fetching domain events from event log from sequence number ${fromSequenceNumber} for ${this.aggregateType} aggregate ${aggregateId}`
         );
 
         const serializedDomainEvents = await this.domainEventRepository.getAggregateDomainEvents(
