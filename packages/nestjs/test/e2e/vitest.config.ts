@@ -1,5 +1,4 @@
 import { config } from "dotenv";
-import "reflect-metadata";
 import swc from "unplugin-swc";
 import { defineConfig } from "vitest/config";
 
@@ -11,7 +10,7 @@ export default defineConfig({
         reporters: ["default"],
         fileParallelism: false,
         globalSetup: ["./setup/global-setup/setup-postgresql-testcontainer.ts"],
-        setupFiles: ["./setup/setup/data-source.ts"],
+        setupFiles: ["./setup/setup/reflect-metadata.ts", "./setup/setup/app.ts"],
         env: {
             ...config({ path: "./test/e2e/.env.e2e" }).parsed
         },

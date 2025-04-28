@@ -1,0 +1,1 @@
+export const CURRENT_ORIGIN_TOKEN = "CURRENT_ORIGIN_TOKEN" as const;
