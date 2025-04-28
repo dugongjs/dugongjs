@@ -10,7 +10,7 @@ import {
 } from "../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
-import type { ISnapshotRepository, Snapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
+import type { ISnapshotRepository, SerializedSnapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
 import type { TransactionContext } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import type { Constructor } from "../../types/constructor.type.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
@@ -167,7 +167,7 @@ describe("AggregateFactory", () => {
                 () => mockSerializedEvents as unknown as AbstractDomainEvent[]
             );
 
-            const latestSnapshot: Snapshot = {
+            const latestSnapshot: SerializedSnapshot = {
                 domainEventSequenceNumber: 1,
                 origin: "CurrentOrigin",
                 aggregateType: "TestType",
@@ -185,7 +185,7 @@ describe("AggregateFactory", () => {
             aggregateSnapshotTransformer.restoreFromSnapshot = vi.fn(
                 <TAggregateRootClass extends Constructor<AbstractAggregateRoot>>(
                     aggregateClass: TAggregateRootClass,
-                    snapshot: Snapshot
+                    snapshot: SerializedSnapshot
                 ): InstanceType<TAggregateRootClass> => mockAggregateInstance as InstanceType<TAggregateRootClass>
             );
 

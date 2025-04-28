@@ -1,6 +1,6 @@
 import type { TransactionContext } from "../transaction-manager/i-transaction-manager.js";
 
-export type Snapshot = {
+export type SerializedSnapshot = {
     origin: string;
     aggregateType: string;
     aggregateId: string;
@@ -27,7 +27,7 @@ export interface ISnapshotRepository {
         origin: string,
         aggregateType: string,
         aggregateId: string
-    ): Promise<Snapshot | null>;
+    ): Promise<SerializedSnapshot | null>;
 
     /**
      * Saves a snapshot for a specific aggregate.

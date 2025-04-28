@@ -5,7 +5,10 @@ import { AggregateMetadataNotFoundError } from "../../../application/aggregate-f
 import type { ILogger } from "../../../application/logger/i-logger.js";
 import { AbstractEventSourcedAggregateRoot } from "../../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
 import type { IDomainEventRepository } from "../../../ports/outbound/repository/i-domain-event-repository.js";
-import type { ISnapshotRepository, Snapshot } from "../../../ports/outbound/repository/i-snapshot-repository.js";
+import type {
+    ISnapshotRepository,
+    SerializedSnapshot
+} from "../../../ports/outbound/repository/i-snapshot-repository.js";
 import { UserAggregate, UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent } from "../test-classes/user.aggregate.js";
 
 describe("AggregateFactory", () => {
@@ -53,7 +56,7 @@ describe("AggregateFactory", () => {
         it("should build an aggregate from the latest snapshot if snapshotable and skipSnapshot is not set", async () => {
             const userId = faker.string.uuid();
 
-            const snapshot: Snapshot = {
+            const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 1,
                 snapshot: {
@@ -92,7 +95,7 @@ describe("AggregateFactory", () => {
         it("should return null if the aggregate is deleted and returnDeleted is not set", async () => {
             const userId = faker.string.uuid();
 
-            const snapshot: Snapshot = {
+            const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 3,
                 snapshot: {
@@ -121,7 +124,7 @@ describe("AggregateFactory", () => {
         it("should return the deleted aggregate if returnDeleted is set", async () => {
             const userId = faker.string.uuid();
 
-            const snapshot: Snapshot = {
+            const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 3,
                 snapshot: {
@@ -229,7 +232,7 @@ describe("AggregateFactory", () => {
         it("should create an instance of the aggregate class from the latest snapshot", async () => {
             const userId = faker.string.uuid();
 
-            const snapshot: Snapshot = {
+            const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 1,
                 snapshot: {
@@ -250,7 +253,7 @@ describe("AggregateFactory", () => {
         it("should create an instance of the aggregate class from the latest snapshot and apply events", async () => {
             const userId = faker.string.uuid();
 
-            const snapshot: Snapshot = {
+            const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 3,
                 snapshot: {

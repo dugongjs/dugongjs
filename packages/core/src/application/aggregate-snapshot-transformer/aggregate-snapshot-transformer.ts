@@ -1,7 +1,7 @@
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import type { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
 import type { AbstractEventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
-import type { Snapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
+import type { SerializedSnapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 
 class AggregateSnapshotTransformer {
@@ -9,7 +9,7 @@ class AggregateSnapshotTransformer {
         origin: string,
         aggregateType: string,
         aggregate: InstanceType<typeof AbstractAggregateRoot>
-    ): Snapshot {
+    ): SerializedSnapshot {
         const aggregateSnapshot = instanceToPlain(aggregate);
 
         return {
@@ -23,7 +23,7 @@ class AggregateSnapshotTransformer {
 
     public restoreFromSnapshot<TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>>(
         aggregateClass: TAggregateRootClass,
-        snapshot: Snapshot
+        snapshot: SerializedSnapshot
     ): InstanceType<TAggregateRootClass> {
         const { aggregateId, domainEventSequenceNumber, snapshot: snapshotData } = snapshot;
 
