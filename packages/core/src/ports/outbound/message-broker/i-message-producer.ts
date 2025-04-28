@@ -1,4 +1,4 @@
-import type { ISerializedDomainEvent } from "../../../domain/abstract-domain-event/i-serialized-domain-event.js";
+import type { SerializedDomainEvent } from "../../../domain/abstract-domain-event/serialized-domain-event.js";
 import type { IMessageChannelParticipant } from "../../common/message-broker/i-message-channel-participant.js";
 import type { TransactionContext } from "../transaction-manager/i-transaction-manager.js";
 
@@ -16,7 +16,7 @@ export interface IMessageProducer extends IMessageChannelParticipant {
      */
     publishDomainEventsAsMessages(
         transactionContext: TransactionContext | null,
-        domainEvents: ISerializedDomainEvent[],
+        domainEvents: SerializedDomainEvent[],
         messageChannelId: string
     ): Promise<void>;
 }

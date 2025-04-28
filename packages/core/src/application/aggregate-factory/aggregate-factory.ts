@@ -1,4 +1,4 @@
-import type { ISerializedDomainEvent } from "../../domain/abstract-domain-event/i-serialized-domain-event.js";
+import type { SerializedDomainEvent } from "../../domain/abstract-domain-event/serialized-domain-event.js";
 import type { AbstractEventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
 import { aggregateDomainEventApplier } from "../../domain/aggregate-domain-event-applier/aggregate-domain-event-applier.js";
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
@@ -159,7 +159,7 @@ export class AggregateFactory<
 
     private deserializeAndApplyDomainEventsToAggregate(
         aggregate: InstanceType<TAggregateRootClass>,
-        serializedDomainEvents: ISerializedDomainEvent[]
+        serializedDomainEvents: SerializedDomainEvent[]
     ): InstanceType<TAggregateRootClass> {
         const logContext = this.getLogContext(aggregate.getId());
 

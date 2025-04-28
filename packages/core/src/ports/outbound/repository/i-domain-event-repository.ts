@@ -1,4 +1,4 @@
-import type { ISerializedDomainEvent } from "../../../domain/abstract-domain-event/i-serialized-domain-event.js";
+import type { SerializedDomainEvent } from "../../../domain/abstract-domain-event/serialized-domain-event.js";
 import type { TransactionContext } from "../transaction-manager/i-transaction-manager.js";
 
 /**
@@ -21,7 +21,7 @@ export interface IDomainEventRepository {
         aggregateType: string,
         aggregateId: string,
         fromSequenceNumber?: number
-    ): Promise<ISerializedDomainEvent[]>;
+    ): Promise<SerializedDomainEvent[]>;
 
     /**
      * Saves a list of domain events to the repository.
@@ -31,5 +31,5 @@ export interface IDomainEventRepository {
      * @param transactionContext
      * @param events
      */
-    saveDomainEvents(transactionContext: TransactionContext | null, events: ISerializedDomainEvent[]): Promise<void>;
+    saveDomainEvents(transactionContext: TransactionContext | null, events: SerializedDomainEvent[]): Promise<void>;
 }

@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { AbstractDomainEvent } from "./abstract-domain-event.js";
-import type { ISerializedDomainEvent } from "./i-serialized-domain-event.js";
+import type { SerializedDomainEvent } from "./serialized-domain-event.js";
 
 class TestDomainEvent extends AbstractDomainEvent<{ key: string }> {
     public static readonly origin = "TestOrigin";
@@ -83,7 +83,7 @@ describe("AbstractDomainEvent", () => {
 
     describe("deserialize", () => {
         it("should deserialize the event correctly", () => {
-            const serializedDomainEvent: ISerializedDomainEvent = {
+            const serializedDomainEvent: SerializedDomainEvent = {
                 origin: "TestOrigin",
                 aggregateType: "TestAggregate",
                 type: "TestType",
@@ -114,7 +114,7 @@ describe("AbstractDomainEvent", () => {
         });
 
         it("should deserialize the event into the correct type", () => {
-            const serializedDomainEvent: ISerializedDomainEvent = {
+            const serializedDomainEvent: SerializedDomainEvent = {
                 origin: "TestOrigin",
                 aggregateType: "TestAggregate",
                 type: "TestType",

@@ -1,6 +1,6 @@
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 import type { SerializableObject } from "../../types/serializable-object.type.js";
-import type { ISerializedDomainEvent } from "./i-serialized-domain-event.js";
+import type { SerializedDomainEvent } from "./serialized-domain-event.js";
 
 export type DomainEventPayload = SerializableObject | null;
 
@@ -144,7 +144,7 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
         return this;
     }
 
-    public serialize(): ISerializedDomainEvent {
+    public serialize(): SerializedDomainEvent {
         return {
             origin: this.getOrigin(),
             aggregateType: this.getAggregateType(),
@@ -164,7 +164,7 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
 
     public static deserialize<TDomainEventClass extends new (...args: any) => AbstractDomainEvent<any>>(
         this: TDomainEventClass,
-        serializedDomainEvent: ISerializedDomainEvent
+        serializedDomainEvent: SerializedDomainEvent
     ): InstanceType<TDomainEventClass> {
         const instance = new (this as unknown as RemoveAbstract<TDomainEventClass>)(serializedDomainEvent.aggregateId);
 

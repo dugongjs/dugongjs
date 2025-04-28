@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import type { AbstractDomainEvent } from "../abstract-domain-event/abstract-domain-event.js";
-import type { ISerializedDomainEvent } from "../abstract-domain-event/i-serialized-domain-event.js";
+import type { SerializedDomainEvent } from "../abstract-domain-event/serialized-domain-event.js";
 import { domainEventRegistry } from "../domain-event-registry/domain-event-registry.js";
 import { domainEventDeserializer } from "./domain-event-deserializer.js";
 
@@ -24,7 +24,7 @@ describe("DomainEventDeserializer", () => {
                 () => mockDomainEventClass as unknown as typeof AbstractDomainEvent
             );
 
-            const serializedEvents: ISerializedDomainEvent[] = [
+            const serializedEvents: SerializedDomainEvent[] = [
                 {
                     aggregateType: "TestAggregate",
                     type: "TestType",
@@ -53,7 +53,7 @@ describe("DomainEventDeserializer", () => {
         it("should filter out events with no matching domain event class", () => {
             vi.spyOn(domainEventRegistry, "getDomainEventClass").mockImplementation(() => null);
 
-            const serializedEvents: ISerializedDomainEvent[] = [
+            const serializedEvents: SerializedDomainEvent[] = [
                 {
                     aggregateType: "testAggregate",
                     type: "testType",

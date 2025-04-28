@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { mock, mockReset } from "vitest-mock-extended";
 import { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
 import type { AbstractDomainEvent } from "../../domain/abstract-domain-event/abstract-domain-event.js";
-import type { ISerializedDomainEvent } from "../../domain/abstract-domain-event/i-serialized-domain-event.js";
+import type { SerializedDomainEvent } from "../../domain/abstract-domain-event/serialized-domain-event.js";
 import { aggregateDomainEventApplier } from "../../domain/aggregate-domain-event-applier/aggregate-domain-event-applier.js";
 import {
     aggregateMetadataRegistry,
@@ -89,7 +89,7 @@ describe("AggregateFactory", () => {
             const mockSerializedEvents = [
                 { id: faker.string.uuid() },
                 { id: faker.string.uuid() }
-            ] as ISerializedDomainEvent[];
+            ] as SerializedDomainEvent[];
 
             mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce(mockSerializedEvents);
 
@@ -160,7 +160,7 @@ describe("AggregateFactory", () => {
             const mockSerializedEvents = [
                 { id: faker.string.uuid() },
                 { id: faker.string.uuid() }
-            ] as ISerializedDomainEvent[];
+            ] as SerializedDomainEvent[];
 
             mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce(mockSerializedEvents);
             domainEventDeserializer.deserializeDomainEvents = vi.fn(

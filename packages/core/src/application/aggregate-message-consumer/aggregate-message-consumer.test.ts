@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { mock, mockReset } from "vitest-mock-extended";
 import type { AbstractDomainEvent } from "../../domain/abstract-domain-event/abstract-domain-event.js";
-import type { ISerializedDomainEvent } from "../../domain/abstract-domain-event/i-serialized-domain-event.js";
+import type { SerializedDomainEvent } from "../../domain/abstract-domain-event/serialized-domain-event.js";
 import { aggregateMetadataRegistry } from "../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
 import type { IMessageConsumer } from "../../ports/inbound/message-broker/i-message-consumer.js";
@@ -57,7 +57,7 @@ describe("AggregateMessageConsumer", () => {
 
     const domainEventId = faker.string.uuid();
 
-    const serializedDomainEvent: ISerializedDomainEvent = {
+    const serializedDomainEvent: SerializedDomainEvent = {
         origin: "TestOrigin",
         aggregateType: "TestAggregate",
         type: "TestType",

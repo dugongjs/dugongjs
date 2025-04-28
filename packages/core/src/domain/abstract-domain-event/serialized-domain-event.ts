@@ -1,6 +1,6 @@
 import type { SerializableObject } from "../../types/serializable-object.type.js";
 
-export interface ISerializedDomainEvent {
+export type SerializedDomainEvent = {
     origin: string;
     aggregateType: string;
     type: string;
@@ -14,4 +14,4 @@ export interface ISerializedDomainEvent {
     triggeredByEventId?: string;
     triggeredByUserId?: string;
     metadata?: SerializableObject;
-}
+};
