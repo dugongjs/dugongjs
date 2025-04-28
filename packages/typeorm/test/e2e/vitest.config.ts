@@ -11,7 +11,7 @@ export default defineConfig({
         reporters: ["default"],
         fileParallelism: false,
         globalSetup: ["./setup/global-setup/setup-postgresql-testcontainer.ts"],
-        setupFiles: ["./setup/setup/data-source.ts"],
+        setupFiles: ["./setup/setup/reflect-metadata.ts", "./setup/setup/data-source.ts"],
         env: {
             ...config({ path: "./test/e2e/.env.e2e" }).parsed
         },
