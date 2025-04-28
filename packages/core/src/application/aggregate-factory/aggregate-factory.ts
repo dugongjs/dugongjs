@@ -168,7 +168,7 @@ export class AggregateFactory<
         if (serializedDomainEvents.length !== domainEvents.length) {
             this.logger.warn(
                 logContext,
-                `Failed to deserialize all domain events, found ${serializedDomainEvents.length} but only ${domainEvents.length} were found`
+                `Failed to deserialize all domain events, ${serializedDomainEvents.length} were found for the aggregate but ${domainEvents.length} were deserialized - this may be caused by a stale domain event collection or a missing '@DomainEvent()' decorator on the domain event class`
             );
         }
 
