@@ -5,7 +5,8 @@ export default defineConfig({
     test: {
         globals: true,
         root: "./",
-        reporters: "verbose"
+        reporters: "verbose",
+        setupFiles: ["./src/test/setup/reflect-metadata.ts"]
     },
     plugins: [swc.vite()]
 });
