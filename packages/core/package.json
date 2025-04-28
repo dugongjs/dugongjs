@@ -9,8 +9,8 @@
     },
     "scripts": {
         "test:typecheck": "tsc --noEmit",
-        "test:run": "vitest run",
-        "test:watch": "vitest watch",
+        "test:unit:run": "vitest run",
+        "test:unit:watch": "vitest watch",
         "test": "pnpm test:typecheck && pnpm test:run",
         "lint": "eslint ."
     },
