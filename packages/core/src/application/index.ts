@@ -2,6 +2,8 @@ export {
     AbstractAggregateHandler,
     type AbstractAggregateHandlerOptions
 } from "./abstract-aggregate-handler/abstract-aggregate-handler.js";
+export { AggregateContext, type AggregateContextOptions } from "./aggregate-context/aggregate-context.js";
+export { AggregateManagerNotAvailableError } from "./aggregate-context/errors/aggregate-manager-not-available-error.js";
 export {
     AggregateFactory,
     type AggregateFactoryOptions,
