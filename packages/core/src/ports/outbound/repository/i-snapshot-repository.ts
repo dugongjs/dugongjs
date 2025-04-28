@@ -5,7 +5,7 @@ export type SerializedSnapshot = {
     aggregateType: string;
     aggregateId: string;
     domainEventSequenceNumber: number;
-    snapshot: any;
+    snapshotData: any;
 };
 
 /**
@@ -33,18 +33,7 @@ export interface ISnapshotRepository {
      * Saves a snapshot for a specific aggregate.
      * May append or overwrite any existing snapshot.
      * @param transactionContext Transaction context for the operation, or null if not using transactions.
-     * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
-     * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
-     * @param aggregateId The ID of the aggregate, used to uniquely identify the aggregate.
-     * @param domainEventSequenceNumber The sequence number of the domain event that triggered the snapshot.
-     * @param snapshot The snapshot data to be saved.
+     * @param snapshot The snapshot to save.
      */
-    saveSnapshot(
-        transactionContext: TransactionContext | null,
-        origin: string,
-        aggregateType: string,
-        aggregateId: string,
-        domainEventSequenceNumber: number,
-        snapshot: any
-    ): Promise<void>;
+    saveSnapshot(transactionContext: TransactionContext | null, snapshot: SerializedSnapshot): Promise<void>;
 }

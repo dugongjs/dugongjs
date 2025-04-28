@@ -5,6 +5,7 @@ import type { IDomainEventRepository } from "../../ports/outbound/repository/i-d
 import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
 import type { TransactionContext } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
+import type { SerializableObject } from "../../types/serializable-object.type.js";
 import {
     AbstractAggregateHandler,
     type AbstractAggregateHandlerOptions
@@ -23,6 +24,7 @@ export type CommitOptions = {
     correlationId?: string;
     triggeredByUserId?: string;
     triggeredByEventId?: string;
+    metadata?: SerializableObject;
 };
 
 export class AggregateManager<
@@ -70,6 +72,9 @@ export class AggregateManager<
             if (options.triggeredByEventId) {
                 domainEvent.setTriggeredByEventId(options.triggeredByEventId);
             }
+            if (options.metadata) {
+                domainEvent.setMetadata(options.metadata);
+            }
         }
 
         const serializedEvents = stagedDomainEvents.map((domainEvent) => domainEvent.serialize());
@@ -105,6 +110,14 @@ export class AggregateManager<
         await this.createSnapshotIfNecessary(aggregate);
     }
 
+    public async applyAndCommitStagedDomainEvents(
+        aggregate: InstanceType<TAggregateRootClass>,
+        options: CommitOptions = {}
+    ): Promise<void> {
+        this.applyStagedDomainEvents(aggregate);
+        await this.commitStagedDomainEvents(aggregate, options);
+    }
+
     private async createSnapshotIfNecessary(aggregate: InstanceType<TAggregateRootClass>): Promise<void> {
         const aggregateId = aggregate.getId();
 
@@ -116,7 +129,8 @@ export class AggregateManager<
 
         const currentDomainEventSequenceNumber = aggregate.getCurrentDomainEventSequenceNumber();
 
-        const shouldCreateSnapshot = currentDomainEventSequenceNumber % this.snapshotInterval === 0;
+        const shouldCreateSnapshot =
+            currentDomainEventSequenceNumber > 0 && currentDomainEventSequenceNumber % this.snapshotInterval === 0;
 
         if (!shouldCreateSnapshot) {
             return;
@@ -129,14 +143,7 @@ export class AggregateManager<
 
         const snapshot = aggregateSnapshotTransformer.takeSnapshot(this.aggregateOrigin, this.aggregateType, aggregate);
 
-        await this.snapshotRepository.saveSnapshot(
-            this.transactionContext,
-            this.aggregateOrigin,
-            this.aggregateType,
-            aggregateId,
-            currentDomainEventSequenceNumber,
-            snapshot
-        );
+        await this.snapshotRepository.saveSnapshot(this.transactionContext, snapshot);
 
         this.logger.verbose(
             logContext,

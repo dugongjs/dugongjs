@@ -59,7 +59,7 @@ describe("AggregateFactory", () => {
             const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 1,
-                snapshot: {
+                snapshotData: {
                     username: faker.internet.userName()
                 },
                 origin: currentOrigin,
@@ -98,7 +98,7 @@ describe("AggregateFactory", () => {
             const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 3,
-                snapshot: {
+                snapshotData: {
                     username: faker.internet.userName()
                 },
                 origin: currentOrigin,
@@ -127,7 +127,7 @@ describe("AggregateFactory", () => {
             const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 3,
-                snapshot: {
+                snapshotData: {
                     username: faker.internet.userName()
                 },
                 origin: currentOrigin,
@@ -235,7 +235,7 @@ describe("AggregateFactory", () => {
             const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 1,
-                snapshot: {
+                snapshotData: {
                     username: faker.internet.userName()
                 },
                 origin: currentOrigin,
@@ -256,7 +256,7 @@ describe("AggregateFactory", () => {
             const snapshot: SerializedSnapshot = {
                 aggregateId: userId,
                 domainEventSequenceNumber: 3,
-                snapshot: {
+                snapshotData: {
                     username: faker.internet.userName()
                 },
                 origin: currentOrigin,

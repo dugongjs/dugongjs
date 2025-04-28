@@ -172,7 +172,7 @@ describe("AggregateFactory", () => {
                 origin: "CurrentOrigin",
                 aggregateType: "TestType",
                 aggregateId: aggregateId,
-                snapshot: {}
+                snapshotData: {}
             };
 
             mockSnapshotRepository.getLatestSnapshot.mockResolvedValueOnce(latestSnapshot);

@@ -13,11 +13,11 @@ class AggregateSnapshotTransformer {
         const aggregateSnapshot = instanceToPlain(aggregate);
 
         return {
+            origin: origin,
+            aggregateType: aggregateType,
             aggregateId: aggregate.getId(),
             domainEventSequenceNumber: aggregate.getCurrentDomainEventSequenceNumber(),
-            snapshot: aggregateSnapshot,
-            origin: origin,
-            aggregateType: aggregateType
+            snapshotData: aggregateSnapshot
         };
     }
 
@@ -25,10 +25,12 @@ class AggregateSnapshotTransformer {
         aggregateClass: TAggregateRootClass,
         snapshot: SerializedSnapshot
     ): InstanceType<TAggregateRootClass> {
-        const { aggregateId, domainEventSequenceNumber, snapshot: snapshotData } = snapshot;
+        const { aggregateId, domainEventSequenceNumber, snapshotData } = snapshot;
 
         const aggregate = plainToInstance(aggregateClass, snapshotData);
-        aggregate.setId(aggregateId);
+        if (!aggregate.getId()) {
+            aggregate.setId(aggregateId);
+        }
         aggregate.setCurrentDomainEventSequenceNumber(domainEventSequenceNumber);
 
         return aggregate as InstanceType<TAggregateRootClass>;
