@@ -18,7 +18,7 @@ export type AggregateFactoryOptions<
 > = AbstractAggregateHandlerOptions<TAggregateRootClass> & {
     transactionContext: TransactionContext | null;
     domainEventRepository: IDomainEventRepository;
-    snapshotRepository: ISnapshotRepository;
+    snapshotRepository?: ISnapshotRepository;
 };
 
 export type BuildOptions = {
@@ -26,12 +26,16 @@ export type BuildOptions = {
     skipSnapshot?: boolean;
 };
 
+export type BuildFromEventLogOptions = {
+    toSequenceNumber?: number;
+};
+
 export class AggregateFactory<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
 > extends AbstractAggregateHandler<TAggregateRootClass> {
     private readonly transactionContext: TransactionContext | null;
     private readonly domainEventRepository: IDomainEventRepository;
-    private readonly snapshotRepository: ISnapshotRepository;
+    private readonly snapshotRepository?: ISnapshotRepository;
 
     constructor(options: AggregateFactoryOptions<TAggregateRootClass>) {
         super(options);
@@ -50,7 +54,7 @@ export class AggregateFactory<
 
         let aggregate: InstanceType<TAggregateRootClass> | null = null;
 
-        if (this.isSnapshotable && !options.skipSnapshot) {
+        if (this.snapshotRepository && this.isSnapshotable && !options.skipSnapshot) {
             this.logger.verbose(
                 logContext,
                 `${this.aggregateType} aggregate is snapshotable, attempting to build from snapshot`
@@ -84,7 +88,10 @@ export class AggregateFactory<
         return aggregate;
     }
 
-    public async buildFromEventLog(aggregateId: string): Promise<InstanceType<TAggregateRootClass> | null> {
+    public async buildFromEventLog(
+        aggregateId: string,
+        options: BuildFromEventLogOptions = {}
+    ): Promise<InstanceType<TAggregateRootClass> | null> {
         this.validateAggregateId(aggregateId);
 
         const logContext = this.getLogContext(aggregateId);
@@ -123,13 +130,41 @@ export class AggregateFactory<
 
         const aggregate = new this.aggregateClass().setId(aggregateId) as InstanceType<TAggregateRootClass>;
 
-        return this.deserializeAndApplyDomainEventsToAggregate(aggregate, serializedDomainEvents);
+        let serializedDomainEventsToApply = serializedDomainEvents;
+
+        if (options.toSequenceNumber) {
+            const maxSequenceNumber = Math.max(...serializedDomainEvents.map((event) => event.sequenceNumber));
+
+            if (options.toSequenceNumber > maxSequenceNumber) {
+                this.logger.error(
+                    logContext,
+                    `Requested toSequenceNumber ${options.toSequenceNumber} is greater than the maximum sequence number ${maxSequenceNumber} for ${this.aggregateType} aggregate ${aggregateId}`
+                );
+                return null;
+            }
+
+            this.logger.verbose(
+                logContext,
+                `Building ${this.aggregateType} aggregate ${aggregateId} to sequence number ${options.toSequenceNumber}`
+            );
+
+            serializedDomainEventsToApply = serializedDomainEvents.filter(
+                (event) => event.sequenceNumber <= options.toSequenceNumber!
+            );
+        }
+
+        return this.deserializeAndApplyDomainEventsToAggregate(aggregate, serializedDomainEventsToApply);
     }
 
     public async buildFromLatestSnapshot(aggregateId: string): Promise<InstanceType<TAggregateRootClass> | null> {
         this.validateAggregateId(aggregateId);
 
         const logContext = this.getLogContext(aggregateId);
+
+        if (!this.snapshotRepository) {
+            this.logger.verbose(logContext, `Snapshot repository not available, skipping snapshot build`);
+            return null;
+        }
 
         this.logger.verbose(logContext, `Fetching latest snapshot for ${this.aggregateType} aggregate ${aggregateId}`);
 

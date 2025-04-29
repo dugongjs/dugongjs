@@ -7,13 +7,14 @@ import type { TransactionContext } from "../transaction-manager/i-transaction-ma
 export interface IDomainEventRepository {
     /**
      * Retrieves a list of domain events for a specific aggregate.
-     * MUST return all domain events for the given aggregate type and ID.
-     * MUST return an empty array if no events are found.
+     * - Must return all domain events for the given aggregate type and ID.
+     * - Must return an empty array if no events are found.
      * @param transactionContext Transaction context for the operation, or null if not using transactions.
      * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateId The ID of the aggregate, used to uniquely identify the aggregate.
      * @param fromSequenceNumber The sequence number to start retrieving events from (inclusive).
+     * @returns A promise that resolves to an array of serialized domain events.
      */
     getAggregateDomainEvents(
         transactionContext: TransactionContext | null,
@@ -24,12 +25,25 @@ export interface IDomainEventRepository {
     ): Promise<SerializedDomainEvent[]>;
 
     /**
+     * Retrieves all aggregate IDs for a specific origin and aggregate type.
+     * @param transactionContext Transaction context for the operation, or null if not using transactions.
+     * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
+     * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
+     * @returns A promise that resolves to an array of aggregate IDs.
+     */
+    getAggregateIds(
+        transactionContext: TransactionContext | null,
+        origin: string,
+        aggregateType: string
+    ): Promise<string[]>;
+
+    /**
      * Saves a list of domain events to the repository.
-     * MUST insert the events into the database.
-     * MUST throw an error if there is a conflict with the event ID.
-     * MUST throw an error if there is a conflict with the composite [origin, aggregateType, aggregateId, sequenceNumber] to ensure optimistic concurrency.
-     * @param transactionContext
-     * @param events
+     * - Must insert the events into the database.
+     * - Must throw an error if there is a conflict with the event ID.
+     * - Must throw an error if there is a conflict with the composite [origin, aggregateType, aggregateId, sequenceNumber] to ensure optimistic concurrency.
+     * @param transactionContext Transaction context for the operation, or null if not using transactions.
+     * @param events The list of serialized domain events to save.
      */
     saveDomainEvents(transactionContext: TransactionContext | null, events: SerializedDomainEvent[]): Promise<void>;
 }

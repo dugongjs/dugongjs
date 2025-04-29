@@ -23,6 +23,10 @@ export {
     type HandleMessageContext,
     type HandleMessageOptions
 } from "./aggregate-message-consumer/aggregate-message-consumer.js";
+export {
+    AggregateQueryService,
+    type AggregateQueryServiceOptions
+} from "./aggregate-query-service/aggregate-query-service.js";
 export { aggregateSnapshotTransformer } from "./aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 export type { ILogger } from "./logger/i-logger.js";
 export { VoidLogger } from "./logger/void-logger.js";
