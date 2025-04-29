@@ -30,6 +30,25 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
         return serializedDomainEvents;
     }
 
+    public async getAggregateIds(
+        transactionContext: EntityManager | null,
+        origin: string,
+        aggregateType: string
+    ): Promise<string[]> {
+        const domainEventRepository =
+            transactionContext?.getRepository(DomainEventEntity) ?? this.domainEventRepository;
+
+        const aggregateIds = await domainEventRepository
+            .createQueryBuilder("domainEvent")
+            .select("DISTINCT domainEvent.aggregateId", "aggregateId")
+            .where("domainEvent.origin = :origin", { origin })
+            .andWhere("domainEvent.aggregateType = :aggregateType", { aggregateType })
+            .orderBy("domainEvent.aggregateId", "ASC")
+            .getRawMany();
+
+        return aggregateIds;
+    }
+
     public async saveDomainEvents(
         transactionContext: EntityManager | null,
         events: SerializedDomainEvent[]
