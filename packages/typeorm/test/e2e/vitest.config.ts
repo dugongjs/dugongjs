@@ -1,5 +1,4 @@
 import { config } from "dotenv";
-import "reflect-metadata";
 import swc from "unplugin-swc";
 import { defineConfig } from "vitest/config";
 
