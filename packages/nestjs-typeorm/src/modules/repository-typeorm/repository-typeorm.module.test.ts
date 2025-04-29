@@ -1,8 +1,8 @@
 import { IConsumedMessageRepository, IDomainEventRepository, ISnapshotRepository } from "@dugongjs/core";
+import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm";
 import { Test, TestingModule } from "@nestjs/testing";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
-import { mockDeep } from "vitest-mock-extended";
+import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
+import { mock } from "vitest-mock-extended";
 import { RepositoryTypeOrmModule } from "./repository-typeorm.module.js";
 
 describe("RepositoryTypeOrmModule", () => {
@@ -13,10 +13,17 @@ describe("RepositoryTypeOrmModule", () => {
 
     beforeEach(async () => {
         app = await Test.createTestingModule({
-            imports: [TypeOrmModule.forRoot(), RepositoryTypeOrmModule.forRoot()]
+            imports: [
+                TypeOrmModule.forFeature([DomainEventEntity, SnapshotEntity, ConsumedMessageEntity]),
+                RepositoryTypeOrmModule
+            ]
         })
-            .overrideProvider(DataSource)
-            .useValue(mockDeep<DataSource>())
+            .overrideProvider(getRepositoryToken(DomainEventEntity))
+            .useValue(mock())
+            .overrideProvider(getRepositoryToken(SnapshotEntity))
+            .useValue(mock())
+            .overrideProvider(getRepositoryToken(ConsumedMessageEntity))
+            .useValue(mock())
             .compile();
 
         domainEventRepository = app.get(IDomainEventRepository);

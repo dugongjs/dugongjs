@@ -1,8 +1,8 @@
 import { IMessageProducer } from "@dugongjs/core";
+import { OutboxEntity } from "@dugongjs/typeorm";
 import { Test, TestingModule } from "@nestjs/testing";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
-import { mockDeep } from "vitest-mock-extended";
+import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
+import { mock } from "vitest-mock-extended";
 import { OutboxMessageProducerTypeOrmModule } from "./outbox-message-producer-typeorm.module.js";
 import { OutboxMessageProducerTypeOrmService } from "./outbox-message-producer-typeorm.service.js";
 
@@ -12,10 +12,10 @@ describe("OutboxMessageProducerTypeOrmModule", () => {
 
     beforeEach(async () => {
         app = await Test.createTestingModule({
-            imports: [TypeOrmModule.forRoot(), OutboxMessageProducerTypeOrmModule.forRoot()]
+            imports: [TypeOrmModule.forFeature([OutboxEntity]), OutboxMessageProducerTypeOrmModule]
         })
-            .overrideProvider(DataSource)
-            .useValue(mockDeep<DataSource>())
+            .overrideProvider(getRepositoryToken(OutboxEntity))
+            .useValue(mock())
             .compile();
 
         outboxMessageProducer = app.get(IMessageProducer);
