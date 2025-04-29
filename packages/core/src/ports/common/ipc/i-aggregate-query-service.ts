@@ -12,22 +12,22 @@ export interface IAggregateQueryService {
 
     /**
      * Retrieves a list of aggregate IDs for a specific origin and aggregate type.
-     * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
+     * @param origin The origin of the aggregate (or null to use the current origin), used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
      * @returns A promise that resolves to an array of aggregate IDs.
      */
-    getAggregateIds(origin: string, aggregateType: string): Promise<string[]>;
+    getAggregateIds(origin: string | null, aggregateType: string): Promise<string[]>;
 
     /**
      * Retrieves an aggregate by its origin, type, and ID.
-     * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
+     * @param origin The origin of the aggregate (or null to use the current origin), used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateId The ID of the aggregate, used to uniquely identify the aggregate.
      * @param toSequenceNumber The sequence number to build the aggregate up to (inclusive).
      * @returns A promise that resolves to the aggregate object, or null if not found.
      */
     getAggregate(
-        origin: string,
+        origin: string | null,
         aggregateType: string,
         aggregateId: string,
         toSequenceNumber?: number
@@ -35,13 +35,13 @@ export interface IAggregateQueryService {
 
     /**
      * Retrieves a list of domain events for a specific aggregate.
-     * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
+     * @param origin The origin of the aggregate (or null to use the current origin), used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateId The ID of the aggregate, used to uniquely identify the aggregate.
      * @returns A promise that resolves to an array of serialized domain events.
      */
     getDomainEventsForAggregate(
-        origin: string,
+        origin: string | null,
         aggregateType: string,
         aggregateId: string
     ): Promise<SerializedDomainEvent[]>;

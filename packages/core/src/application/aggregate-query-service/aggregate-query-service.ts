@@ -25,8 +25,8 @@ export class AggregateQueryService implements IAggregateQueryService {
         return aggregateMetadataRegistry.getAggregateTypes();
     }
 
-    public async getAggregateIds(origin: string, aggregateType: string): Promise<string[]> {
-        return this.domainEventRepository.getAggregateIds(null, origin, aggregateType);
+    public async getAggregateIds(origin: string | null, aggregateType: string): Promise<string[]> {
+        return this.domainEventRepository.getAggregateIds(null, origin ?? this.currentOrigin, aggregateType);
     }
 
     public async getAggregate(
@@ -55,10 +55,15 @@ export class AggregateQueryService implements IAggregateQueryService {
     }
 
     public async getDomainEventsForAggregate(
-        origin: string,
+        origin: string | null,
         aggregateType: string,
         aggregateId: string
     ): Promise<SerializedDomainEvent[]> {
-        return this.domainEventRepository.getAggregateDomainEvents(null, origin, aggregateType, aggregateId);
+        return this.domainEventRepository.getAggregateDomainEvents(
+            null,
+            origin ?? this.currentOrigin,
+            aggregateType,
+            aggregateId
+        );
     }
 }
