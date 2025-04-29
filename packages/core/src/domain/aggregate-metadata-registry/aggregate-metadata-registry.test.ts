@@ -83,6 +83,68 @@ describe("AggregateMetadataRegistry", () => {
         });
     });
 
+    describe("getAggregateClass", () => {
+        it("should return the aggregate class for the given type and origin", () => {
+            registry.registerExternalAggregateMetadata(TestAggregateRoot, "TestType", "TestOrigin");
+
+            const aggregateClass = registry.getAggregateClass("TestType", "TestOrigin");
+            expect(aggregateClass).toBe(TestAggregateRoot);
+        });
+
+        it("should return the aggregate class for the given type without origin", () => {
+            registry.registerAggregateMetadata(TestAggregateRoot, "TestType");
+
+            const aggregateClass = registry.getAggregateClass("TestType");
+            expect(aggregateClass).toBe(TestAggregateRoot);
+        });
+
+        it("should return null if no matching aggregate class is found", () => {
+            const aggregateClass = registry.getAggregateClass("NonExistentType", "NonExistentOrigin");
+            expect(aggregateClass).toBeNull();
+        });
+    });
+
+    describe("getAggregateTypes", () => {
+        it("should return all registered aggregate types", () => {
+            registry.registerAggregateMetadata(TestAggregateRoot, "TestType1");
+            class AnotherAggregateRoot {}
+            registry.registerAggregateMetadata(AnotherAggregateRoot, "TestType2");
+
+            const types = registry.getAggregateTypes();
+            expect(types).toEqual(["TestType1", "TestType2"]);
+        });
+
+        it("should return an empty array if no aggregates are registered", () => {
+            const types = registry.getAggregateTypes();
+            expect(types).toEqual([]);
+        });
+    });
+
+    describe("getAllAggregateMetadata", () => {
+        it("should return all registered aggregate metadata", () => {
+            registry.registerAggregateMetadata(TestAggregateRoot, "TestType1");
+            class AnotherAggregateRoot {}
+            registry.registerExternalAggregateMetadata(AnotherAggregateRoot, "TestType2", "TestOrigin");
+
+            const allMetadata = registry.getAllAggregateMetadata();
+            expect(allMetadata.size).toBe(2);
+            expect(allMetadata.get(TestAggregateRoot)).toEqual({
+                isInternal: true,
+                type: "TestType1"
+            });
+            expect(allMetadata.get(AnotherAggregateRoot)).toEqual({
+                isInternal: false,
+                type: "TestType2",
+                origin: "TestOrigin"
+            });
+        });
+
+        it("should return an empty map if no metadata is registered", () => {
+            const allMetadata = registry.getAllAggregateMetadata();
+            expect(allMetadata.size).toBe(0);
+        });
+    });
+
     describe("getAggregateMetadata", () => {
         it("should return null if no metadata is registered", () => {
             const metadata = registry.getAggregateMetadata(TestAggregateRoot);

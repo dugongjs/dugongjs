@@ -108,6 +108,20 @@ class AggregateMetadataRegistry {
         return domainEventApplierMap.get(domainEventClass) ?? null;
     }
 
+    public getAggregateClass(type: string, origin?: string): Constructor | null {
+        for (const [aggregateClass, metadata] of this.aggregateMetadataMap.entries()) {
+            if (metadata.type === type && metadata.origin === origin) {
+                return aggregateClass;
+            }
+        }
+
+        return null;
+    }
+
+    public getAggregateTypes(): string[] {
+        return Array.from(this.aggregateMetadataMap.values()).map((metadata) => metadata.type);
+    }
+
     public getAllAggregateMetadata(): Map<Constructor, AggregateMetadata> {
         return this.aggregateMetadataMap;
     }
