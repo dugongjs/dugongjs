@@ -16,3 +16,6 @@ export type {
     SnapshotRepositoryProvider,
     TransactionManagerProvider
 } from "./module-providers.js";
+export { EventIssuerModule, type EventIssuerModuleOptions } from "./modules/event-issuer.module.js";
+export { EventSourcingModule, type EventSourcingModuleOptions } from "./modules/event-sourcing.module.js";
+export { EventSourcingService } from "./services/event-sourcing.service.js";
