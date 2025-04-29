@@ -18,4 +18,5 @@ export type {
 } from "./module-providers.js";
 export { EventIssuerModule, type EventIssuerModuleOptions } from "./modules/event-issuer.module.js";
 export { EventSourcingModule, type EventSourcingModuleOptions } from "./modules/event-sourcing.module.js";
+export { AggregateQueryService } from "./services/aggregate-query.service.js";
 export { EventSourcingService } from "./services/event-sourcing.service.js";
