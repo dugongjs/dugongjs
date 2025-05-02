@@ -2,6 +2,7 @@ import { aggregateMetadataRegistry, type SerializedDomainEvent } from "../../dom
 import type { IAggregateQueryService } from "../../ports/common/ipc/i-aggregate-query-service.js";
 import type { IDomainEventRepository } from "../../ports/index.js";
 import { AggregateFactory } from "../aggregate-factory/aggregate-factory.js";
+import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import type { ILogger } from "../logger/i-logger.js";
 
 export type AggregateQueryServiceOptions = {
@@ -50,6 +51,18 @@ export class AggregateQueryService implements IAggregateQueryService {
         });
 
         const aggregate = await factory.buildFromEventLog(aggregateId, { toSequenceNumber });
+
+        const snapshotMetadata = aggregateMetadataRegistry.getAggregateSnapshotMetadata(aggregateClass);
+
+        if (snapshotMetadata) {
+            const snapshot = await aggregateSnapshotTransformer.takeSnapshot(
+                origin ?? this.currentOrigin,
+                aggregateType,
+                aggregate
+            );
+
+            return snapshot.snapshotData;
+        }
 
         return aggregate;
     }
