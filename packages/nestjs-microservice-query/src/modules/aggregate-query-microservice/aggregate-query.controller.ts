@@ -24,8 +24,14 @@ export class AggregateQueryController {
     }
 
     @MessagePattern(GET_AGGREGATE_TOKEN)
-    public getAggregate(args: Parameters<IAggregateQueryService["getAggregate"]>): Promise<object | null> {
-        return this.aggregateQueryService.getAggregate(...args);
+    public async getAggregate(args: Parameters<IAggregateQueryService["getAggregate"]>): Promise<string | null> {
+        const aggregate = await this.aggregateQueryService.getAggregate(...args);
+
+        if (aggregate === null) {
+            return null;
+        }
+
+        return JSON.stringify(aggregate);
     }
 
     @MessagePattern(GET_DOMAIN_EVENTS_FOR_AGGREGATE_TOKEN)

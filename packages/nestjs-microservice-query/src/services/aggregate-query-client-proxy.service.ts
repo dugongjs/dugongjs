@@ -27,9 +27,15 @@ export class AggregateQueryClientProxyService implements IAggregateQueryService 
         aggregateId: string,
         toSequenceNumber?: number
     ): Promise<object | null> {
-        return await firstValueFrom(
+        const aggregate = await firstValueFrom(
             this.queryClientProxy.send(GET_AGGREGATE_TOKEN, [origin, aggregateType, aggregateId, toSequenceNumber])
         );
+
+        if (aggregate === null) {
+            return null;
+        }
+
+        return JSON.parse(aggregate);
     }
 
     public async getDomainEventsForAggregate(
@@ -40,5 +46,9 @@ export class AggregateQueryClientProxyService implements IAggregateQueryService 
         return await firstValueFrom(
             this.queryClientProxy.send(GET_DOMAIN_EVENTS_FOR_AGGREGATE_TOKEN, [origin, aggregateType, aggregateId])
         );
+    }
+
+    public async close(): Promise<void> {
+        await this.queryClientProxy.close();
     }
 }
