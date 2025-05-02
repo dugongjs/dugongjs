@@ -46,7 +46,7 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
             .orderBy("domainEvent.aggregateId", "ASC")
             .getRawMany();
 
-        return aggregateIds;
+        return aggregateIds.map((row) => row.aggregateId);
     }
 
     public async saveDomainEvents(
