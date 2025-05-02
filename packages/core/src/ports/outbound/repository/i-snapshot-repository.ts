@@ -14,8 +14,8 @@ export type SerializedSnapshot = {
 export interface ISnapshotRepository {
     /**
      * Retrieves the latest snapshot for a specific aggregate.
-     * MUST return the latest snapshot for the given aggregate type and ID, where 'latest' means the one with the highest domain event sequence number.
-     * MUST return null if no snapshot is found.
+     * - Must return the latest snapshot for the given aggregate type and ID, where 'latest' means the one with the highest domain event sequence number.
+     * - Must return null if no snapshot is found.
      * @param transactionContext Transaction context for the operation, or null if not using transactions.
      * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
@@ -31,7 +31,7 @@ export interface ISnapshotRepository {
 
     /**
      * Saves a snapshot for a specific aggregate.
-     * May append or overwrite any existing snapshot.
+     * - May append or overwrite any existing snapshot.
      * @param transactionContext Transaction context for the operation, or null if not using transactions.
      * @param snapshot The snapshot to save.
      */

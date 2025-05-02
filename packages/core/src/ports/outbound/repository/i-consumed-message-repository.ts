@@ -7,7 +7,7 @@ import type { TransactionContext } from "../transaction-manager/i-transaction-ma
 export interface IConsumedMessageRepository {
     /**
      * Checks if a message containing a domain event has already been consumed by a specific consumer.
-     * MUST return true if the message has been consumed by the consumer, false otherwise.
+     * - Must return true if the message has been consumed by the consumer, false otherwise.
      * @param transactionContext Transaction context for the operation, or null if not using transactions.
      * @param domainEventId The ID of the domain event contained in the message.
      * @param consumerId The ID of the consumer that is consuming the message.
@@ -20,7 +20,7 @@ export interface IConsumedMessageRepository {
 
     /**
      * Marks a message containing a domain event as consumed by a specific consumer.
-     * MUST insert a new record in the database to indicate that the message has been consumed.
+     * - Must insert a new record in the database to indicate that the message has been consumed.
      * @param transactionContext Transaction context for the operation, or null if not using transactions.
      * @param domainEventId The ID of the domain event contained in the message.
      * @param consumerId The ID of the consumer that is consuming the message
