@@ -3,16 +3,30 @@
     "version": "0.0.1",
     "author": "Erik Lysne",
     "license": "MIT",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "keywords": [
+        "dugong",
+        "dugongjs"
+    ],
     "type": "module",
     "exports": {
         ".": "./src/index.ts"
+    },
+    "publishConfig": {
+        "access": "public",
+        "directory": "dist",
+        "linkDirectory": false
     },
     "scripts": {
         "test:typecheck": "tsc --noEmit",
         "test:unit:run": "vitest run",
         "test:unit:watch": "vitest watch",
         "test": "pnpm test:typecheck && pnpm test:run",
-        "lint": "eslint ."
+        "lint": "eslint .",
+        "build": "vite-node ./scripts/build.ts",
+        "prepublishOnly": "pnpm build"
     },
     "dependencies": {
         "class-transformer": "^0.5.1",
@@ -20,6 +34,7 @@
     },
     "devDependencies": {
         "@dugongjs/eslint-config": "workspace:*",
+        "@dugongjs/scripts": "workspace:*",
         "@dugongjs/typescript-config": "workspace:*",
         "@faker-js/faker": "^8.4.1",
         "@swc/core": "^1.11.21",
@@ -29,6 +44,7 @@
         "reflect-metadata": "^0.2.2",
         "typescript": "^5.6.3",
         "unplugin-swc": "^1.5.2",
+        "vite-node": "^3.1.2",
         "vitest": "^3.1.2",
         "vitest-mock-extended": "^2.0.2"
     }

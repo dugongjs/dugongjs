@@ -112,6 +112,9 @@ importers:
       '@dugongjs/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@dugongjs/scripts':
+        specifier: workspace:*
+        version: link:../scripts
       '@dugongjs/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -148,6 +151,7 @@ importers:
       vitest-mock-extended:
         specifier: ^2.0.2
         version: 2.0.2(typescript@5.8.2)(vitest@3.1.2(@types/node@20.17.30)(@vitest/ui@3.1.2)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
+    publishDirectory: dist
 
   packages/eslint-config:
     devDependencies:
