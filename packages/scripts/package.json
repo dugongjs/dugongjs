@@ -1,0 +1,21 @@
+{
+    "name": "@dugongjs/scripts",
+    "version": "0.0.1",
+    "author": "Erik Lysne",
+    "license": "MIT",
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "dependencies": {
+        "execa": "^9.5.2",
+        "fs-extra": "^11.3.0",
+        "ora": "^8.2.0"
+    },
+    "devDependencies": {
+        "@dugongjs/eslint-config": "workspace:*",
+        "@dugongjs/typescript-config": "workspace:*",
+        "@types/fs-extra": "^11.0.4",
+        "@types/node": "^20.17.6"
+    }
+}

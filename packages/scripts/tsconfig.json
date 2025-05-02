@@ -1,0 +1,6 @@
+{
+    "extends": "@dugongjs/typescript-config/nodejs.json",
+    "compilerOptions": {},
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}
