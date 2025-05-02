@@ -52,6 +52,10 @@ export class AggregateQueryService implements IAggregateQueryService {
 
         const aggregate = await factory.buildFromEventLog(aggregateId, { toSequenceNumber });
 
+        if (!aggregate) {
+            return null;
+        }
+
         const snapshotMetadata = aggregateMetadataRegistry.getAggregateSnapshotMetadata(aggregateClass);
 
         if (snapshotMetadata) {
