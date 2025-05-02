@@ -1,0 +1,40 @@
+{
+    "name": "@dugongjs/cli",
+    "version": "0.0.1",
+    "author": "Erik Lysne",
+    "license": "MIT",
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "dugong": "vite-node src/index.ts",
+        "lint": "eslint ."
+    },
+    "dependencies": {
+        "@dugongjs/core": "workspace:*",
+        "@dugongjs/nestjs": "workspace:*",
+        "@dugongjs/nestjs-microservice-query": "workspace:*",
+        "@nestjs/common": "^10.4.13",
+        "@nestjs/core": "^10.4.13",
+        "@nestjs/microservices": "^10.4.13",
+        "chalk": "^5.4.1",
+        "commander": "^13.1.0",
+        "fullscreen-ink": "^0.0.2",
+        "ink": "^5.2.1",
+        "ink-select-input": "^6.2.0",
+        "ink-text-input": "^6.0.0",
+        "jsondiffpatch": "^0.7.3",
+        "react": "^18.3.1",
+        "reflect-metadata": "^0.2.2",
+        "rxjs": "^7.8.1"
+    },
+    "devDependencies": {
+        "@dugongjs/eslint-config": "workspace:*",
+        "@dugongjs/typescript-config": "workspace:*",
+        "@types/node": "^20.17.6",
+        "@types/react": "^18.3.20",
+        "typescript": "^5.6.3",
+        "vite-node": "^3.1.2"
+    }
+}

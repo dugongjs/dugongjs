@@ -1,0 +1,8 @@
+{
+    "extends": "@dugongjs/typescript-config/nodejs.json",
+    "compilerOptions": {
+        "jsx": "react"
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
+}
