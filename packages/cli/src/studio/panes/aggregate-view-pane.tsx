@@ -8,10 +8,11 @@ export type AggregateViewPaneProps = PaneProps & {
     aggregateType: string | null;
     aggregateId: string | null;
     aggregate: object | null;
+    isDeleted: boolean;
 };
 
 export const AggregateViewPane: React.FC<AggregateViewPaneProps> = (props) => {
-    const { isLoading, aggregateType, aggregateId, aggregate } = props;
+    const { isLoading, aggregateType, aggregateId, aggregate, isDeleted } = props;
 
     return (
         <Pane isLoading={isLoading}>
@@ -24,6 +25,7 @@ export const AggregateViewPane: React.FC<AggregateViewPaneProps> = (props) => {
                     <Box flexDirection="column" width="100%" padding={1}>
                         <ValueDisplay label="Type" value={aggregateType ?? "none"} />
                         <ValueDisplay label="ID" value={aggregateId ?? "none"} />
+                        <ValueDisplay label="Is deleted" value={isDeleted ? "Yes" : "No"} />
                     </Box>
 
                     <Box flexDirection="column" rowGap={1} width="100%" padding={1}>

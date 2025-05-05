@@ -5,7 +5,7 @@ function formatAggregate(aggregate: any): any {
 
     const formattedAggregate = Object.assign({}, aggregate);
 
-    formattedAggregate.isDeleted = formattedAggregate.isDeletedInternal;
+    delete formattedAggregate["id"];
     delete formattedAggregate["stagedEvents"];
     delete formattedAggregate["isDeletedInternal"];
     delete formattedAggregate["currentDomainEventSequenceNumber"];

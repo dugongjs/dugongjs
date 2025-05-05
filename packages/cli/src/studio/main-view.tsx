@@ -170,13 +170,20 @@ export function MainView(props: MainViewProps) {
                             aggregateType={selectedType}
                             aggregateId={selectedId}
                             aggregate={formatAggregate(aggregate)}
+                            isDeleted={(aggregate as any)?.isDeletedInternal ?? false}
                         />
                     </Box>
 
                     <Box width="100%" height="25%">
                         <AggregateDiffPane
-                            current={formatAggregate(aggregate)}
-                            previous={formatAggregate(previousAggregate)}
+                            current={formatAggregate({
+                                ...aggregate,
+                                isDeleted: (aggregate as any)?.isDeletedInternal ?? false
+                            })}
+                            previous={formatAggregate({
+                                ...previousAggregate,
+                                isDeleted: (previousAggregate as any)?.isDeletedInternal ?? false
+                            })}
                         />
                     </Box>
                 </Box>
