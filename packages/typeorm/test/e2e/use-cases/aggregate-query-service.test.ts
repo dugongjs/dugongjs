@@ -63,7 +63,7 @@ describe("AggregateQueryService", () => {
     });
 
     describe("getAggregate", () => {
-        it("should return aggregate", async () => {
+        it("should return the aggregate", async () => {
             const finalUsername = faker.internet.userName();
             const finalEmail = faker.internet.email();
 
@@ -75,12 +75,10 @@ describe("AggregateQueryService", () => {
 
             await userManager.commitStagedDomainEvents(user);
 
-            const aggregate = await service.getAggregate(null, "User", user.getId());
-            const userAggregate = aggregate as User;
+            const aggregate: any = await service.getAggregate(null, "User", user.getId());
 
-            expect(aggregate).toBeInstanceOf(User);
-            expect(userAggregate.getUsername()).toEqual(finalUsername);
-            expect(userAggregate.getEmail()).toEqual(finalEmail);
+            expect(aggregate.username).toEqual(finalUsername);
+            expect(aggregate.email).toEqual(finalEmail);
         });
 
         it("should be possible to build the aggregate up to a specific sequence number", async () => {
@@ -95,12 +93,10 @@ describe("AggregateQueryService", () => {
 
             await userManager.commitStagedDomainEvents(user);
 
-            const aggregate = await service.getAggregate(null, "User", user.getId(), 1);
-            const userAggregate = aggregate as User;
+            const aggregate: any = await service.getAggregate(null, "User", user.getId(), 1);
 
-            expect(aggregate).toBeInstanceOf(User);
-            expect(userAggregate.getUsername()).toEqual(initialUsername);
-            expect(userAggregate.getEmail()).toEqual(initialEmail);
+            expect(aggregate.username).toEqual(initialUsername);
+            expect(aggregate.email).toEqual(initialEmail);
         });
 
         it("should return null if aggregate not found", async () => {
