@@ -1,7 +1,7 @@
 export { IAggregateQueryService } from "./common/ipc/i-aggregate-query-service.js";
 export type { IMessageChannelParticipant } from "./common/message-broker/i-message-channel-participant.js";
+export { IMessageSerdes } from "./common/message-broker/i-message-serdes.js";
 export { IMessageConsumer } from "./inbound/message-broker/i-message-consumer.js";
-export { IMessageExtractor } from "./inbound/message-broker/i-message-extractor.js";
 export { IMessageProducer } from "./outbound/message-broker/i-message-producer.js";
 export { IConsumedMessageRepository } from "./outbound/repository/i-consumed-message-repository.js";
 export { IDomainEventRepository } from "./outbound/repository/i-domain-event-repository.js";

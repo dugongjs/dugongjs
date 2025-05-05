@@ -16,6 +16,7 @@ export {
     type AggregateManagerOptions,
     type CommitOptions
 } from "./aggregate-manager/aggregate-manager.js";
+export { MissingProducerOrSerdesError } from "./aggregate-manager/errors/missing-producer-or-serdes.error.js";
 export {
     AggregateMessageConsumer,
     type AggregateMessageConsumerOptions,
