@@ -2,6 +2,7 @@ import {
     IConsumedMessageRepository,
     IDomainEventRepository,
     IMessageProducer,
+    IMessageSerdes,
     ISnapshotRepository,
     ITransactionManager
 } from "@dugongjs/core";
@@ -10,6 +11,7 @@ import type {
     ConsumedMessageRepositoryProvider,
     DomainEventRepositoryProvider,
     MessageProducerProvider,
+    MessageSerdesProvider,
     ModuleInjectables,
     SnapshotRepositoryProvider,
     TransactionManagerProvider
@@ -23,7 +25,7 @@ export type EventSourcingModuleOptions = {
     repository?: Partial<DomainEventRepositoryProvider> &
         Partial<SnapshotRepositoryProvider> &
         Partial<ConsumedMessageRepositoryProvider>;
-    messageBroker?: Partial<MessageProducerProvider>;
+    messageBroker?: Partial<MessageProducerProvider> & Partial<MessageSerdesProvider>;
 };
 
 @Module({
@@ -67,6 +69,13 @@ export class EventSourcingModule {
             providers.push({
                 provide: IMessageProducer,
                 useClass: options.messageBroker.messageProducer
+            });
+        }
+
+        if (options?.messageBroker?.messageSerdes) {
+            providers.push({
+                provide: IMessageSerdes,
+                useClass: options.messageBroker.messageSerdes
             });
         }
 

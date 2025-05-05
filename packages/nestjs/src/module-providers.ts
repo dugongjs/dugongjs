@@ -4,6 +4,7 @@ import type {
     IDomainEventRepository,
     IMessageConsumer,
     IMessageProducer,
+    IMessageSerdes,
     ISnapshotRepository,
     ITransactionManager
 } from "@dugongjs/core";
@@ -16,5 +17,6 @@ export type DomainEventRepositoryProvider = { domainEventRepository: Constructor
 export type SnapshotRepositoryProvider = { snapshotRepository: Constructor<ISnapshotRepository> };
 export type ConsumedMessageRepositoryProvider = { consumedMessageRepository: Constructor<IConsumedMessageRepository> };
 export type TransactionManagerProvider = { transactionManager: Constructor<ITransactionManager> };
-export type MessageProducerProvider = { messageProducer: Constructor<IMessageProducer> };
+export type MessageProducerProvider = { messageProducer: Constructor<IMessageProducer<any>> };
 export type MessageConsumerProvider = { messageConsumer: Constructor<IMessageConsumer<any>> };
+export type MessageSerdesProvider = { messageSerdes: Constructor<IMessageSerdes<any>> };
