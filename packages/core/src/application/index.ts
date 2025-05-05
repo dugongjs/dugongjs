@@ -30,3 +30,7 @@ export {
 export { aggregateSnapshotTransformer } from "./aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 export type { ILogger } from "./logger/i-logger.js";
 export { VoidLogger } from "./logger/void-logger.js";
+export {
+    WaitForMessageConsumer,
+    type WaitForMessageConsumerOptions
+} from "./wait-for-message-consumer/wait-for-message-consumer.js";
