@@ -141,7 +141,7 @@ export class BankAccount extends AbstractAggregateRoot {
     }
 
     @Apply(AccountOpenedEvent)
-    public onAccountOpened(event: AccountOpenedEvent): void {
+    public applyAccountOpened(event: AccountOpenedEvent): void {
         const payload = event.getPayload();
 
         this.owner = payload.owner;
@@ -149,21 +149,21 @@ export class BankAccount extends AbstractAggregateRoot {
     }
 
     @Apply(MoneyDepositedEvent)
-    public onMoneyDeposited(event: MoneyDepositedEvent): void {
+    public applyMoneyDeposited(event: MoneyDepositedEvent): void {
         const payload = event.getPayload();
 
         this.balance += payload.amount;
     }
 
     @Apply(MoneyWithdrawnEvent)
-    public onMoneyWithdrawn(event: MoneyWithdrawnEvent): void {
+    public applyMoneyWithdrawn(event: MoneyWithdrawnEvent): void {
         const payload = event.getPayload();
 
         this.balance -= payload.amount;
     }
 
     @Apply(AccountClosedEvent)
-    public onAccountClosed(): void {
+    public applyAccountClosed(): void {
         this.delete();
     }
 }
