@@ -78,7 +78,7 @@ export type WithdrawMoneyCommand = {
 Finally, we define the bank account aggregate.
 
 ```typescript
-import { AbstractAggregateRoot, Aggregate, Apply, Process } from "@dugongjs/core";
+import { AbstractAggregateRoot, Aggregate, Apply, CreationProcess, Process } from "@dugongjs/core";
 
 @Aggregate("BankAccount")
 export class BankAccount extends AbstractAggregateRoot {
@@ -93,7 +93,7 @@ export class BankAccount extends AbstractAggregateRoot {
         return this.balance;
     }
 
-    @Process({ isCreation: true })
+    @CreationProcess()
     public openAccount(command: OpenAccountCommand): void {
         const event = this.createDomainEvent(AccountOpenedEvent, {
             owner: command.owner,
