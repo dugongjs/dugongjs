@@ -12,6 +12,7 @@ export { AbstractEventSourcedAggregateRoot } from "./abstract-event-sourced-aggr
 export { AggregateIdAlreadySetError } from "./abstract-event-sourced-aggregate-root/errors/aggregate-id-already-set.error.js";
 export { Aggregate } from "./aggregate-decorators/aggregate.js";
 export { Apply } from "./aggregate-decorators/apply.js";
+export { CreationProcess } from "./aggregate-decorators/creation-process.js";
 export { ExternalAggregate } from "./aggregate-decorators/external-aggregate.js";
 export { Process, type ProcessOptions } from "./aggregate-decorators/process.js";
 export { Snapshotable } from "./aggregate-decorators/snapshotable.js";
