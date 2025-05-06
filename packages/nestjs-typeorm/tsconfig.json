@@ -3,6 +3,6 @@
     "compilerOptions": {
         "types": ["vitest/globals", "vitest-mock-extended"]
     },
-    "include": ["src"],
+    "include": ["src", "test", "vitest.config.unit.ts"],
     "exclude": ["node_modules", "dist"]
 }

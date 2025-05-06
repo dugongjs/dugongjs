@@ -9,8 +9,8 @@
     },
     "scripts": {
         "test:typecheck": "tsc --noEmit",
-        "test:unit:run": "vitest run",
-        "test:unit:watch": "vitest watch",
+        "test:unit:run": "vitest --config vitest.config.unit.ts run",
+        "test:unit:watch": "vitest --config vitest.config.unit.ts watch",
         "lint": "eslint ."
     },
     "peerDependencies": {
