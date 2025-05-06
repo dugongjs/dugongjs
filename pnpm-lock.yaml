@@ -192,6 +192,88 @@ importers:
         specifier: ^8.30.1
         version: 8.30.1(eslint@9.25.0(jiti@2.4.2))(typescript@5.8.2)
 
+  packages/kafkajs:
+    dependencies:
+      '@dugongjs/core':
+        specifier: workspace:*
+        version: link:../core
+      change-case:
+        specifier: ^5.4.4
+        version: 5.4.4
+      kafkajs:
+        specifier: ^2.2.4
+        version: 2.2.4
+    devDependencies:
+      '@dugongjs/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@dugongjs/testing':
+        specifier: workspace:*
+        version: link:../testing
+      '@dugongjs/typeorm':
+        specifier: workspace:*
+        version: link:../typeorm
+      '@dugongjs/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@faker-js/faker':
+        specifier: ^8.4.1
+        version: 8.4.1
+      '@swc/core':
+        specifier: ^1.11.21
+        version: 1.11.21(@swc/helpers@0.5.17)
+      '@swc/helpers':
+        specifier: ^0.5.17
+        version: 0.5.17
+      '@testcontainers/kafka':
+        specifier: ^10.25.0
+        version: 10.25.0
+      '@testcontainers/postgresql':
+        specifier: ^10.24.2
+        version: 10.24.2
+      '@types/node':
+        specifier: ^20.17.6
+        version: 20.17.30
+      '@types/pg':
+        specifier: ^8.11.14
+        version: 8.11.14
+      '@types/uuid':
+        specifier: ^9.0.8
+        version: 9.0.8
+      '@vitest/ui':
+        specifier: ^3.1.2
+        version: 3.1.2(vitest@3.1.2)
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.5.0
+      pg:
+        specifier: ^8.15.6
+        version: 8.15.6
+      pino:
+        specifier: ^9.6.0
+        version: 9.6.0
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      typeorm:
+        specifier: ^0.3.22
+        version: 0.3.22(pg@8.15.6)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.11.21(@swc/helpers@0.5.17))(@types/node@20.17.30)(typescript@5.8.2))
+      typescript:
+        specifier: ^5.6.3
+        version: 5.8.2
+      unplugin-swc:
+        specifier: ^1.5.2
+        version: 1.5.2(@swc/core@1.11.21(@swc/helpers@0.5.17))(rollup@4.40.1)
+      vitest:
+        specifier: ^3.1.2
+        version: 3.1.2(@types/node@20.17.30)(@vitest/ui@3.1.2)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)
+      vitest-mock-extended:
+        specifier: ^2.0.2
+        version: 2.0.2(typescript@5.8.2)(vitest@3.1.2(@types/node@20.17.30)(@vitest/ui@3.1.2)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
+      zod:
+        specifier: ^3.24.3
+        version: 3.24.3
+
   packages/nestjs:
     dependencies:
       '@dugongjs/core':
@@ -1329,6 +1411,9 @@ packages:
 
   '@swc/types@0.1.21':
     resolution: {integrity: sha512-2YEtj5HJVbKivud9N4bpPBAyZhj4S2Ipe5LkUG94alTpr7in/GU/EARgPAd3BwU+YOmFVJC2+kjqhGRi3r0ZpQ==}
+
+  '@testcontainers/kafka@10.25.0':
+    resolution: {integrity: sha512-IkamPKVANmVGqKw4hXn26jBQpcvDH8tRC3h9Jlm+rSY1ukCP/HcAse78gfCgWp/v6HbtIwvlrn4Xeru7ZXb/Eg==}
 
   '@testcontainers/postgresql@10.24.2':
     resolution: {integrity: sha512-s4k/QVSmpXFzxNBeft84x172Hx5tNiGeDRWwU8iOAHjtcnyXd4aBORF0GruNojTo7TOIuAM0ArBZUMqRBLJKwQ==}
@@ -4041,6 +4126,9 @@ packages:
   testcontainers@10.24.2:
     resolution: {integrity: sha512-Don3EXEQuSw14+nFG9pj48fL9ck/jXDfR9Rb0K3acOyn/gg97+gsnfZaLzpdejl9GcPJVKxACNRe3SYVC2uWqg==}
 
+  testcontainers@10.25.0:
+    resolution: {integrity: sha512-X3x6cjorEMgei1vVx3M7dnTMzWoWOTi4krpUf3C2iOvOcwsaMUHbca9J4yzpN65ieiWhcK2dA5dxpZyUonwC2Q==}
+
   text-decoder@1.2.3:
     resolution: {integrity: sha512-3/o9z3X0X0fTupwsYvR03pJ/DjWuqqrfwBgTQzdWDiQSm9KitAyz/9WqsT2JQW7KV2m+bC2ol/zqpW37NHxLaA==}
 
@@ -5277,6 +5365,13 @@ snapshots:
   '@swc/types@0.1.21':
     dependencies:
       '@swc/counter': 0.1.3
+
+  '@testcontainers/kafka@10.25.0':
+    dependencies:
+      testcontainers: 10.25.0
+    transitivePeerDependencies:
+      - bare-buffer
+      - supports-color
 
   '@testcontainers/postgresql@10.24.2':
     dependencies:
@@ -7263,8 +7358,7 @@ snapshots:
       object.assign: 4.1.7
       object.values: 1.2.1
 
-  kafkajs@2.2.4:
-    optional: true
+  kafkajs@2.2.4: {}
 
   keyv@4.5.4:
     dependencies:
@@ -8422,6 +8516,27 @@ snapshots:
     optional: true
 
   testcontainers@10.24.2:
+    dependencies:
+      '@balena/dockerignore': 1.0.2
+      '@types/dockerode': 3.3.38
+      archiver: 7.0.1
+      async-lock: 1.4.1
+      byline: 5.0.0
+      debug: 4.4.0
+      docker-compose: 0.24.8
+      dockerode: 4.0.6
+      get-port: 7.1.0
+      proper-lockfile: 4.1.2
+      properties-reader: 2.3.0
+      ssh-remote-port-forward: 1.0.4
+      tar-fs: 3.0.8
+      tmp: 0.2.3
+      undici: 5.29.0
+    transitivePeerDependencies:
+      - bare-buffer
+      - supports-color
+
+  testcontainers@10.25.0:
     dependencies:
       '@balena/dockerignore': 1.0.2
       '@types/dockerode': 3.3.38
