@@ -9,5 +9,9 @@
             "mode": "auto"
         }
     ],
-    "material-icon-theme.activeIconPack": "nest"
+    "material-icon-theme.activeIconPack": "nest",
+    "material-icon-theme.files.associations": {
+        "vitest.config.unit.ts": "vitest",
+        "vitest.config.e2e.ts": "vitest"
+    }
 }
