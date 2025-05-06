@@ -9,8 +9,8 @@
     },
     "scripts": {
         "test:typecheck": "tsc --noEmit",
-        "test:e2e:run": "DEBUG=testcontainers* vitest run --config ./test/e2e/vitest.config.ts",
-        "test:e2e:watch": "DEBUG=testcontainers* vitest watch --ui --config ./test/e2e/vitest.config.ts",
+        "test:e2e:run": "DEBUG=testcontainers* vitest run --config vitest.config.e2e.ts",
+        "test:e2e:watch": "DEBUG=testcontainers* vitest watch --ui --config vitest.config.e2e.ts",
         "lint": "eslint ."
     },
     "peerDependencies": {
