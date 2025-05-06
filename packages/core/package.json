@@ -21,8 +21,8 @@
     },
     "scripts": {
         "test:typecheck": "tsc --noEmit",
-        "test:unit:run": "vitest run",
-        "test:unit:watch": "vitest watch",
+        "test:unit:run": "vitest --config vitest.config.unit.ts run",
+        "test:unit:watch": "vitest --config vitest.config.unit.ts watch",
         "test": "pnpm test:typecheck && pnpm test:run",
         "lint": "eslint .",
         "build": "vite-node ./scripts/build.ts",
