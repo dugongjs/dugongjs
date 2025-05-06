@@ -60,13 +60,16 @@ export class AggregateFactory<
                 `${this.aggregateType} aggregate is snapshotable, attempting to build from snapshot`
             );
             aggregate = await this.buildFromLatestSnapshot(aggregateId);
+
+            if (!aggregate) {
+                this.logger.verbose(
+                    logContext,
+                    `Failed to build ${this.aggregateType} aggregate ${aggregateId} from snapshot, falling back to event log`
+                );
+            }
         }
 
         if (!aggregate) {
-            this.logger.verbose(
-                logContext,
-                `Could not build ${this.aggregateType} aggregate ${aggregateId} from snapshot, attempting to build from event log`
-            );
             aggregate = await this.buildFromEventLog(aggregateId);
         }
 
