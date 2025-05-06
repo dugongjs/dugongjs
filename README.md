@@ -4,6 +4,8 @@
 
 <p align="center">An event sourcing framework for Node.js.</p>
 
+[![CI](https://github.com/dugongjs/dugongjs/actions/workflows/ci.yaml/badge.svg)](https://github.com/dugongjs/dugongjs/actions/workflows/ci.yaml)
+
 ## Introduction
 
 Many popular backend frameworks, such as Express and Nest.js, excel at handling networking, request life-cycle management, and other infrastructure concerns. However, these frameworks often do not address domain-driven design (DDD) concepts like aggregates, domain events, and the complexities of modeling business logic.
