@@ -99,13 +99,23 @@ class AggregateMetadataRegistry {
         aggregateClass: Constructor,
         domainEventClass: Constructor
     ): AggregateDomainEventApplier[] | null {
-        const domainEventApplierMap = this.aggregateDomainEventAppliers.get(aggregateClass);
+        const appliers: AggregateDomainEventApplier[] = [];
 
-        if (!domainEventApplierMap) {
-            return null;
+        let currentClass: Constructor | null = aggregateClass;
+
+        while (currentClass) {
+            const domainEventApplierMap = this.aggregateDomainEventAppliers.get(currentClass);
+
+            if (domainEventApplierMap) {
+                const handlers = domainEventApplierMap.get(domainEventClass);
+                if (handlers) {
+                    appliers.push(...handlers);
+                }
+            }
+            currentClass = Object.getPrototypeOf(currentClass);
         }
 
-        return domainEventApplierMap.get(domainEventClass) ?? null;
+        return appliers.length ? appliers : null;
     }
 
     public getAggregateClass(type: string, origin?: string): Constructor | null {
