@@ -25,6 +25,10 @@ export {
     type HandleMessageOptions
 } from "./aggregate-message-consumer/aggregate-message-consumer.js";
 export {
+    AggregateMessageProducer,
+    type AggregateMessageProducerOptions
+} from "./aggregate-message-producer/aggregate-message-producer.js";
+export {
     AggregateQueryService,
     type AggregateQueryServiceOptions
 } from "./aggregate-query-service/aggregate-query-service.js";
