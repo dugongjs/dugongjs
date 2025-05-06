@@ -502,6 +502,38 @@ importers:
         specifier: ^20.17.6
         version: 20.17.30
 
+  packages/testing:
+    dependencies:
+      '@dugongjs/core':
+        specifier: workspace:*
+        version: link:../core
+      uuid:
+        specifier: ^9.0.1
+        version: 9.0.1
+    devDependencies:
+      '@dugongjs/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@dugongjs/scripts':
+        specifier: workspace:*
+        version: link:../scripts
+      '@dugongjs/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: ^20.17.6
+        version: 20.17.30
+      '@types/uuid':
+        specifier: ^9.0.8
+        version: 9.0.8
+      typescript:
+        specifier: ^5.6.3
+        version: 5.8.2
+      vite-node:
+        specifier: ^3.1.2
+        version: 3.1.2(@types/node@20.17.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)
+    publishDirectory: dist
+
   packages/typeorm:
     dependencies:
       '@dugongjs/core':
