@@ -1,17 +1,28 @@
 import { mock, mockReset } from "vitest-mock-extended";
+import { AbstractAggregateRoot, Aggregate } from "../../domain/index.js";
+import { IMessageConsumer } from "../../ports/index.js";
 import type { IConsumedMessageRepository } from "../../ports/outbound/repository/i-consumed-message-repository.js";
 import type { ILogger } from "../logger/i-logger.js";
-import { WaitForMessageConsumer } from "./wait-for-message-consumer.js";
+import { WaitForMessageConsumer, type WaitForMessageConsumerOptions } from "./wait-for-message-consumer.js";
 
 describe("WaitForMessageConsumer", () => {
     const mockConsumedMessageRepository = mock<IConsumedMessageRepository>({
         checkIfMessageIsConsumed: vi.fn()
     });
+    const mockMessageConsumer = mock<IMessageConsumer<any>>({
+        generateMessageConsumerIdForAggregate: vi.fn().mockReturnValue("consumer-id")
+    });
 
     const mockLogger = mock<ILogger>();
 
-    const defaultOptions = {
+    @Aggregate("Test")
+    class TestAggregate extends AbstractAggregateRoot {}
+
+    const defaultOptions: WaitForMessageConsumerOptions = {
+        aggregateClass: TestAggregate,
         consumedMessageRepository: mockConsumedMessageRepository,
+        messageConsumer: mockMessageConsumer,
+        currentOrigin: "TestOrigin",
         logger: mockLogger,
         pollingInterval: 10
     };

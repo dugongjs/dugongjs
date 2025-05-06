@@ -61,6 +61,7 @@ export class AggregateMessageConsumer<
     }
 
     public async registerMessageConsumerForAggregate(
+        consumerName: string,
         handleMessage?: HandleMessage,
         options?: HandleMessageOptions
     ): Promise<void> {
@@ -73,7 +74,13 @@ export class AggregateMessageConsumer<
 
         const messageConsumerId = this.messageConsumer.generateMessageConsumerIdForAggregate(
             this.currentOrigin,
-            this.aggregateType
+            this.aggregateType,
+            consumerName
+        );
+
+        this.logger.verbose(
+            this.logContext,
+            logPrefix + `Registering message consumer ${messageConsumerId} for ${messageChannelId}`
         );
 
         await this.retryOnFailure(
@@ -126,9 +133,15 @@ export class AggregateMessageConsumer<
                             const shouldPersistDomainEvent = !this.isInternalAggregate && !options?.skipPersistence;
 
                             if (shouldPersistDomainEvent) {
+                                this.logger.verbose(
+                                    messageLogContext,
+                                    logPrefix + "Persisting domain event to repository"
+                                );
                                 await this.domainEventRepository.saveDomainEvents(transactionContext, [
                                     serializedDomainEvent
                                 ]);
+                            } else {
+                                this.logger.verbose(messageLogContext, logPrefix + "Domain event persistence skipped");
                             }
 
                             await this.consumedMessageRepository.markMessageAsConsumed(

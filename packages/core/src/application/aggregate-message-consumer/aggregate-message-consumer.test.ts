@@ -99,7 +99,7 @@ describe("AggregateMessageConsumer", () => {
             await fn(transactionContext);
         });
 
-        await consumer.registerMessageConsumerForAggregate(handleMessage);
+        await consumer.registerMessageConsumerForAggregate("TestConsumer", handleMessage);
 
         const messageHandler = mockMessageConsumer.registerDomainEventMessageConsumer.mock.calls[0][2];
 
@@ -147,7 +147,7 @@ describe("AggregateMessageConsumer", () => {
             await fn(transactionContext);
         });
 
-        await consumer.registerMessageConsumerForAggregate(handleMessage);
+        await consumer.registerMessageConsumerForAggregate("TestConsumer", handleMessage);
 
         const messageHandler = mockMessageConsumer.registerDomainEventMessageConsumer.mock.calls[0][2];
 
@@ -185,7 +185,7 @@ describe("AggregateMessageConsumer", () => {
             await fn(transactionContext);
         });
 
-        await consumer.registerMessageConsumerForAggregate(handleMessage, { skipPersistence: true });
+        await consumer.registerMessageConsumerForAggregate("TestConsumer", handleMessage, { skipPersistence: true });
 
         const messageHandler = mockMessageConsumer.registerDomainEventMessageConsumer.mock.calls[0][2];
 
@@ -213,7 +213,7 @@ describe("AggregateMessageConsumer", () => {
             await fn(transactionContext);
         });
 
-        await consumer.registerMessageConsumerForAggregate(handleMessage);
+        await consumer.registerMessageConsumerForAggregate("TestConsumer", handleMessage);
 
         const messageHandler = mockMessageConsumer.registerDomainEventMessageConsumer.mock.calls[0][2];
 

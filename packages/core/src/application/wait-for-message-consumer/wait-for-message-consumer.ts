@@ -1,33 +1,44 @@
-import type { IConsumedMessageRepository } from "../../ports/index.js";
-import type { ILogger } from "../logger/i-logger.js";
+import type { IMessageConsumer } from "../../ports/index.js";
+import type { IConsumedMessageRepository } from "../../ports/outbound/repository/i-consumed-message-repository.js";
+import {
+    AbstractAggregateHandler,
+    type AbstractAggregateHandlerOptions
+} from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
 
-export type WaitForMessageConsumerOptions = {
+export type WaitForMessageConsumerOptions = AbstractAggregateHandlerOptions<any> & {
     consumedMessageRepository: IConsumedMessageRepository;
-    logger?: ILogger;
+    messageConsumer: IMessageConsumer<any>;
     pollingInterval?: number;
 };
 
 /**
  * Utility class to wait for a message to be consumed. This is primarily intended for testing purposes.
  */
-export class WaitForMessageConsumer {
+export class WaitForMessageConsumer extends AbstractAggregateHandler<any> {
     private readonly consumedMessageRepository: IConsumedMessageRepository;
-    private readonly logger?: ILogger;
+    private readonly messageConsumer: IMessageConsumer<any>;
     private readonly pollingInterval: number;
 
     constructor(options: WaitForMessageConsumerOptions) {
+        super(options);
         this.consumedMessageRepository = options.consumedMessageRepository;
-        this.logger = options.logger;
+        this.messageConsumer = options.messageConsumer;
         this.pollingInterval = options.pollingInterval ?? 100;
     }
 
     /**
      * Waits for the specified messages to be consumed by the given message consumer.
-     * @param messageConsumerId ID of the message consumer.
+     * @param consumerName Name of the message consumer.
      * @param ids IDs of the messages to wait for.
      * @returns A promise that resolves when all messages are consumed.
      */
-    public async waitForMessagesToBeConsumed(messageConsumerId: string, ...ids: string[]): Promise<void> {
+    public async waitForMessagesToBeConsumed(consumerName: string, ...ids: string[]): Promise<void> {
+        const messageConsumerId = this.messageConsumer.generateMessageConsumerIdForAggregate(
+            this.currentOrigin,
+            this.aggregateType,
+            consumerName
+        );
+
         if (ids.length === 0) {
             this.logger?.verbose("No messages to wait for");
             return;
@@ -57,7 +68,9 @@ export class WaitForMessageConsumer {
                 return;
             }
 
-            this.logger?.verbose(`Waiting for messages to be consumed: ${Array.from(remainingIds).join(", ")}`);
+            this.logger?.verbose(
+                `${messageConsumerId} waiting for domain events to be consumed: ${Array.from(remainingIds).join(", ")}`
+            );
 
             await new Promise((resolve) => setTimeout(resolve, this.pollingInterval));
         }

@@ -5,13 +5,14 @@ import type { IMessageChannelParticipant } from "../../common/message-broker/i-m
  */
 export interface IMessageConsumer<TMessage> extends IMessageChannelParticipant {
     /**
-     * Generates a message channel ID for a specific aggregate, using metadata from the aggregate and the current origin.
-     * The message channel ID is used to identify the channel to which messages will be published.
+     * Generates a message consumer ID for a specific aggregate, using metadata from the aggregate and the current origin.
+     * The message consumer ID is used to identify the consumer within the message broker.
      * @param origin The origin of the consumer, used to uniquely identify the consumer.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
-     * @returns The generated message channel ID.
+     * @param consumerName The name of the consumer, used to uniquely identify the consumer.
+     * @returns The generated message consumer ID.
      */
-    generateMessageConsumerIdForAggregate(origin: string, aggregateType: string): string;
+    generateMessageConsumerIdForAggregate(origin: string, aggregateType: string, consumerName: string): string;
 
     /**
      * Registers a message consumer for a specific channel.
