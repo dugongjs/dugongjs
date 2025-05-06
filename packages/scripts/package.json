@@ -2,7 +2,7 @@
     "name": "@dugongjs/scripts",
     "version": "0.0.1",
     "author": "Erik Lysne",
-    "license": "MIT",
+    "license": "UNLICENSED",
     "type": "module",
     "exports": {
         ".": "./src/index.ts"
