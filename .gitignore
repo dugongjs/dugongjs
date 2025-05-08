@@ -27,6 +27,9 @@ out/
 build
 dist
 
+# Generated files
+.docusaurus
+.cache-loader
 
 # Debug
 npm-debug.log*
