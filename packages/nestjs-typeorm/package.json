@@ -1,6 +1,6 @@
 {
     "name": "@dugongjs/nestjs-typeorm",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "author": "Erik Lysne",
     "license": "MIT",
     "private": true,
