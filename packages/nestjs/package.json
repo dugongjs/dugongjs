@@ -3,6 +3,7 @@
     "version": "0.0.1",
     "author": "Erik Lysne",
     "license": "MIT",
+    "private": true,
     "type": "module",
     "exports": {
         ".": "./src/index.ts"
