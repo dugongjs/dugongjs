@@ -1,0 +1,9 @@
+{
+    "extends": "@dugongjs/typescript-config/nodejs.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "sourceMap": false
+    },
+    "include": ["src"],
+    "exclude": ["**/*.test.ts"]
+}
