@@ -1,5 +1,11 @@
 # @dugongjs/typeorm
 
+## 0.0.3
+
+### Patch Changes
+
+- 017dcc0: Initial release
+
 ## 0.0.2
 
 ### Patch Changes
