@@ -1,0 +1,16 @@
+services:
+    postgres:
+        image: postgres:14
+        container_name: nestjs_tutorial_account_service_db
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: postgres_user
+            POSTGRES_PASSWORD: postgres_password
+            POSTGRES_DB: account_service_db
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+volumes:
+    postgres_data:
