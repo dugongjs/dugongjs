@@ -1,5 +1,11 @@
 # @dugongjs/cli
 
+## 0.0.5
+
+### Patch Changes
+
+- aa2ea1c: Fix an error preventing the bin from working
+
 ## 0.0.4
 
 ### Patch Changes
