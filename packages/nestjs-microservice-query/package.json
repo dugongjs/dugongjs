@@ -3,16 +3,29 @@
     "version": "0.0.3",
     "author": "Erik Lysne",
     "license": "MIT",
-    "private": true,
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "keywords": [
+        "dugong",
+        "dugongjs"
+    ],
     "type": "module",
     "exports": {
         ".": "./src/index.ts"
+    },
+    "publishConfig": {
+        "access": "public",
+        "directory": "dist",
+        "linkDirectory": false
     },
     "scripts": {
         "test:typecheck": "tsc --noEmit",
         "test:e2e:run": "DEBUG=testcontainers* vitest run --config vitest.config.e2e.ts",
         "test:e2e:watch": "DEBUG=testcontainers* vitest watch --ui --config vitest.config.e2e.ts",
-        "lint": "eslint ."
+        "lint": "eslint .",
+        "build": "vite-node ./scripts/build.ts",
+        "prepublishOnly": "pnpm build"
     },
     "peerDependencies": {
         "@dugongjs/core": "workspace:*",
@@ -25,6 +38,7 @@
     "devDependencies": {
         "@dugongjs/eslint-config": "workspace:*",
         "@dugongjs/nestjs-typeorm": "workspace:*",
+        "@dugongjs/scripts": "workspace:*",
         "@dugongjs/typeorm": "workspace:*",
         "@dugongjs/typescript-config": "workspace:*",
         "@faker-js/faker": "^8.4.1",
@@ -48,6 +62,7 @@
         "typeorm": "^0.3.22",
         "typescript": "^5.6.3",
         "unplugin-swc": "^1.5.2",
+        "vite-node": "^3.1.2",
         "vitest": "^3.1.2",
         "vitest-mock-extended": "^2.0.2",
         "zod": "^3.24.3"

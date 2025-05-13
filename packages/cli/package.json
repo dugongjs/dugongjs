@@ -3,14 +3,30 @@
     "version": "0.0.3",
     "author": "Erik Lysne",
     "license": "MIT",
-    "private": true,
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "keywords": [
+        "dugong",
+        "dugongjs"
+    ],
     "type": "module",
     "exports": {
         ".": "./src/index.ts"
     },
+    "publishConfig": {
+        "access": "public",
+        "directory": "dist",
+        "linkDirectory": false
+    },
+    "bin": {
+        "dugong": "./index.js"
+    },
     "scripts": {
-        "dugong": "vite-node src/index.ts",
-        "lint": "eslint ."
+        "dugong": "vite-node ./src/index.ts",
+        "lint": "eslint .",
+        "build": "vite-node ./scripts/build.ts",
+        "prepublishOnly": "pnpm build"
     },
     "dependencies": {
         "@dugongjs/core": "workspace:*",
@@ -32,6 +48,7 @@
     },
     "devDependencies": {
         "@dugongjs/eslint-config": "workspace:*",
+        "@dugongjs/scripts": "workspace:*",
         "@dugongjs/typescript-config": "workspace:*",
         "@types/node": "^20.17.6",
         "@types/react": "^18.3.20",
