@@ -46,7 +46,7 @@ DugongJS is built for native ECMAScript Modules (ESM), but NestJS is configured 
 Install the required dev dependencies:
 
 ```bash
-npm install --save-dev vite vite-node vite-plugin-node
+npm install --save-dev vite vite-node vite-plugin-node dotenv-cli
 ```
 
 Then create a `vite.config.ts` file:
@@ -81,7 +81,7 @@ Next, in `package.json,` set the `type` to `module` to declare it an ESM module 
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "start:dev": "dotenv -e .env.public -- vite-node src/main.ts"
+        "start:dev": "dotenv -e .env -- vite-node src/main.ts"
     }
 }
 ```
@@ -101,6 +101,22 @@ Finally, update your `tsconfig.json` to support ESM:
 When using `NodeNext` module resolution, TypeScript requires all file imports to end in .js — even when importing TypeScript files. This will cause all your existing imports to error if they use the default module resolution. [Learn more](https://www.typescriptlang.org/docs/handbook/modules/theory.html#module-resolution).
 :::
 
+Verify that everything has been set up correctly by running the following script:
+
+```bash
+npm run start:dev
+```
+
+You should see the normal log output from NestJS.
+
+Also verify the build script:
+
+```bash
+npm run build
+```
+
+And make sure the `dist` folder contains a `main.js` file.
+
 ### Installing TypeORM and PostgreSQL
 
 We’ll use [TypeORM](https://typeorm.io/) for persistence and configure it with PostgreSQL.
@@ -109,12 +125,6 @@ Install the following dependencies:
 
 ```bash
 npm install typeorm @nestjs/typeorm @dugongjs/typeorm @dugongjs/nestjs-typeorm
-```
-
-We'll also need to install the following dev dependency:
-
-```bash
-npm install --save-dev  dotenv-cli
 ```
 
 To keep things organized, we’ll store our database configuration in a dedicated folder. Add the following to your project:
@@ -154,7 +164,7 @@ In this tutorial, we're just using `process.env` to access environmental variabl
 
 Create a `.env` file at the root of your project with your database settings:
 
-```conf
+```conf title=".env"
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres_user
@@ -170,7 +180,7 @@ If you don’t already have a PostgreSQL instance, you can spin one up with Dock
 services:
     postgres:
         image: postgres:14
-        container_name: banking_context_account_service_db
+        container_name: nestjs_tutorial_account_service_db
         restart: unless-stopped
         environment:
             POSTGRES_USER: postgres_user
@@ -302,17 +312,17 @@ Now, define each concrete event by extending this base:
 
 ```typescript title="src/bank-account/domain/domain-events/account-opened.event.ts"
 import { DomainEvent } from "@dugongjs/core";
-import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.ts";
+import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.js";
 
 @DomainEvent()
-export class AccountOpenedEvent extends AbstractBankAccountDomainEvent<{ owner: string; initialAmount: number }> {
+export class AccountOpenedEvent extends AbstractBankAccountDomainEvent<{ owner: string; initialBalance: number }> {
     public static readonly type = "AccountOpened";
 }
 ```
 
 ```typescript title="src/bank-account/domain/domain-events/account-closed.event.ts"
 import { DomainEvent } from "@dugongjs/core";
-import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.ts";
+import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.js";
 
 @DomainEvent()
 export class AccountClosedEvent extends AbstractBankAccountDomainEvent {
@@ -322,7 +332,7 @@ export class AccountClosedEvent extends AbstractBankAccountDomainEvent {
 
 ```typescript title="src/bank-account/domain/domain-events/money-deposited.event.ts"
 import { DomainEvent } from "@dugongjs/core";
-import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.ts";
+import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.js";
 
 @DomainEvent()
 export class MoneyDepositedEvent extends AbstractBankAccountDomainEvent<{ amount: number }> {
@@ -332,7 +342,7 @@ export class MoneyDepositedEvent extends AbstractBankAccountDomainEvent<{ amount
 
 ```typescript title="src/bank-account/domain/domain-events/money-withdrawn.event.ts"
 import { DomainEvent } from "@dugongjs/core";
-import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.ts";
+import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.js";
 
 @DomainEvent()
 export class MoneyWithdrawnEvent extends AbstractBankAccountDomainEvent<{ amount: number }> {
@@ -376,13 +386,13 @@ With commands and events in place, we can now define the `BankAccount` [aggregat
 
 ```typescript title="src/bank-account/domain/bank-account.aggregate.ts"
 import { AbstractAggregateRoot, Aggregate, Apply, CreationProcess, Process } from "@dugongjs/core";
-import type { DepositMoneyCommand } from "./commands/deposit-money.command";
-import type { OpenAccountCommand } from "./commands/open-account.command";
-import type { WithdrawMoneyCommand } from "./commands/withdraw-money.command";
-import { AccountClosedEvent } from "./domain-events/account-closed.event";
-import { AccountOpenedEvent } from "./domain-events/account-opened.event";
-import { MoneyDepositedEvent } from "./domain-events/money-deposited.event";
-import { MoneyWithdrawnEvent } from "./domain-events/money-withdrawn.event";
+import type { DepositMoneyCommand } from "./commands/deposit-money.command.js";
+import type { OpenAccountCommand } from "./commands/open-account.command.js";
+import type { WithdrawMoneyCommand } from "./commands/withdraw-money.command.js";
+import { AccountClosedEvent } from "./domain-events/account-closed.event.js";
+import { AccountOpenedEvent } from "./domain-events/account-opened.event.js";
+import { MoneyDepositedEvent } from "./domain-events/money-deposited.event.js";
+import { MoneyWithdrawnEvent } from "./domain-events/money-withdrawn.event.js";
 
 @Aggregate("BankAccount")
 export class BankAccount extends AbstractAggregateRoot {
@@ -486,7 +496,7 @@ We'll begin by creating a NestJS service in the application layer that interacts
 ```typescript title="src/bank-account/application/command/bank-account.command.service.ts"
 import { EventSourcingService } from "@dugongjs/nestjs";
 import { Injectable } from "@nestjs/common";
-import { BankAccount } from "../../domain/account.aggregate.js";
+import { BankAccount } from "../../domain/bank-account.aggregate.js";
 import type { DepositMoneyCommand } from "../../domain/commands/deposit-money.command.js";
 import type { OpenAccountCommand } from "../../domain/commands/open-account.command.js";
 import type { WithdrawMoneyCommand } from "../../domain/commands/withdraw-money.command.js";
@@ -555,7 +565,7 @@ export class BankAccountCommandService {
                 throw new Error(`BankAccount with ID ${accountId} not found.`);
             }
 
-            account.close();
+            account.closeAccount();
 
             await accountContext.applyAndCommitStagedDomainEvents(account);
 
@@ -656,9 +666,9 @@ Next, we'll define a NestJS controller to expose the `BankAccountCommandService`
 import type { BankAccount } from "../../domain/bank-account.aggregate.js";
 
 export class BankAccountDto {
-    public readonly id: string;
-    public readonly owner: string;
-    public readonly balance: number;
+    public id: string;
+    public owner: string;
+    public balance: number;
 
     public static fromAggregate(aggregate: BankAccount): BankAccountDto {
         const dto = new BankAccountDto();
@@ -687,9 +697,9 @@ export class BankAccountCommandController {
     @Post()
     public async openAccount(
         @Body("owner") owner: string,
-        @Body("initialAmount") initialAmount: number
+        @Body("initialBalance") initialBalance: number
     ): Promise<BankAccountDto> {
-        const account = await this.bankAccountCommandService.openAccount({ owner, initialAmount });
+        const account = await this.bankAccountCommandService.openAccount({ owner, initialBalance });
 
         return BankAccountDto.fromAggregate(account);
     }
@@ -778,7 +788,7 @@ We’ll now test the `BankAccountCommandController` endpoints using curl. You ca
 ```bash
 curl -X POST http://localhost:3000/bank-accounts \
     -H "Content-Type: application/json" \
-    -d '{"owner": "Alice", "initialAmount": 500}'
+    -d '{"owner": "Alice", "initialBalance": 500}'
 ```
 
 If everything was set up correctly, you should get a 201 response with the following body:
@@ -935,7 +945,7 @@ export class AppModule {}
 We'll first need to configure the CLI to connect to our application. The quickest way to do this is to set the current context:
 
 ```bash
-dugong config set-context --current --host localhost --port 3001 --adapter nestjs-microservice --transport tcp
+dugong config set-context --current --host localhost --port 3001 --adapter nestjs-microservices --transport tcp
 ```
 
 :::info
@@ -978,7 +988,20 @@ The main feature of the CLI is Dugong Studio. Start Dugong Studio by running:
 dugong studio
 ```
 
-This will launch an interactive terminal UI where you can explore your aggregates, time-travel in the event log and view computed diffs on aggregates based on applied domain events.
+This will launch an interactive terminal UI, as shown in the screenshot below. Here, you can explore your aggregates, time-travel in the event log and view computed diffs on aggregates based on applied domain events.
+
+![DugongJS studio](/img/dugong_cli.png)
+
+The terminal UI consists of 6 panes:
+
+1. **Aggregate Types pane**: Shows a list of all aggregate types. Use the arrow keys to navigate and press enter to select one.
+2. **Aggregate Instances pane**: Shows a list of all aggregate instances of the selected type. Use the arrow keys to navigate and press enter to select one.
+3. **Aggregate pane**: Shows the selected aggregate instance. When a domain event is selected, the aggregate is built up to the selected event. Cannot be interacted with.
+4. **Domain Events pane**: Shows the list of domain events for the selected aggregate instance. Use the arrow keys to select one.
+5. **Domain Event pane**: Shows the selected domain event. Cannot be interacted with.
+6. **Diff pane**: Shows the diff of the aggregate for the selected domain event against the previous. Cannot be interacted with.
+
+The `TAB` key and `SHIT+TAB` keys can be used to navigate between the different panes.
 
 ## Part 6: Adding a Message Broker
 
