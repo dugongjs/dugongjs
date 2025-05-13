@@ -548,6 +548,9 @@ importers:
       '@dugongjs/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@dugongjs/scripts':
+        specifier: workspace:*
+        version: link:../scripts
       '@dugongjs/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -596,6 +599,9 @@ importers:
       unplugin-swc:
         specifier: ^1.5.2
         version: 1.5.2(@swc/core@1.11.21(@swc/helpers@0.5.17))(rollup@4.40.1)
+      vite-node:
+        specifier: ^3.1.2
+        version: 3.1.2(@types/node@20.17.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)
       vitest:
         specifier: ^3.1.2
         version: 3.1.2(@types/debug@4.1.12)(@types/node@20.17.30)(@vitest/ui@3.1.2)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)
@@ -605,6 +611,7 @@ importers:
       zod:
         specifier: ^3.24.3
         version: 3.24.3
+    publishDirectory: dist
 
   packages/scripts:
     dependencies:
