@@ -443,6 +443,33 @@ export class BankAccount extends AbstractAggregateRoot {
 
         this.stageDomainEvent(event);
     }
+
+    @Apply(AccountOpenedEvent)
+    public applyAccountOpened(event: AccountOpenedEvent): void {
+        const payload = event.getPayload();
+
+        this.owner = payload.owner;
+        this.balance = payload.initialBalance;
+    }
+
+    @Apply(MoneyDepositedEvent)
+    public applyMoneyDeposited(event: MoneyDepositedEvent): void {
+        const payload = event.getPayload();
+
+        this.balance += payload.amount;
+    }
+
+    @Apply(MoneyWithdrawnEvent)
+    public applyMoneyWithdrawn(event: MoneyWithdrawnEvent): void {
+        const payload = event.getPayload();
+
+        this.balance -= payload.amount;
+    }
+
+    @Apply(AccountClosedEvent)
+    public applyAccountClosed(): void {
+        this.delete();
+    }
 }
 ```
 
