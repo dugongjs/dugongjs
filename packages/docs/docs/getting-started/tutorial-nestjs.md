@@ -3,13 +3,13 @@ title: "Tutorial: NestJS"
 sidebar_position: 2
 ---
 
-:::danger
-This tutorial is a work in progress - don't try it just yet 😉
-:::
-
 ![DugongJS + NestJS](/img/dugongjs_nestjs.png)
 
 In this tutorial, you'll learn how to set up DugongJS within a [NestJS](https://docs.nestjs.com/) application using [TypeORM](https://typeorm.io/) for persistence. We'll walk through a practical example: implementing a very simple **bank account** aggregate. Eventually, we'll also introduce [Kafka](https://kafka.apache.org/documentation/) as a message broker and see how to implement command query responsibility segregation (CQRS).
+
+:::tip
+You can find the complete source code for this tutorial in the [official GitHub repository](https://github.com/dugongjs/dugongjs/tree/main/tutorials/nestjs).
+:::
 
 This will demonstrate how to:
 
