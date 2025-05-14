@@ -115,7 +115,7 @@ export class AggregateManager<
                 this.messageSerdes!.wrapDomainEvent(serializedDomainEvent)
             );
 
-            await this.messageProducer.publishMessages(this.transactionContext, channelId, serializedDomainEvents);
+            await this.messageProducer.publishMessages(this.transactionContext, channelId, messages);
 
             this.logger.verbose(
                 logContext,
