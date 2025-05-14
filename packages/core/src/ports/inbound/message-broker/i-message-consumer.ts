@@ -1,4 +1,7 @@
 import type { IMessageChannelParticipant } from "../../common/message-broker/i-message-channel-participant.js";
+import type { TransactionContext } from "../../outbound/transaction-manager/i-transaction-manager.js";
+
+export type OnMessage<TMessage> = (message: TMessage, transactionContext?: TransactionContext) => Promise<void>;
 
 /**
  * Inbound port interface for a message consumer.
@@ -26,7 +29,7 @@ export interface IMessageConsumer<TMessage> extends IMessageChannelParticipant {
     registerDomainEventMessageConsumer(
         channelId: string,
         consumerId: string,
-        onMessage?: (message: TMessage) => Promise<void>
+        onMessage?: OnMessage<TMessage>
     ): Promise<void>;
 }
 

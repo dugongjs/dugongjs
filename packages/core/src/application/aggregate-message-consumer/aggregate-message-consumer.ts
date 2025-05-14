@@ -7,6 +7,7 @@ import type { IConsumedMessageRepository } from "../../ports/outbound/repository
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type {
     ITransactionManager,
+    RunInTransaction,
     TransactionContext
 } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
@@ -33,7 +34,7 @@ export type HandleMessageOptions = {
     retryInterval?: number;
 };
 
-export type HandleMessageContext<TMessage> = {
+export type HandleMessageContext<TMessage = any> = {
     transactionContext: TransactionContext;
     domainEvent: InstanceType<typeof AbstractDomainEvent>;
     message: TMessage;
@@ -88,7 +89,7 @@ export class AggregateMessageConsumer<
                 await this.messageConsumer.registerDomainEventMessageConsumer(
                     messageChannelId,
                     messageConsumerId,
-                    async (message) => {
+                    async (message, transactionContext) => {
                         const serializedDomainEvent = this.messageSerdes.unwrapMessage(message);
                         const domainEvent = domainEventDeserializer.deserializeDomainEvents(serializedDomainEvent)[0];
 
@@ -113,7 +114,11 @@ export class AggregateMessageConsumer<
                             }
                         };
 
-                        await this.transactionManager.transaction(async (transactionContext) => {
+                        const transaction: RunInTransaction<any> = transactionContext
+                            ? async (fn: (ctx: TransactionContext) => Promise<void>) => fn(transactionContext)
+                            : this.transactionManager.transaction.bind(this.transactionManager);
+
+                        await transaction(async (transactionContext: TransactionContext) => {
                             this.logger.log(messageLogContext, logPrefix + "Message received");
 
                             const isConsumed = await this.consumedMessageRepository.checkIfMessageIsConsumed(
