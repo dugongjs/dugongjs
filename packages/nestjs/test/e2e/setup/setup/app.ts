@@ -5,7 +5,7 @@ import { Test } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Logger, LoggerModule } from "nestjs-pino";
 import { DataSource } from "typeorm";
-import { EventIssuerModule } from "../../../../src/modules/event-issuer.module.js";
+import { EventIssuerModule } from "../../../../src/event-issuer/event-issuer.module.js";
 import { UserCommandModule } from "../../use-cases/user/application/command/user.command.module.js";
 import { UserQueryModule } from "../../use-cases/user/application/query/user.query.module.js";
 

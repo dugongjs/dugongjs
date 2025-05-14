@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { EventSourcingService } from "../../../../../../src/services/event-sourcing.service.js";
+import { EventSourcingService } from "../../../../../../src/event-sourcing/event-sourcing.service.js";
 import { User } from "../../domain/user.js";
 
 @Injectable()

@@ -1,3 +1,4 @@
+export { AggregateQueryService } from "./aggregate-query/aggregate-query.service.js";
 export { InjectConsumedMessageRepository } from "./decorators/inject-comsumed-message-repository.decorator.js";
 export { InjectCurrentOrigin } from "./decorators/inject-current-origin.decorator.js";
 export { InjectDomainEventRepository } from "./decorators/inject-domain-event-repository.decorator.js";
@@ -5,6 +6,9 @@ export { InjectMessageConsumer } from "./decorators/inject-message-consumer.deco
 export { InjectMessageProducer } from "./decorators/inject-message-producer.decorator.js";
 export { InjectSnapshotRepository } from "./decorators/inject-snapshot-repository.decorator.js";
 export { InjectTransactionManager } from "./decorators/inject-transaction-manager.decorator.js";
+export { EventIssuerModule, type EventIssuerModuleOptions } from "./event-issuer/event-issuer.module.js";
+export { EventSourcingModule, type EventSourcingModuleOptions } from "./event-sourcing/event-sourcing.module.js";
+export { EventSourcingService } from "./event-sourcing/event-sourcing.service.js";
 export type {
     ConsumedMessageRepositoryProvider,
     DomainEventRepositoryProvider,
@@ -15,8 +19,4 @@ export type {
     ModuleProviders,
     SnapshotRepositoryProvider,
     TransactionManagerProvider
-} from "./module-providers.js";
-export { EventIssuerModule, type EventIssuerModuleOptions } from "./modules/event-issuer.module.js";
-export { EventSourcingModule, type EventSourcingModuleOptions } from "./modules/event-sourcing.module.js";
-export { AggregateQueryService } from "./services/aggregate-query.service.js";
-export { EventSourcingService } from "./services/event-sourcing.service.js";
+} from "./providers/module-providers.js";

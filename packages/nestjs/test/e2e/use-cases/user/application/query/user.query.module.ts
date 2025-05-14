@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { EventSourcingModule } from "../../../../../../src/modules/event-sourcing.module.js";
+import { EventSourcingModule } from "../../../../../../src/event-sourcing/event-sourcing.module.js";
 import { UserQueryController } from "./user.query.controller.js";
 import { UserQueryService } from "./user.query.service.js";
 

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { EventSourcingService } from "../../../../../../src/services/event-sourcing.service.js";
+import { EventSourcingService } from "../../../../../../src/event-sourcing/event-sourcing.service.js";
 import type { CreateUserCommand } from "../../domain/commands/create-user-command.js";
 import type { UpdateEmailCommand } from "../../domain/commands/update-email-command.js";
 import type { UpdateUsernameCommand } from "../../domain/commands/update-username-command.js";

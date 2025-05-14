@@ -15,8 +15,8 @@ import type {
     ModuleInjectables,
     SnapshotRepositoryProvider,
     TransactionManagerProvider
-} from "../module-providers.js";
-import { EventSourcingService } from "../services/event-sourcing.service.js";
+} from "../providers/module-providers.js";
+import { EventSourcingService } from "./event-sourcing.service.js";
 
 export type EventSourcingModuleOptions = {
     global?: boolean;

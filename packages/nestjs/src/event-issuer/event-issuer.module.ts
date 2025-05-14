@@ -1,5 +1,5 @@
 import { Global, Module, type DynamicModule } from "@nestjs/common";
-import { CURRENT_ORIGIN_TOKEN } from "../tokens.js";
+import { CURRENT_ORIGIN_TOKEN } from "./event-issuer.tokens.js";
 
 export type EventIssuerModuleOptions = {
     currentOrigin: string;
