@@ -1,4 +1,6 @@
+import type { ITransactionManager } from "@dugongjs/core";
 import { faker } from "@faker-js/faker";
+import { mock } from "vitest-mock-extended";
 import { DomainEventEntity } from "../../../src/infrastructure/db/entities/domain-event.entity.js";
 import { OutboxEntity } from "../../../src/infrastructure/db/entities/outbox-entity.js";
 import { SnapshotEntity } from "../../../src/infrastructure/db/entities/snapshot.entity.js";
@@ -15,13 +17,13 @@ describe("User", () => {
         userFactory = new AggregateFactoryTypeOrm({
             aggregateClass: User,
             currentOrigin: "IAM-UserService",
-            transactionContext: null
+            transactionManager: mock<ITransactionManager>()
         });
 
         userManager = new AggregateManagerTypeOrm({
             aggregateClass: User,
             currentOrigin: "IAM-UserService",
-            transactionContext: null
+            transactionManager: mock<ITransactionManager>()
         });
     });
 
@@ -48,10 +50,7 @@ describe("User", () => {
             expect(userCreatedEvent.aggregateId).toBe(user.getId());
             expect(userCreatedEvent.sequenceNumber).toBe(1);
             expect(userCreatedEvent.timestamp).toBeInstanceOf(Date);
-            expect(userCreatedEvent.payload).toEqual({
-                email,
-                username
-            });
+            expect(userCreatedEvent.payload).toEqual({ email, username });
         });
 
         it("should create a user and persist the event with triggeredByUserId", async () => {

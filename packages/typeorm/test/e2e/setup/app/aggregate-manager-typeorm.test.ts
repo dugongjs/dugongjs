@@ -1,4 +1,5 @@
-import { AbstractAggregateRoot, Aggregate } from "@dugongjs/core";
+import { AbstractAggregateRoot, Aggregate, ITransactionManager } from "@dugongjs/core";
+import { mock } from "vitest-mock-extended";
 import { AggregateManagerTypeOrm } from "./aggregate-manager-typeorm.js";
 
 describe("AggregateManagerTypeOrm", () => {
@@ -9,7 +10,7 @@ describe("AggregateManagerTypeOrm", () => {
         const aggregateManager = new AggregateManagerTypeOrm({
             aggregateClass: TestAggregate,
             currentOrigin: "Test",
-            transactionContext: null
+            transactionManager: mock<ITransactionManager>()
         });
 
         expect(aggregateManager).toBeDefined();

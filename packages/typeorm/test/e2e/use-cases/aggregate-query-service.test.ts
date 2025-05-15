@@ -1,4 +1,6 @@
+import type { ITransactionManager } from "@dugongjs/core";
 import { faker } from "@faker-js/faker";
+import { mock } from "vitest-mock-extended";
 import { AggregateManagerTypeOrm } from "../setup/app/aggregate-manager-typeorm.js";
 import { AggregateQueryServiceTypeOrm } from "../setup/app/aggregate-query-service-typeorm.js";
 import { User } from "./user-aggregate/user.js";
@@ -10,7 +12,7 @@ describe("AggregateQueryService", () => {
     beforeEach(() => {
         userManager = new AggregateManagerTypeOrm({
             aggregateClass: User,
-            transactionContext: null,
+            transactionManager: mock<ITransactionManager>(),
             currentOrigin: "IAM-UserService"
         });
 
