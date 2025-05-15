@@ -39,7 +39,7 @@ export class EventSourcingService {
     ): AggregateContext<TAggregateRootClass> {
         const aggregateContextOptions: AggregateContextOptions<RemoveAbstract<typeof AbstractAggregateRoot>> = {
             aggregateClass: aggregateClass as unknown as RemoveAbstract<typeof AbstractAggregateRoot>,
-            transactionContext,
+            transactionManager: this.transactionManager,
             domainEventRepository: this.domainEventRepository,
             snapshotRepository: this.snapshotRepository,
             messageProducer: this.messageProducer,
@@ -48,9 +48,20 @@ export class EventSourcingService {
             logger: this.logger
         };
 
-        return new AggregateContext<TAggregateRootClass>(
+        const context = new AggregateContext<TAggregateRootClass>(
             aggregateContextOptions as AggregateContextOptions<TAggregateRootClass>
         );
+
+        const factory = context.getFactory();
+        const manager = context.getManager();
+
+        factory.setTransactionContext(transactionContext);
+
+        if (manager) {
+            context.getManager().setTransactionContext(transactionContext);
+        }
+
+        return context;
     }
 
     public transaction<TResult>(runInTransaction: RunInTransaction<TResult>): Promise<TResult> {
