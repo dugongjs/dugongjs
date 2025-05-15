@@ -17,7 +17,11 @@ export abstract class AbstractTransactionCoordinator {
         return this.transactionManager.transaction(async (transactionContext) => {
             this.transactionContext = transactionContext;
 
-            return runInTransaction(transactionContext);
+            try {
+                return await runInTransaction(transactionContext);
+            } finally {
+                this.transactionContext = null;
+            }
         });
     }
 
