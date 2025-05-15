@@ -6,7 +6,11 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Logger, LoggerModule } from "nestjs-pino";
 import { DataSource } from "typeorm";
 import { EventIssuerModule } from "../../../../src/event-issuer/event-issuer.module.js";
+import { MessageBrokerInMemoryModule } from "../../../../src/message-broker-in-memory/message-broker-in-memory.module.js";
+import { UserQueryModelEntity } from "../../use-cases/user/adapters/repository/user-query-model-entity.js";
+import { UserQueryModelRepositoryTypeOrmService } from "../../use-cases/user/adapters/repository/user-query-model-repository-typeorm.service.js";
 import { UserCommandModule } from "../../use-cases/user/application/command/user.command.module.js";
+import { UserQueryModelProjectionModule } from "../../use-cases/user/application/consumer/user-query-model-projection.module.js";
 import { UserQueryModule } from "../../use-cases/user/application/query/user.query.module.js";
 
 let app: INestApplication;
@@ -26,14 +30,27 @@ beforeAll(async () => {
                 username: process.env.DB_USERNAME!,
                 password: process.env.DB_PASSWORD!,
                 database: process.env.DB_NAME!,
-                entities: [DomainEventEntity, SnapshotEntity, ConsumedMessageEntity, OutboxEntity],
+                entities: [
+                    DomainEventEntity,
+                    SnapshotEntity,
+                    ConsumedMessageEntity,
+                    OutboxEntity,
+                    UserQueryModelEntity
+                ],
                 synchronize: true
             }),
             EventIssuerModule.forRoot({ currentOrigin: "IAM-UserService" }),
             RepositoryTypeOrmModule.forRoot(),
             TransactionManagerTypeOrmModule.forRoot(),
+            MessageBrokerInMemoryModule.forRoot(),
             UserCommandModule,
-            UserQueryModule
+            UserQueryModule.register({
+                module: { imports: [TypeOrmModule.forFeature([UserQueryModelEntity])] },
+                repository: UserQueryModelRepositoryTypeOrmService
+            }),
+            UserQueryModelProjectionModule.register({
+                repository: UserQueryModelRepositoryTypeOrmService
+            })
         ]
     }).compile();
 
@@ -52,6 +69,7 @@ afterEach(async () => {
     await dataSource.getRepository(SnapshotEntity).delete({});
     await dataSource.getRepository(ConsumedMessageEntity).delete({});
     await dataSource.getRepository(OutboxEntity).delete({});
+    await dataSource.getRepository(UserQueryModelEntity).delete({});
 });
 
 export { app, dataSource };

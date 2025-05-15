@@ -1,18 +1,18 @@
-import { Injectable } from "@nestjs/common";
-import { EventSourcingService } from "../../../../../../src/event-sourcing/event-sourcing.service.js";
-import { User } from "../../domain/user.js";
+import { Inject, Injectable } from "@nestjs/common";
+import {
+    IUserQueryModelRepository,
+    type UserQueryModel
+} from "../../ports/repository/i-user-query-model-repository.js";
 
 @Injectable()
 export class UserQueryService {
-    constructor(private readonly eventSourcingService: EventSourcingService) {}
+    constructor(@Inject(IUserQueryModelRepository) private readonly queryModelRepository: IUserQueryModelRepository) {}
 
-    public async getUser(userId: string): Promise<User | null> {
-        return this.eventSourcingService.transaction(async (transactionContext) => {
-            const userContext = this.eventSourcingService.createAggregateContext(transactionContext, User);
+    public async getUserById(userId: string): Promise<UserQueryModel | null> {
+        return this.queryModelRepository.getQueryModelById(null, userId);
+    }
 
-            const user = await userContext.build(userId);
-
-            return user;
-        });
+    public async getAllUsers(): Promise<UserQueryModel[]> {
+        return this.queryModelRepository.getAllQueryModels(null);
     }
 }

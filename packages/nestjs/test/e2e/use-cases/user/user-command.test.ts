@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import supertest from "supertest";
 import { app } from "../../setup/setup/app.js";
 
-describe("User", () => {
+describe("User command", () => {
     it("should be possible to create a user", async () => {
         const email = faker.internet.email();
         const username = faker.internet.userName();
@@ -109,34 +109,6 @@ describe("User", () => {
         const getResponse = await supertest(app.getHttpServer()).get(`/users/${userId}`);
 
         expect(getResponse.status).toBe(404);
-    });
-
-    it("should be possible to get a user", async () => {
-        const email = faker.internet.email();
-        const username = faker.internet.userName();
-        const createResponse = await supertest(app.getHttpServer()).post("/users").send({
-            email,
-            username
-        });
-
-        const userId = createResponse.body.id;
-
-        expect(createResponse.status).toBe(201);
-
-        expect(createResponse.body).toEqual({
-            id: userId,
-            username,
-            email
-        });
-
-        const getResponse = await supertest(app.getHttpServer()).get(`/users/${userId}`);
-
-        expect(getResponse.status).toBe(200);
-        expect(getResponse.body).toEqual({
-            id: userId,
-            username,
-            email
-        });
     });
 
     it("should return 404 when user not found", async () => {

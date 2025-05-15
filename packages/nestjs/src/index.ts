@@ -9,6 +9,11 @@ export { InjectTransactionManager } from "./decorators/inject-transaction-manage
 export { EventIssuerModule, type EventIssuerModuleOptions } from "./event-issuer/event-issuer.module.js";
 export { EventSourcingModule, type EventSourcingModuleOptions } from "./event-sourcing/event-sourcing.module.js";
 export { EventSourcingService } from "./event-sourcing/event-sourcing.service.js";
+export { InMemoryMessageBusService } from "./message-broker-in-memory/in-memory-message-bus.service.js";
+export { MessageBrokerInMemoryModule } from "./message-broker-in-memory/message-broker-in-memory.module.js";
+export { MessageConsumerInMemoryService } from "./message-broker-in-memory/message-consumer-in-memory.service.js";
+export { MessageProducerInMemoryService } from "./message-broker-in-memory/message-producer-in-memory.service.js";
+export { MessageSerdesInMemoryService } from "./message-broker-in-memory/message-serdes-in-memory.service.js";
 export type {
     ConsumedMessageRepositoryProvider,
     DomainEventRepositoryProvider,
@@ -20,3 +25,10 @@ export type {
     SnapshotRepositoryProvider,
     TransactionManagerProvider
 } from "./providers/module-providers.js";
+export { IQueryModelProjectionHandler } from "./query-model-projection-consumer/i-query-model-projection-handler.js";
+export { QueryModelProjectionConsumerController } from "./query-model-projection-consumer/query-model-projection-consumer.controller.js";
+export {
+    QueryModelProjectionConsumerModule,
+    type QueryModelProjectionConsumerModuleOptions
+} from "./query-model-projection-consumer/query-model-projection-consumer.module.js";
+export { QueryModelProjectionConsumerService } from "./query-model-projection-consumer/query-model-projection-consumer.service.js";
