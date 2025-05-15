@@ -23,7 +23,6 @@ describe("WaitForMessageConsumer", () => {
 
     const defaultOptions: WaitForMessageConsumerOptions = {
         aggregateClass: TestAggregate,
-        transactionManager: mockTransactionManager,
         consumedMessageRepository: mockConsumedMessageRepository,
         messageConsumer: mockMessageConsumer,
         currentOrigin: "TestOrigin",

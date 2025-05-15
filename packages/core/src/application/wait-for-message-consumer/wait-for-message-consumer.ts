@@ -5,11 +5,14 @@ import {
     type AbstractAggregateHandlerOptions
 } from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
 
-export type WaitForMessageConsumerOptions = AbstractAggregateHandlerOptions<any> & {
-    consumedMessageRepository: IConsumedMessageRepository;
-    messageConsumer: IMessageConsumer<any>;
-    pollingInterval?: number;
-};
+export type WaitForMessageConsumerOptions = Omit<
+    AbstractAggregateHandlerOptions<any> & {
+        consumedMessageRepository: IConsumedMessageRepository;
+        messageConsumer: IMessageConsumer<any>;
+        pollingInterval?: number;
+    },
+    "transactionManager"
+>;
 
 /**
  * Utility class to wait for a message to be consumed. This is primarily intended for testing purposes.
@@ -20,7 +23,7 @@ export class WaitForMessageConsumer extends AbstractAggregateHandler<any> {
     private readonly pollingInterval: number;
 
     constructor(options: WaitForMessageConsumerOptions) {
-        super(options);
+        super({ ...options, transactionManager: { transaction: (fn) => fn({}) } });
         this.consumedMessageRepository = options.consumedMessageRepository;
         this.messageConsumer = options.messageConsumer;
         this.pollingInterval = options.pollingInterval ?? 100;
