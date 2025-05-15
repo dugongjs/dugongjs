@@ -5,11 +5,7 @@ import type { IMessageSerdes } from "../../ports/common/message-broker/i-message
 import type { IMessageConsumer } from "../../ports/inbound/message-broker/i-message-consumer.js";
 import type { IConsumedMessageRepository } from "../../ports/outbound/repository/i-consumed-message-repository.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
-import type {
-    ITransactionManager,
-    RunInTransaction,
-    TransactionContext
-} from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
+import type { TransactionContext } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 import {
     AbstractAggregateHandler,
@@ -20,7 +16,6 @@ export type AggregateMessageConsumerOptions<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>,
     TMessage
 > = AbstractAggregateHandlerOptions<TAggregateRootClass> & {
-    transactionManager: ITransactionManager;
     domainEventRepository: IDomainEventRepository;
     consumedMessageRepository: IConsumedMessageRepository;
     messageConsumer: IMessageConsumer<TMessage>;
@@ -46,7 +41,6 @@ export class AggregateMessageConsumer<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>,
     TMessage
 > extends AbstractAggregateHandler<TAggregateRootClass> {
-    private readonly transactionManager: ITransactionManager;
     private readonly domainEventRepository: IDomainEventRepository;
     private readonly consumedMessageRepository: IConsumedMessageRepository;
     private readonly messageConsumer: IMessageConsumer<TMessage>;
@@ -54,7 +48,6 @@ export class AggregateMessageConsumer<
 
     constructor(options: AggregateMessageConsumerOptions<TAggregateRootClass, TMessage>) {
         super(options);
-        this.transactionManager = options.transactionManager;
         this.domainEventRepository = options.domainEventRepository;
         this.consumedMessageRepository = options.consumedMessageRepository;
         this.messageSerdes = options.messageSerdes;
@@ -84,12 +77,15 @@ export class AggregateMessageConsumer<
             logPrefix + `Registering message consumer ${messageConsumerId} for ${messageChannelId}`
         );
 
-        await this.retryOnFailure(
-            async () =>
-                await this.messageConsumer.registerDomainEventMessageConsumer(
-                    messageChannelId,
-                    messageConsumerId,
-                    async (message, transactionContext) => {
+        await this.messageConsumer.registerDomainEventMessageConsumer(
+            messageChannelId,
+            messageConsumerId,
+            async (message, transactionContext) => {
+                // If the consumer receives a transaction, retries should be skipped
+                const maximumRetries = transactionContext ? 0 : options?.maximumRetries;
+
+                return this.retryOnFailure(
+                    async () => {
                         const serializedDomainEvent = this.messageSerdes.unwrapMessage(message);
                         const domainEvent = domainEventDeserializer.deserializeDomainEvents(serializedDomainEvent)[0];
 
@@ -114,11 +110,11 @@ export class AggregateMessageConsumer<
                             }
                         };
 
-                        const transaction: RunInTransaction<any> = transactionContext
-                            ? async (fn: (ctx: TransactionContext) => Promise<void>) => fn(transactionContext)
-                            : this.transactionManager.transaction.bind(this.transactionManager);
+                        if (transactionContext) {
+                            this.setTransactionContext(transactionContext);
+                        }
 
-                        await transaction(async (transactionContext: TransactionContext) => {
+                        await this.transaction(async (transactionContext: TransactionContext) => {
                             this.logger.log(messageLogContext, logPrefix + "Message received");
 
                             const isConsumed = await this.consumedMessageRepository.checkIfMessageIsConsumed(
@@ -166,10 +162,11 @@ export class AggregateMessageConsumer<
                                 this.logger.log(messageLogContext, logPrefix + "Message processing completed");
                             }
                         });
-                    }
-                ),
-            options?.maximumRetries,
-            options?.retryInterval
+                    },
+                    maximumRetries,
+                    options?.retryInterval
+                );
+            }
         );
     }
 
@@ -185,14 +182,14 @@ export class AggregateMessageConsumer<
                 return await fn();
             } catch (error: any) {
                 if (attempt >= maximumRetries) {
-                    this.logger.error({ ...this.logContext, error }, "Message processing failed permanently");
+                    this.logger.error(error, "Message processing failed permanently");
                     return;
                 }
 
                 attempt++;
                 this.logger.error(
-                    { ...this.logContext, error },
-                    `[Retry] Message processing failed (attempt ${attempt}/${maximumRetries}), retrying in ${retryInterval}ms,$`
+                    error,
+                    `[Retry] Message processing failed (attempt ${attempt}/${maximumRetries}), retrying in ${retryInterval}ms`
                 );
                 await new Promise((resolve) => setTimeout(resolve, retryInterval));
             }

@@ -1,6 +1,8 @@
 import type { AbstractEventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
 import { aggregateMetadataRegistry } from "../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
+import type { ITransactionManager } from "../../ports/index.js";
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
+import { AbstractTransactionCoordinator } from "../abstract-transaction-coordinator/abstract-transaction-coordinator.js";
 import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggregate-metadata-not-found.error.js";
 import type { ILogger } from "../logger/i-logger.js";
 import { VoidLogger } from "../logger/void-logger.js";
@@ -9,13 +11,14 @@ export type AbstractAggregateHandlerOptions<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
 > = {
     aggregateClass: TAggregateRootClass;
+    transactionManager: ITransactionManager;
     currentOrigin: string;
     logger?: ILogger;
 };
 
 export abstract class AbstractAggregateHandler<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-> {
+> extends AbstractTransactionCoordinator {
     protected readonly aggregateClass: TAggregateRootClass;
     protected readonly logger: ILogger;
     protected readonly logContext: any;
@@ -27,6 +30,8 @@ export abstract class AbstractAggregateHandler<
     protected readonly snapshotInterval: number;
 
     constructor(options: AbstractAggregateHandlerOptions<TAggregateRootClass>) {
+        super(options.transactionManager);
+
         this.aggregateClass = options.aggregateClass;
         this.logger = options.logger ?? new VoidLogger();
 

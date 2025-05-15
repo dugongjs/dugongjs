@@ -4,7 +4,6 @@ import type { IMessageSerdes } from "../../ports/common/message-broker/i-message
 import type { IMessageProducer } from "../../ports/outbound/message-broker/i-message-producer.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
-import type { TransactionContext } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 import type { SerializableObject } from "../../types/serializable-object.type.js";
 import {
@@ -16,7 +15,6 @@ import { MissingProducerOrSerdesError } from "./errors/missing-producer-or-serde
 
 export type AggregateManagerOptions<TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>> =
     AbstractAggregateHandlerOptions<TAggregateRootClass> & {
-        transactionContext: TransactionContext | null;
         domainEventRepository: IDomainEventRepository;
         snapshotRepository: ISnapshotRepository;
         messageProducer?: IMessageProducer<any>;
@@ -33,7 +31,6 @@ export type CommitOptions = {
 export class AggregateManager<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
 > extends AbstractAggregateHandler<TAggregateRootClass> {
-    private readonly transactionContext: TransactionContext | null;
     private readonly domainEventRepository: IDomainEventRepository;
     private readonly snapshotRepository: ISnapshotRepository;
     private readonly messageProducer?: IMessageProducer<any>;
@@ -41,7 +38,6 @@ export class AggregateManager<
 
     constructor(options: AggregateManagerOptions<TAggregateRootClass>) {
         super(options);
-        this.transactionContext = options.transactionContext;
         this.domainEventRepository = options.domainEventRepository;
         this.snapshotRepository = options.snapshotRepository;
         this.messageProducer = options.messageProducer;
@@ -93,7 +89,7 @@ export class AggregateManager<
             `Committing ${serializedDomainEvents.length} staged domain events to event log for ${this.aggregateType} aggregate ${aggregateId}`
         );
 
-        await this.domainEventRepository.saveDomainEvents(this.transactionContext, serializedDomainEvents);
+        await this.domainEventRepository.saveDomainEvents(this.getTransactionContext(), serializedDomainEvents);
 
         this.logger.verbose(
             logContext,
@@ -115,7 +111,7 @@ export class AggregateManager<
                 this.messageSerdes!.wrapDomainEvent(serializedDomainEvent)
             );
 
-            await this.messageProducer.publishMessages(this.transactionContext, channelId, messages);
+            await this.messageProducer.publishMessages(this.getTransactionContext(), channelId, messages);
 
             this.logger.verbose(
                 logContext,
@@ -161,7 +157,7 @@ export class AggregateManager<
 
         const snapshot = aggregateSnapshotTransformer.takeSnapshot(this.aggregateOrigin, this.aggregateType, aggregate);
 
-        await this.snapshotRepository.saveSnapshot(this.transactionContext, snapshot);
+        await this.snapshotRepository.saveSnapshot(this.getTransactionContext(), snapshot);
 
         this.logger.verbose(
             logContext,

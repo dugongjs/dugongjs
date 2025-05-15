@@ -3,6 +3,7 @@ import { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abst
 import { AbstractEventSourcedAggregateRoot, Aggregate, ExternalAggregate } from "../../domain/index.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
+import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { AggregateFactory } from "../aggregate-factory/aggregate-factory.js";
 import { AggregateManager } from "../aggregate-manager/aggregate-manager.js";
 import { AggregateContext } from "./aggregate-context.js";
@@ -15,6 +16,9 @@ class TestAggregate extends AbstractAggregateRoot {}
 class TestEventSourcedAggregate extends AbstractEventSourcedAggregateRoot {}
 
 describe("AggregateContext", () => {
+    const mockTransactionManager = mock<ITransactionManager>({
+        transaction: (fn) => fn({})
+    });
     const mockDomainEventRepository = mock<IDomainEventRepository>();
     const mockSnapshotRepository = mock<ISnapshotRepository>();
 
@@ -27,9 +31,9 @@ describe("AggregateContext", () => {
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestAggregate,
                 currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                transactionContext: null
+                snapshotRepository: mockSnapshotRepository
             });
 
             expect(aggregateContext).toBeInstanceOf(AggregateContext);
@@ -41,9 +45,9 @@ describe("AggregateContext", () => {
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestAggregate,
                 currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                transactionContext: null
+                snapshotRepository: mockSnapshotRepository
             });
 
             const factory = aggregateContext.getFactory();
@@ -55,9 +59,9 @@ describe("AggregateContext", () => {
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestEventSourcedAggregate,
                 currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                transactionContext: null
+                snapshotRepository: mockSnapshotRepository
             });
 
             const factory = aggregateContext.getFactory();
@@ -71,9 +75,9 @@ describe("AggregateContext", () => {
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestAggregate,
                 currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                transactionContext: null
+                snapshotRepository: mockSnapshotRepository
             });
 
             const manager = aggregateContext.getManager();
@@ -85,9 +89,9 @@ describe("AggregateContext", () => {
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestEventSourcedAggregate,
                 currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                transactionContext: null
+                snapshotRepository: mockSnapshotRepository
             });
 
             expect(() => aggregateContext.getManager()).toThrow(AggregateManagerNotAvailableError);
@@ -99,9 +103,9 @@ describe("AggregateContext", () => {
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestAggregate,
                 currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                transactionContext: null
+                snapshotRepository: mockSnapshotRepository
             });
 
             const factory = aggregateContext.getFactory();
@@ -113,9 +117,9 @@ describe("AggregateContext", () => {
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestEventSourcedAggregate,
                 currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                transactionContext: null
+                snapshotRepository: mockSnapshotRepository
             });
 
             const factory = aggregateContext.getFactory();
@@ -127,9 +131,9 @@ describe("AggregateContext", () => {
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestAggregate,
                 currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                transactionContext: null
+                snapshotRepository: mockSnapshotRepository
             });
 
             const manager = aggregateContext.getManager();
@@ -141,9 +145,9 @@ describe("AggregateContext", () => {
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestEventSourcedAggregate,
                 currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                transactionContext: null
+                snapshotRepository: mockSnapshotRepository
             });
 
             type Manager = ReturnType<typeof aggregateContext.getManager>;

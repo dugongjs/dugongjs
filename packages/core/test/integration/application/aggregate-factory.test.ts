@@ -9,15 +9,16 @@ import type {
     ISnapshotRepository,
     SerializedSnapshot
 } from "../../../src/ports/outbound/repository/i-snapshot-repository.js";
+import type { ITransactionManager } from "../../../src/ports/outbound/transaction-manager/i-transaction-manager.js";
 import { UserAggregate, UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent } from "../use-cases/user.aggregate.js";
 
 describe("AggregateFactory", () => {
     let factory: AggregateFactory<typeof UserAggregate>;
 
+    const transactionManager = mock<ITransactionManager>();
     const domainEventRepository = mock<IDomainEventRepository>();
     const snapshotRepository = mock<ISnapshotRepository>();
     const logger = mock<ILogger>();
-    const transactionContext = {};
     const currentOrigin = "TestOrigin";
 
     beforeEach(() => {
@@ -26,7 +27,7 @@ describe("AggregateFactory", () => {
         mockReset(logger);
         factory = new AggregateFactory({
             aggregateClass: UserAggregate,
-            transactionContext,
+            transactionManager,
             domainEventRepository,
             snapshotRepository,
             currentOrigin,
@@ -42,7 +43,7 @@ describe("AggregateFactory", () => {
                 () =>
                     new AggregateFactory({
                         aggregateClass: AggregateWithoutMetadata,
-                        transactionContext,
+                        transactionManager,
                         domainEventRepository,
                         snapshotRepository,
                         currentOrigin,

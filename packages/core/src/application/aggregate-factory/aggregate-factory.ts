@@ -4,7 +4,6 @@ import { aggregateDomainEventApplier } from "../../domain/aggregate-domain-event
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
-import type { TransactionContext } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 import {
     AbstractAggregateHandler,
@@ -16,7 +15,6 @@ import { MissingAggregateIdError } from "./errors/missing-aggregate-id.error.js"
 export type AggregateFactoryOptions<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
 > = AbstractAggregateHandlerOptions<TAggregateRootClass> & {
-    transactionContext: TransactionContext | null;
     domainEventRepository: IDomainEventRepository;
     snapshotRepository?: ISnapshotRepository;
 };
@@ -33,13 +31,11 @@ export type BuildFromEventLogOptions = {
 export class AggregateFactory<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
 > extends AbstractAggregateHandler<TAggregateRootClass> {
-    private readonly transactionContext: TransactionContext | null;
     private readonly domainEventRepository: IDomainEventRepository;
     private readonly snapshotRepository?: ISnapshotRepository;
 
     constructor(options: AggregateFactoryOptions<TAggregateRootClass>) {
         super(options);
-        this.transactionContext = options.transactionContext;
         this.domainEventRepository = options.domainEventRepository;
         this.snapshotRepository = options.snapshotRepository;
     }
@@ -106,7 +102,7 @@ export class AggregateFactory<
             `Fetching domain events from event log for ${this.aggregateType} aggregate ${aggregateId}`
         );
         const serializedDomainEvents = await this.domainEventRepository.getAggregateDomainEvents(
-            this.transactionContext,
+            this.getTransactionContext(),
             this.aggregateOrigin,
             this.aggregateType,
             aggregateId
@@ -172,7 +168,7 @@ export class AggregateFactory<
         this.logger.verbose(logContext, `Fetching latest snapshot for ${this.aggregateType} aggregate ${aggregateId}`);
 
         const latestSnapshot = await this.snapshotRepository.getLatestSnapshot(
-            this.transactionContext,
+            this.getTransactionContext(),
             this.aggregateOrigin,
             this.aggregateType,
             aggregateId
@@ -198,7 +194,7 @@ export class AggregateFactory<
         );
 
         const serializedDomainEvents = await this.domainEventRepository.getAggregateDomainEvents(
-            this.transactionContext,
+            this.getTransactionContext(),
             this.aggregateOrigin,
             this.aggregateType,
             aggregateId,

@@ -44,7 +44,7 @@ export class AggregateQueryService implements IAggregateQueryService {
 
         const factory = new AggregateFactory({
             aggregateClass,
-            transactionContext: null,
+            transactionManager: { transaction: (fn) => fn({}) },
             domainEventRepository: this.domainEventRepository,
             currentOrigin: this.currentOrigin,
             logger: this.logger

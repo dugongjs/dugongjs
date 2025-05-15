@@ -1,11 +1,14 @@
 import { mock, mockReset } from "vitest-mock-extended";
 import { AbstractAggregateRoot, Aggregate } from "../../domain/index.js";
-import { IMessageConsumer } from "../../ports/index.js";
+import { IMessageConsumer, ITransactionManager } from "../../ports/index.js";
 import type { IConsumedMessageRepository } from "../../ports/outbound/repository/i-consumed-message-repository.js";
 import type { ILogger } from "../logger/i-logger.js";
 import { WaitForMessageConsumer, type WaitForMessageConsumerOptions } from "./wait-for-message-consumer.js";
 
 describe("WaitForMessageConsumer", () => {
+    const mockTransactionManager = mock<ITransactionManager>({
+        transaction: (fn) => fn({})
+    });
     const mockConsumedMessageRepository = mock<IConsumedMessageRepository>({
         checkIfMessageIsConsumed: vi.fn()
     });
@@ -20,6 +23,7 @@ describe("WaitForMessageConsumer", () => {
 
     const defaultOptions: WaitForMessageConsumerOptions = {
         aggregateClass: TestAggregate,
+        transactionManager: mockTransactionManager,
         consumedMessageRepository: mockConsumedMessageRepository,
         messageConsumer: mockMessageConsumer,
         currentOrigin: "TestOrigin",
@@ -28,6 +32,7 @@ describe("WaitForMessageConsumer", () => {
     };
 
     beforeEach(() => {
+        mockReset(mockTransactionManager);
         mockReset(mockConsumedMessageRepository);
         mockReset(mockLogger);
         vi.useFakeTimers();

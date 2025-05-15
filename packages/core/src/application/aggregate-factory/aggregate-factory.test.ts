@@ -11,7 +11,7 @@ import {
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository, SerializedSnapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
-import type { TransactionContext } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
+import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import type { Constructor } from "../../types/constructor.type.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import type { ILogger } from "../logger/i-logger.js";
@@ -20,7 +20,9 @@ import { AggregateMetadataNotFoundError } from "./errors/aggregate-metadata-not-
 
 describe("AggregateFactory", () => {
     const mockAggregateClass = vi.fn();
-    const mockTransactionContext = mock<TransactionContext>();
+    const mockTransactionManager = mock<ITransactionManager>({
+        transaction: (fn) => fn({})
+    });
     const mockDomainEventRepository = mock<IDomainEventRepository>();
     const mockSnapshotRepository = mock<ISnapshotRepository>();
     const mockLogger = mock<ILogger>();
@@ -32,7 +34,7 @@ describe("AggregateFactory", () => {
     };
 
     beforeEach(() => {
-        mockReset(mockTransactionContext);
+        mockReset(mockTransactionManager);
         mockReset(mockDomainEventRepository);
         mockReset(mockSnapshotRepository);
         mockReset(mockLogger);
@@ -52,7 +54,7 @@ describe("AggregateFactory", () => {
             expect(() => {
                 new AggregateFactory({
                     aggregateClass: mockAggregateClass,
-                    transactionContext: mockTransactionContext,
+                    transactionManager: mockTransactionManager,
                     domainEventRepository: mockDomainEventRepository,
                     snapshotRepository: mockSnapshotRepository,
                     currentOrigin: "CurrentOrigin",
@@ -64,7 +66,7 @@ describe("AggregateFactory", () => {
         it("should construct a valid instance", () => {
             const factory = new AggregateFactory({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 currentOrigin: "CurrentOrigin",
@@ -79,7 +81,7 @@ describe("AggregateFactory", () => {
         it("should build the aggregate from the event log", async () => {
             const factory = new AggregateFactory({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 currentOrigin: "CurrentOrigin",
@@ -109,7 +111,7 @@ describe("AggregateFactory", () => {
             const result = await factory.buildFromEventLog(aggregateId);
 
             expect(mockDomainEventRepository.getAggregateDomainEvents).toHaveBeenCalledWith(
-                mockTransactionContext,
+                factory.getTransactionContext(),
                 "TestOrigin",
                 "TestType",
                 aggregateId
@@ -129,7 +131,7 @@ describe("AggregateFactory", () => {
         it("should return null if no events are found in event log", async () => {
             const factory = new AggregateFactory({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 currentOrigin: "CurrentOrigin",
@@ -148,7 +150,7 @@ describe("AggregateFactory", () => {
         it("should build the aggregate from the latest snapshot", async () => {
             const factory = new AggregateFactory({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 currentOrigin: "CurrentOrigin",
@@ -192,7 +194,7 @@ describe("AggregateFactory", () => {
             const result = await factory.buildFromLatestSnapshot(aggregateId);
 
             expect(mockSnapshotRepository.getLatestSnapshot).toHaveBeenCalledWith(
-                mockTransactionContext,
+                factory.getTransactionContext(),
                 "TestOrigin",
                 "TestType",
                 aggregateId
@@ -212,7 +214,7 @@ describe("AggregateFactory", () => {
         it("should return null if no snapshot is found", async () => {
             const factory = new AggregateFactory({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 currentOrigin: "CurrentOrigin",

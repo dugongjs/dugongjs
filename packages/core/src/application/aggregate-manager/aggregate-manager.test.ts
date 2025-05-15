@@ -9,7 +9,7 @@ import type { IMessageSerdes } from "../../ports/common/message-broker/i-message
 import type { IMessageProducer } from "../../ports/outbound/message-broker/i-message-producer.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
-import type { TransactionContext } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
+import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggregate-metadata-not-found.error.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import type { ILogger } from "../logger/i-logger.js";
@@ -18,7 +18,9 @@ import { MissingProducerOrSerdesError } from "./errors/missing-producer-or-serde
 
 describe("AggregateManager", () => {
     const mockAggregateClass = vi.fn();
-    const mockTransactionContext = mock<TransactionContext>();
+    const mockTransactionManager = mock<ITransactionManager>({
+        transaction: (fn) => fn({})
+    });
     const mockDomainEventRepository = mock<IDomainEventRepository>();
     const mockSnapshotRepository = mock<ISnapshotRepository>();
     const mockMessageProducer = mock<IMessageProducer<any>>();
@@ -32,7 +34,7 @@ describe("AggregateManager", () => {
     };
 
     beforeEach(() => {
-        mockReset(mockTransactionContext);
+        mockReset(mockTransactionManager);
         mockReset(mockDomainEventRepository);
         mockReset(mockSnapshotRepository);
         mockReset(mockMessageProducer);
@@ -53,7 +55,7 @@ describe("AggregateManager", () => {
             expect(() => {
                 new AggregateManager({
                     aggregateClass: mockAggregateClass,
-                    transactionContext: mockTransactionContext,
+                    transactionManager: mockTransactionManager,
                     domainEventRepository: mockDomainEventRepository,
                     snapshotRepository: mockSnapshotRepository,
                     messageProducer: mockMessageProducer,
@@ -68,7 +70,7 @@ describe("AggregateManager", () => {
             expect(() => {
                 new AggregateManager({
                     aggregateClass: mockAggregateClass,
-                    transactionContext: mockTransactionContext,
+                    transactionManager: mockTransactionManager,
                     domainEventRepository: mockDomainEventRepository,
                     snapshotRepository: mockSnapshotRepository,
                     messageProducer: mockMessageProducer,
@@ -82,7 +84,7 @@ describe("AggregateManager", () => {
         it("should construct a valid instance", () => {
             const manager = new AggregateManager({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
@@ -101,7 +103,7 @@ describe("AggregateManager", () => {
 
             const manager = new AggregateManager({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
@@ -126,7 +128,7 @@ describe("AggregateManager", () => {
 
             const manager = new AggregateManager({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageSerdes: mockMessageSerdes,
@@ -155,7 +157,7 @@ describe("AggregateManager", () => {
 
             const manager = new AggregateManager({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
@@ -177,7 +179,7 @@ describe("AggregateManager", () => {
             expect(mockDomainEvent.setCorrelationId).toHaveBeenCalledWith(correlationId);
             expect(mockDomainEvent.setTriggeredByUserId).toHaveBeenCalledWith(triggeredByUserId);
             expect(mockDomainEvent.setTriggeredByEventId).toHaveBeenCalledWith(triggeredByEventId);
-            expect(mockDomainEventRepository.saveDomainEvents).toHaveBeenCalledWith(mockTransactionContext, [
+            expect(mockDomainEventRepository.saveDomainEvents).toHaveBeenCalledWith(manager.getTransactionContext(), [
                 "serialized-event"
             ]);
             expect(mockMessageSerdes.wrapDomainEvent).toHaveBeenCalled();
@@ -195,7 +197,7 @@ describe("AggregateManager", () => {
 
             const manager = new AggregateManager({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
@@ -222,7 +224,7 @@ describe("AggregateManager", () => {
 
             const manager = new AggregateManager({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
@@ -250,7 +252,7 @@ describe("AggregateManager", () => {
 
             const manager = new AggregateManager({
                 aggregateClass: mockAggregateClass,
-                transactionContext: mockTransactionContext,
+                transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
