@@ -1,4 +1,4 @@
-import { AggregateFactory, WaitForMessageConsumer } from "@dugongjs/core";
+import { AggregateFactory, ITransactionManager, WaitForMessageConsumer } from "@dugongjs/core";
 import { MessageBuilder } from "@dugongjs/testing";
 import { faker } from "@faker-js/faker";
 import { MessageSerdesKafkajs } from "../../../src/adapters/common/message-broker/message-serdes-kafkajs.js";
@@ -13,6 +13,7 @@ import { MoneyDepositedEvent } from "./account/domain-events/monet-deposited.eve
 import { MoneyWithdrawnEvent } from "./account/domain-events/monet-withdrawn.event.js";
 
 describe("Account", () => {
+    let transactionManager: ITransactionManager;
     let accountMessageConsumer: AggregateMessageConsumerKafkajs<typeof Account>;
     let accountMessageProducer: AggregateMessageProducerKafkajs<typeof Account>;
     let accountFactory: AggregateFactory<typeof Account>;
@@ -31,8 +32,7 @@ describe("Account", () => {
         });
         accountFactory = new AggregateFactoryTypeOrm({
             aggregateClass: Account,
-            currentOrigin: "TestOrigin",
-            transactionContext: null
+            currentOrigin: "TestOrigin"
         });
         waitForMessageConsumer = new WaitForMessageConsumerKafkajs({
             aggregateClass: Account,

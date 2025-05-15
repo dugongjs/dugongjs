@@ -8,14 +8,18 @@ import {
     DomainEventEntity,
     DomainEventRepositoryTypeOrm,
     SnapshotEntity,
-    SnapshotRepositoryTypeOrm
+    SnapshotRepositoryTypeOrm,
+    TransactionManagerTypeOrm
 } from "@dugongjs/typeorm";
 import { dataSource } from "../setup/data-source.js";
 import { Logger } from "./logger.js";
 
 export type AggregateFactoryTypeOrmOptions<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-> = Omit<AggregateFactoryOptions<TAggregateRootClass>, "domainEventRepository" | "snapshotRepository" | "logger">;
+> = Omit<
+    AggregateFactoryOptions<TAggregateRootClass>,
+    "transactionManager" | "domainEventRepository" | "snapshotRepository" | "logger"
+>;
 
 export class AggregateFactoryTypeOrm<
     TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
@@ -23,6 +27,7 @@ export class AggregateFactoryTypeOrm<
     constructor(options: AggregateFactoryTypeOrmOptions<TAggregateRootClass>) {
         super({
             ...options,
+            transactionManager: new TransactionManagerTypeOrm(dataSource),
             domainEventRepository: new DomainEventRepositoryTypeOrm(dataSource.getRepository(DomainEventEntity)),
             snapshotRepository: new SnapshotRepositoryTypeOrm(dataSource.getRepository(SnapshotEntity)),
             logger: new Logger()
