@@ -1,5 +1,14 @@
 # @dugongjs/kafkajs
 
+## 0.0.4
+
+### Patch Changes
+
+- 9dee746: Replaced IMessageSerdes port with IInboundMessageMapper and IOutboundMessageMapper to support asymmetric publish/consume paradigms
+- Updated dependencies [15c618f]
+- Updated dependencies [9dee746]
+    - @dugongjs/core@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes
