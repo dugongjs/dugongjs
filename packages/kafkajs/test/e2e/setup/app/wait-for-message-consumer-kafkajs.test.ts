@@ -1,12 +1,12 @@
 import { AbstractAggregateRoot, Aggregate } from "@dugongjs/core";
-import { WaitForMessageConsumerKafkajs } from "./wait-for-message-consumer-kafkajs.js";
+import { WaitForMessageConsumerKafkaJS } from "./wait-for-message-consumer-kafkajs.js";
 
-describe("AggregateMessageProducerKafkajs", () => {
+describe("AggregateMessageProducerKafkaJS", () => {
     it("should setup the waiter correctly", () => {
         @Aggregate("Test")
         class TestAggregate extends AbstractAggregateRoot {}
 
-        const waitForMessageConsumer = new WaitForMessageConsumerKafkajs({
+        const waitForMessageConsumer = new WaitForMessageConsumerKafkaJS({
             aggregateClass: TestAggregate,
             currentOrigin: "Test"
         });

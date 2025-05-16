@@ -1,8 +1,8 @@
 import type { IMessageProducer, TransactionContext } from "@dugongjs/core";
 import { Partitioners, type Kafka, type Message, type Producer, type ProducerConfig } from "kafkajs";
-import { MessageChannelParticipantKafkajs } from "../../common/message-broker/message-channel-participator-kafkajs.js";
+import { MessageChannelParticipantKafkaJS } from "../../common/message-broker/message-channel-participator-kafkajs.js";
 
-export class MessageProducerKafkajs extends MessageChannelParticipantKafkajs implements IMessageProducer<Message> {
+export class MessageProducerKafkaJS extends MessageChannelParticipantKafkaJS implements IMessageProducer<Message> {
     private producer: Producer;
     private isConnected: boolean = false;
 

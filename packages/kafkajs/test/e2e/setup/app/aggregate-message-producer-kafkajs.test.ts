@@ -1,12 +1,12 @@
 import { AbstractAggregateRoot, Aggregate } from "@dugongjs/core";
-import { AggregateMessageProducerKafkajs } from "./aggregate-message-producer-kafkajs.js";
+import { AggregateMessageProducerKafkaJS } from "./aggregate-message-producer-kafkajs.js";
 
-describe("AggregateMessageProducerKafkajs", () => {
+describe("AggregateMessageProducerKafkaJS", () => {
     it("should setup aggregate message Producer correctly", () => {
         @Aggregate("Test")
         class TestAggregate extends AbstractAggregateRoot {}
 
-        const aggregateMessageProducer = new AggregateMessageProducerKafkajs({
+        const aggregateMessageProducer = new AggregateMessageProducerKafkaJS({
             aggregateClass: TestAggregate,
             currentOrigin: "Test"
         });

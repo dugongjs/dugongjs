@@ -8,10 +8,10 @@ import {
     type ConsumerSubscribeTopics,
     type EachMessagePayload
 } from "kafkajs";
-import { MessageChannelParticipantKafkajs } from "../../common/message-broker/message-channel-participator-kafkajs.js";
+import { MessageChannelParticipantKafkaJS } from "../../common/message-broker/message-channel-participator-kafkajs.js";
 
-export class MessageConsumerKafkajs
-    extends MessageChannelParticipantKafkajs
+export class MessageConsumerKafkaJS
+    extends MessageChannelParticipantKafkaJS
     implements IMessageConsumer<EachMessagePayload>
 {
     private consumer: Consumer;

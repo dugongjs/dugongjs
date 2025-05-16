@@ -1,11 +1,11 @@
 import { AggregateFactory, ITransactionManager, WaitForMessageConsumer } from "@dugongjs/core";
 import { MessageBuilder } from "@dugongjs/testing";
 import { faker } from "@faker-js/faker";
-import { MessageSerdesKafkajs } from "../../../src/adapters/common/message-broker/message-serdes-kafkajs.js";
+import { OutboundMessageMapperKafkaJS } from "../../../src/adapters/outbound/message-broker/outbound-message-mapper-kafkajs.js";
 import { AggregateFactoryTypeOrm } from "../setup/app/aggregate-factory-typeorm.js";
-import { AggregateMessageConsumerKafkajs } from "../setup/app/aggregate-message-consumer-kafkajs.js";
-import { AggregateMessageProducerKafkajs } from "../setup/app/aggregate-message-producer-kafkajs.js";
-import { WaitForMessageConsumerKafkajs } from "../setup/app/wait-for-message-consumer-kafkajs.js";
+import { AggregateMessageConsumerKafkaJS } from "../setup/app/aggregate-message-consumer-kafkajs.js";
+import { AggregateMessageProducerKafkaJS } from "../setup/app/aggregate-message-producer-kafkajs.js";
+import { WaitForMessageConsumerKafkaJS } from "../setup/app/wait-for-message-consumer-kafkajs.js";
 import { Account } from "./account/account.aggregate.js";
 import { AccountClosedEvent } from "./account/domain-events/account-closed.event.js";
 import { AccountOpenedEvent } from "./account/domain-events/account-opened.event.js";
@@ -14,19 +14,19 @@ import { MoneyWithdrawnEvent } from "./account/domain-events/monet-withdrawn.eve
 
 describe("Account", () => {
     let transactionManager: ITransactionManager;
-    let accountMessageConsumer: AggregateMessageConsumerKafkajs<typeof Account>;
-    let accountMessageProducer: AggregateMessageProducerKafkajs<typeof Account>;
+    let accountMessageConsumer: AggregateMessageConsumerKafkaJS<typeof Account>;
+    let accountMessageProducer: AggregateMessageProducerKafkaJS<typeof Account>;
     let accountFactory: AggregateFactory<typeof Account>;
     let waitForMessageConsumer: WaitForMessageConsumer;
 
     const mockHandleMessage = vi.fn();
 
     beforeAll(async () => {
-        accountMessageConsumer = new AggregateMessageConsumerKafkajs({
+        accountMessageConsumer = new AggregateMessageConsumerKafkaJS({
             aggregateClass: Account,
             currentOrigin: "TestOrigin"
         });
-        accountMessageProducer = new AggregateMessageProducerKafkajs({
+        accountMessageProducer = new AggregateMessageProducerKafkaJS({
             aggregateClass: Account,
             currentOrigin: "TestOrigin"
         });
@@ -34,7 +34,7 @@ describe("Account", () => {
             aggregateClass: Account,
             currentOrigin: "TestOrigin"
         });
-        waitForMessageConsumer = new WaitForMessageConsumerKafkajs({
+        waitForMessageConsumer = new WaitForMessageConsumerKafkaJS({
             aggregateClass: Account,
             currentOrigin: "TestOrigin"
         });
@@ -59,7 +59,7 @@ describe("Account", () => {
             const owner = faker.person.fullName();
 
             const { domainEvents, domainEventIds } = new MessageBuilder({
-                messageSerdes: new MessageSerdesKafkajs()
+                outboundMessageMapper: new OutboundMessageMapperKafkaJS()
             })
                 .addDomainEvent(
                     new AccountOpenedEvent(accountId, {
@@ -88,7 +88,7 @@ describe("Account", () => {
             const owner = faker.person.fullName();
 
             const { domainEvents, domainEventIds } = new MessageBuilder({
-                messageSerdes: new MessageSerdesKafkajs()
+                outboundMessageMapper: new OutboundMessageMapperKafkaJS()
             })
                 .addDomainEvent(
                     new AccountOpenedEvent(accountId, {
@@ -116,7 +116,7 @@ describe("Account", () => {
             const owner = faker.person.fullName();
 
             const { domainEvents, domainEventIds } = new MessageBuilder({
-                messageSerdes: new MessageSerdesKafkajs()
+                outboundMessageMapper: new OutboundMessageMapperKafkaJS()
             })
                 .addDomainEvent(
                     new AccountOpenedEvent(accountId, {
@@ -149,7 +149,7 @@ describe("Account", () => {
             const owner = faker.person.fullName();
 
             const { domainEvents, domainEventIds } = new MessageBuilder({
-                messageSerdes: new MessageSerdesKafkajs()
+                outboundMessageMapper: new OutboundMessageMapperKafkaJS()
             })
                 .addDomainEvent(
                     new AccountOpenedEvent(accountId, {

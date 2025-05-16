@@ -1,53 +1,8 @@
-import type { IMessageSerdes, SerializedDomainEvent } from "@dugongjs/core";
-import type { EachMessagePayload, Message } from "kafkajs";
+import type { IInboundMessageMapper, SerializedDomainEvent } from "@dugongjs/core";
+import type { EachMessagePayload } from "kafkajs";
 
-export class MessageSerdesKafkajs implements IMessageSerdes<EachMessagePayload, Message> {
-    public wrapDomainEvent(domainEvent: SerializedDomainEvent): Message {
-        const {
-            id,
-            origin,
-            aggregateType,
-            aggregateId,
-            type,
-            version,
-            sequenceNumber,
-            timestamp,
-            correlationId,
-            triggeredByUserId,
-            triggeredByEventId,
-            metadata,
-            payload
-        } = domainEvent;
-
-        const message: Message = {
-            key: Buffer.from(aggregateId),
-            value: payload ? Buffer.from(JSON.stringify(payload)) : null,
-            headers: {
-                id: Buffer.from(id),
-                origin: Buffer.from(origin),
-                aggregateType: Buffer.from(aggregateType),
-                type: Buffer.from(type),
-                version: Buffer.from(version.toString()),
-                sequenceNumber: Buffer.from(sequenceNumber.toString()),
-                timestamp: Buffer.from(timestamp.getTime().toString()),
-                correlationId: correlationId ? Buffer.from(correlationId) : undefined,
-                triggeredByUserId: triggeredByUserId ? Buffer.from(triggeredByUserId) : undefined,
-                triggeredByEventId: triggeredByEventId ? Buffer.from(triggeredByEventId) : undefined,
-                metadata: metadata ? Buffer.from(JSON.stringify(metadata)) : undefined
-            }
-        };
-
-        // Kafka headers cannot have null/undefined values
-        for (const [key, value] of Object.entries(message.headers ?? {})) {
-            if (value == null) {
-                delete message.headers![key];
-            }
-        }
-
-        return message;
-    }
-
-    public unwrapMessage(messagePayload: EachMessagePayload): SerializedDomainEvent {
+export class InboundMessageMapperKafkaJS implements IInboundMessageMapper<EachMessagePayload> {
+    public map(messagePayload: EachMessagePayload): SerializedDomainEvent {
         const message = messagePayload.message;
         const headers = message.headers;
         const key = message.key;
