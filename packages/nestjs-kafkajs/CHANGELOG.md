@@ -1,5 +1,11 @@
 # @dugongjs/nestjs-kafkajs
 
+## 0.0.4
+
+### Patch Changes
+
+- 8b9ae67: Fix missing exports
+
 ## 0.0.3
 
 ### Patch Changes
