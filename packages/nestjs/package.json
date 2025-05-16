@@ -48,7 +48,6 @@
         "@types/node": "^20.17.6",
         "@types/pg": "^8.11.14",
         "@types/supertest": "^6.0.3",
-        "@types/uuid": "^9.0.8",
         "@vitest/ui": "^3.1.2",
         "dotenv": "^16.5.0",
         "nestjs-pino": "^4.4.0",

@@ -281,9 +281,6 @@ importers:
       '@types/pg':
         specifier: ^8.11.14
         version: 8.11.14
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
       '@vitest/ui':
         specifier: ^3.1.2
         version: 3.1.2(vitest@3.1.2)
@@ -314,9 +311,6 @@ importers:
       vitest-mock-extended:
         specifier: ^2.0.2
         version: 2.0.2(typescript@5.8.2)(vitest@3.1.2(@types/debug@4.1.12)(@types/node@20.17.30)(@vitest/ui@3.1.2)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
-      zod:
-        specifier: ^3.24.3
-        version: 3.24.3
 
   packages/nestjs:
     dependencies:
@@ -375,9 +369,6 @@ importers:
       '@types/supertest':
         specifier: ^6.0.3
         version: 6.0.3
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
       '@vitest/ui':
         specifier: ^3.1.2
         version: 3.1.2(vitest@3.1.2)
@@ -577,30 +568,12 @@ importers:
       '@swc/helpers':
         specifier: ^0.5.17
         version: 0.5.17
-      '@testcontainers/postgresql':
-        specifier: ^10.24.2
-        version: 10.24.2
       '@types/node':
         specifier: ^20.17.6
         version: 20.17.30
-      '@types/pg':
-        specifier: ^8.11.14
-        version: 8.11.14
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
       '@vitest/ui':
         specifier: ^3.1.2
         version: 3.1.2(vitest@3.1.2)
-      dotenv:
-        specifier: ^16.5.0
-        version: 16.5.0
-      pg:
-        specifier: ^8.15.6
-        version: 8.15.6
-      pino:
-        specifier: ^9.6.0
-        version: 9.6.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -619,9 +592,6 @@ importers:
       vitest-mock-extended:
         specifier: ^2.0.2
         version: 2.0.2(typescript@5.8.2)(vitest@3.1.2(@types/debug@4.1.12)(@types/node@20.17.30)(@vitest/ui@3.1.2)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
-      zod:
-        specifier: ^3.24.3
-        version: 3.24.3
     publishDirectory: dist
 
   packages/scripts:
