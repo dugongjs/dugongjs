@@ -11,11 +11,11 @@ import { aggregateDomainEventApplier } from "./aggregate-domain-event-applier.js
 import { DomainEventSequenceNumberMismatchError } from "./errors/domain-event-sequence-number-mismatch.error.js";
 
 class MockDomainEvent<TPayload extends DomainEventPayload = null> extends AbstractDomainEvent<TPayload> {
-    public static readonly context = "MockContext";
-    public static readonly origin = "MockOrigin";
-    public static readonly aggregateType = "MockAggregateType";
-    public static readonly type = "MockDomainEvent";
-    public static readonly version = 1;
+    public readonly context = "MockContext";
+    public readonly origin = "MockOrigin";
+    public readonly aggregateType = "MockAggregateType";
+    public readonly type = "MockDomainEvent";
+    public readonly version = 1;
 }
 
 class MockEventSourcedAggregateRoot extends AbstractEventSourcedAggregateRoot {

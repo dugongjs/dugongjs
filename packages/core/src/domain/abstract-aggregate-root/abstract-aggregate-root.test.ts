@@ -11,11 +11,11 @@ vi.mock("uuid", () => ({
 }));
 
 class TestDomainEventWithoutPayload extends AbstractDomainEvent {
-    public static readonly context = "TestContext";
-    public static readonly origin = "TestOrigin";
-    public static readonly aggregateType = "TestAggregate";
-    public static readonly type = "TestType";
-    public static readonly version = 1;
+    public readonly context = "TestContext";
+    public readonly origin = "TestOrigin";
+    public readonly aggregateType = "TestAggregate";
+    public readonly type = "TestType";
+    public readonly version = 1;
 
     constructor(aggregateId: string) {
         super(aggregateId);
@@ -23,11 +23,11 @@ class TestDomainEventWithoutPayload extends AbstractDomainEvent {
 }
 
 class TestDomainEventWithPayload extends AbstractDomainEvent<{ key: string }> {
-    public static readonly context = "TestContext";
-    public static readonly origin = "TestOrigin";
-    public static readonly aggregateType = "TestAggregate";
-    public static readonly type = "TestType";
-    public static readonly version = 1;
+    public readonly context = "TestContext";
+    public readonly origin = "TestOrigin";
+    public readonly aggregateType = "TestAggregate";
+    public readonly type = "TestType";
+    public readonly version = 1;
 
     constructor(aggregateId: string, payload: { key: string }) {
         super(aggregateId, payload);

@@ -9,9 +9,11 @@ import { Process } from "../../../src/domain/aggregate-decorators/process.js";
 import { Snapshotable } from "../../../src/domain/aggregate-decorators/snapshotable.js";
 import { DomainEvent } from "../../../src/domain/domain-event-decorators/domain-event.js";
 
-class AbstractUserDomainEvent<TPayload extends DomainEventPayload = null> extends AbstractDomainEvent<TPayload> {
-    public static readonly origin = "IAM.UserService";
-    public static readonly aggregateType = "User";
+abstract class AbstractUserDomainEvent<
+    TPayload extends DomainEventPayload = null
+> extends AbstractDomainEvent<TPayload> {
+    public readonly origin = "IAM.UserService";
+    public readonly aggregateType = "User";
 
     protected static validateUsername(username: string): void {
         if (username.length < 3) {
@@ -25,8 +27,8 @@ class AbstractUserDomainEvent<TPayload extends DomainEventPayload = null> extend
 
 @DomainEvent()
 export class UserCreatedEvent extends AbstractUserDomainEvent<{ username: string }> {
-    public static readonly type = "UserCreated";
-    public static readonly version = 1;
+    public readonly type = "UserCreated";
+    public readonly version = 1;
 
     constructor(aggregateId: string, payload: { username: string }) {
         super(aggregateId, payload);
@@ -39,8 +41,8 @@ export class UserCreatedEvent extends AbstractUserDomainEvent<{ username: string
 
 @DomainEvent()
 export class UserUpdatedEvent extends AbstractUserDomainEvent<{ username: string }> {
-    public static readonly type = "UserUpdated";
-    public static readonly version = 1;
+    public readonly type = "UserUpdated";
+    public readonly version = 1;
 
     constructor(aggregateId: string, payload: { username: string }) {
         super(aggregateId, payload);
@@ -53,8 +55,8 @@ export class UserUpdatedEvent extends AbstractUserDomainEvent<{ username: string
 
 @DomainEvent()
 export class UserDeletedEvent extends AbstractUserDomainEvent {
-    public static readonly type = "UserDeleted";
-    public static readonly version = 1;
+    public readonly type = "UserDeleted";
+    public readonly version = 1;
 
     constructor(aggregateId: string) {
         super(aggregateId);

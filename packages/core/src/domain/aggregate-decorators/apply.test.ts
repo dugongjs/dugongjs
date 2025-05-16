@@ -10,7 +10,12 @@ vi.mock("../aggregate-metadata-registry/aggregate-metadata-registry.js", () => (
 
 describe("Apply decorator", () => {
     it("should register the domain event applier in the aggregate metadata registry", () => {
-        class TestDomainEvent extends AbstractDomainEvent {}
+        class TestDomainEvent extends AbstractDomainEvent {
+            public origin: string;
+            public aggregateType: string;
+            public type: string;
+            public version: number;
+        }
         class TestAggregate {
             @Apply(TestDomainEvent)
             handleEvent() {}

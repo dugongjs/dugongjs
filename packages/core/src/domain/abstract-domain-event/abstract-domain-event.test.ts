@@ -3,25 +3,15 @@ import { AbstractDomainEvent } from "./abstract-domain-event.js";
 import type { SerializedDomainEvent } from "./serialized-domain-event.js";
 
 class TestDomainEvent extends AbstractDomainEvent<{ key: string }> {
-    public static readonly origin = "TestOrigin";
-    public static readonly aggregateType = "TestAggregate";
-    public static readonly type = "TestType";
-    public static readonly version = 1;
+    public readonly origin = "TestOrigin";
+    public readonly aggregateType = "TestAggregate";
+    public readonly type = "TestType";
+    public readonly version = 1;
 }
 
 describe("AbstractDomainEvent", () => {
     describe("constructor", () => {
-        it("should throw an error if static properties are missing", () => {
-            class InvalidDomainEvent extends AbstractDomainEvent {
-                // Missing static properties
-            }
-
-            expect(() => new InvalidDomainEvent(faker.string.uuid())).toThrowErrorMatchingInlineSnapshot(
-                `[Error: Missing static property 'origin' in InvalidDomainEvent]`
-            );
-        });
-
-        it("should initialize with valid static properties", () => {
+        it("should initialize with valid constant properties", () => {
             const aggregateId = faker.string.uuid();
             const payload = { key: faker.string.uuid() };
             const event = new TestDomainEvent(aggregateId, payload);
@@ -36,10 +26,10 @@ describe("AbstractDomainEvent", () => {
 
         it("should set payload to null if not provided", () => {
             class NullPayloadEvent extends AbstractDomainEvent<null> {
-                public static readonly origin = "TestOrigin";
-                public static readonly aggregateType = "TestAggregate";
-                public static readonly type = "TestType";
-                public static readonly version = 1;
+                public readonly origin = "TestOrigin";
+                public readonly aggregateType = "TestAggregate";
+                public readonly type = "TestType";
+                public readonly version = 1;
             }
 
             const aggregateId = faker.string.uuid();
@@ -155,10 +145,10 @@ describe("AbstractDomainEvent", () => {
 
             //@ts-expect-error: NonSerializablePayload is not serializable
             class InvalidPayloadEvent extends AbstractDomainEvent<NonSerializablePayload> {
-                public static readonly origin = "TestOrigin";
-                public static readonly aggregateType = "TestAggregate";
-                public static readonly type = "TestType";
-                public static readonly version = 1;
+                public readonly origin = "TestOrigin";
+                public readonly aggregateType = "TestAggregate";
+                public readonly type = "TestType";
+                public readonly version = 1;
 
                 constructor(aggregateId: string, payload: NonSerializablePayload) {
                     super(aggregateId, payload);

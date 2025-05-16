@@ -10,10 +10,10 @@ export type DomainEventPayload = SerializableObject | null;
  * @template TPayload - The type of the payload. It can be a SerializableObject or null.
  */
 export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = null> {
-    public static readonly origin: string;
-    public static readonly aggregateType: string;
-    public static readonly type: string;
-    public static readonly version: number;
+    public abstract readonly origin: string;
+    public abstract readonly aggregateType: string;
+    public abstract readonly type: string;
+    public abstract readonly version: number;
 
     protected id: string;
     protected aggregateId: string;
@@ -26,10 +26,24 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
     protected metadata?: SerializableObject;
 
     constructor(aggregateId: string, ...payload: TPayload extends null ? [] : [payload: TPayload]) {
-        this.validateStaticProperties();
-
         this.aggregateId = aggregateId;
         this.payload = (payload[0] ?? null) as TPayload;
+    }
+
+    public static get origin(): string {
+        return new (this as any)().origin;
+    }
+
+    public static get aggregateType(): string {
+        return new (this as any)().aggregateType;
+    }
+
+    public static get type(): string {
+        return new (this as any)().type;
+    }
+
+    public static get version(): number {
+        return new (this as any)().version;
     }
 
     /**
@@ -53,19 +67,19 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
     public onApply?(): void;
 
     public getOrigin(): string {
-        return (this.constructor as typeof AbstractDomainEvent).origin;
+        return this.origin;
     }
 
     public getAggregateType(): string {
-        return (this.constructor as typeof AbstractDomainEvent).aggregateType;
+        return this.aggregateType;
     }
 
     public getType(): string {
-        return (this.constructor as typeof AbstractDomainEvent).type;
+        return this.type;
     }
 
     public getVersion(): number {
-        return (this.constructor as typeof AbstractDomainEvent).version;
+        return this.version;
     }
 
     public getId(): string {
@@ -178,20 +192,5 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
         instance.metadata = serializedDomainEvent.metadata;
 
         return instance as unknown as InstanceType<TDomainEventClass>;
-    }
-
-    private validateStaticProperties(): void {
-        if (!this.getOrigin()) {
-            throw new Error(`Missing static property 'origin' in ${this.constructor.name}`);
-        }
-        if (!this.getAggregateType()) {
-            throw new Error(`Missing static property 'aggregateType' in ${this.constructor.name}`);
-        }
-        if (!this.getType()) {
-            throw new Error(`Missing static property 'type' in ${this.constructor.name}`);
-        }
-        if (!this.getVersion()) {
-            throw new Error(`Missing static property 'version' in ${this.constructor.name}`);
-        }
     }
 }
