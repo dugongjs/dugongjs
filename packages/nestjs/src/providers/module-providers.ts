@@ -2,9 +2,10 @@ import type {
     Constructor,
     IConsumedMessageRepository,
     IDomainEventRepository,
+    IInboundMessageMapper,
     IMessageConsumer,
     IMessageProducer,
-    IMessageSerdes,
+    IOutboundMessageMapper,
     ISnapshotRepository,
     ITransactionManager
 } from "@dugongjs/core";
@@ -19,4 +20,5 @@ export type ConsumedMessageRepositoryProvider = { consumedMessageRepository: Con
 export type TransactionManagerProvider = { transactionManager: Constructor<ITransactionManager> };
 export type MessageProducerProvider = { messageProducer: Constructor<IMessageProducer<any>> };
 export type MessageConsumerProvider = { messageConsumer: Constructor<IMessageConsumer<any>> };
-export type MessageSerdesProvider = { messageSerdes: Constructor<IMessageSerdes<any>> };
+export type InboundMessageMapperProvider = { inboundMessageMapper: Constructor<IInboundMessageMapper<any>> };
+export type OutboundMessageMapperProvider = { outboundMessageMapper: Constructor<IOutboundMessageMapper<any>> };

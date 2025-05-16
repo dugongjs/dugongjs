@@ -10,10 +10,11 @@ export { EventIssuerModule, type EventIssuerModuleOptions } from "./event-issuer
 export { EventSourcingModule, type EventSourcingModuleOptions } from "./event-sourcing/event-sourcing.module.js";
 export { EventSourcingService } from "./event-sourcing/event-sourcing.service.js";
 export { InMemoryMessageBusService } from "./message-broker-in-memory/in-memory-message-bus.service.js";
+export { InboundMessageMapperInMemoryService } from "./message-broker-in-memory/inbound-message-mapper-in-memory.service.js";
 export { MessageBrokerInMemoryModule } from "./message-broker-in-memory/message-broker-in-memory.module.js";
 export { MessageConsumerInMemoryService } from "./message-broker-in-memory/message-consumer-in-memory.service.js";
 export { MessageProducerInMemoryService } from "./message-broker-in-memory/message-producer-in-memory.service.js";
-export { MessageSerdesInMemoryService } from "./message-broker-in-memory/message-serdes-in-memory.service.js";
+export { OutboundMessageMapperInMemoryService } from "./message-broker-in-memory/outbound-message-mapper-in-memory.service.js";
 export type {
     ConsumedMessageRepositoryProvider,
     DomainEventRepositoryProvider,

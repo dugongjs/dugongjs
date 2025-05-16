@@ -3,19 +3,18 @@ import { Module, type DynamicModule } from "@nestjs/common";
 import { AggregateMessageConsumerService } from "../aggregate-message-consumer/aggregate-message-consumer.service.js";
 import { EventSourcingModule } from "../event-sourcing/event-sourcing.module.js";
 import type {
+    InboundMessageMapperProvider,
     MessageConsumerProvider,
-    MessageSerdesProvider,
-    ModuleImports,
-    ModuleProviders
+    ModuleInjectables
 } from "../providers/module-providers.js";
 import { IQueryModelProjectionHandler } from "./i-query-model-projection-handler.js";
 import { QueryModelProjectionConsumerController } from "./query-model-projection-consumer.controller.js";
 import { QueryModelProjectionConsumerService } from "./query-model-projection-consumer.service.js";
 
 export type QueryModelProjectionConsumerModuleOptions = {
-    module?: ModuleImports & ModuleProviders;
+    module?: ModuleInjectables;
     queryModelProjectionHandler: Constructor<IQueryModelProjectionHandler<any>>;
-    messageBroker?: Partial<MessageConsumerProvider> & Partial<MessageSerdesProvider>;
+    messageBroker?: Partial<MessageConsumerProvider> & Partial<InboundMessageMapperProvider>;
 };
 
 @Module({

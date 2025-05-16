@@ -1,7 +1,7 @@
 import {
     AbstractAggregateRoot,
     AggregateContext,
-    IMessageSerdes,
+    IOutboundMessageMapper,
     type AbstractEventSourcedAggregateRoot,
     type AggregateContextOptions,
     type IDomainEventRepository,
@@ -16,7 +16,7 @@ import { Injectable, Logger, Optional } from "@nestjs/common";
 import { InjectCurrentOrigin } from "../decorators/inject-current-origin.decorator.js";
 import { InjectDomainEventRepository } from "../decorators/inject-domain-event-repository.decorator.js";
 import { InjectMessageProducer } from "../decorators/inject-message-producer.decorator.js";
-import { InjectMessageSerdes } from "../decorators/inject-message-serdes.decorator.js";
+import { InjectOutboundMessageMapper } from "../decorators/inject-outbound-message-mapper.decorator.js";
 import { InjectSnapshotRepository } from "../decorators/inject-snapshot-repository.decorator.js";
 import { InjectTransactionManager } from "../decorators/inject-transaction-manager.decorator.js";
 
@@ -30,7 +30,7 @@ export class EventSourcingService {
         @InjectDomainEventRepository() private readonly domainEventRepository: IDomainEventRepository,
         @InjectSnapshotRepository() private readonly snapshotRepository: ISnapshotRepository,
         @Optional() @InjectMessageProducer() private readonly messageProducer?: IMessageProducer<any>,
-        @Optional() @InjectMessageSerdes() private readonly messageSerdes?: IMessageSerdes<any>
+        @Optional() @InjectOutboundMessageMapper() private readonly outboundMessageMapper?: IOutboundMessageMapper<any>
     ) {}
 
     public createAggregateContext<TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>>(
@@ -43,7 +43,7 @@ export class EventSourcingService {
             domainEventRepository: this.domainEventRepository,
             snapshotRepository: this.snapshotRepository,
             messageProducer: this.messageProducer,
-            messageSerdes: this.messageSerdes,
+            outboundMessageMapper: this.outboundMessageMapper,
             currentOrigin: this.currentOrigin,
             logger: this.logger
         };
