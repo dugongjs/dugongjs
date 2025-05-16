@@ -1,4 +1,3 @@
-import { faker } from "@faker-js/faker";
 import { mock, mockReset } from "vitest-mock-extended";
 import { InboundMessageMapperInMemory } from "../../../src/adapters/inbound/message-broker/inbound-message-mapper-in-memory.js";
 import { MessageConsumerInMemory } from "../../../src/adapters/inbound/message-broker/message-consumer-in-memory.js";
@@ -75,7 +74,7 @@ describe("InMemoryMessageBus", () => {
 
         const user = new UserAggregate();
 
-        user.createUser(faker.internet.userName());
+        user.createUser("test_user");
 
         const userCreatedEvent = user.getStagedDomainEvents()[0];
 
