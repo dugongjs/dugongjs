@@ -3,14 +3,14 @@ import { z } from "zod";
 import { AbstractUserDomainEvent } from "./abstract-user-domain-event.js";
 
 const payloadSchema = z.object({
-    email: z.string().email()
+    username: z.string()
 });
 
 type Payload = z.infer<typeof payloadSchema>;
 
 @DomainEvent()
-export class EmailUpdatedEvent extends AbstractUserDomainEvent<Payload> {
-    public static readonly type = "EmailUpdated";
+export class UsernameUpdatedEvent extends AbstractUserDomainEvent<Payload> {
+    public readonly type = "UsernameUpdated";
 
     public onCreate(): void {
         this.validatePayload(payloadSchema);
