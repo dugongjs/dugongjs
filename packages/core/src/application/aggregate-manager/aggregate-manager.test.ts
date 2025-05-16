@@ -142,7 +142,7 @@ describe("AggregateManager", () => {
             expect(mockDomainEventRepository.saveDomainEvents).not.toHaveBeenCalled();
         });
 
-        it("should commit staged domain events and publish them if a message producer and serdes is provided", async () => {
+        it("should commit staged domain events and publish them if a message producer and outbound message mapper is provided", async () => {
             const mockDomainEvent = {
                 serialize: vi.fn(() => "serialized-event"),
                 setCorrelationId: vi.fn(),
