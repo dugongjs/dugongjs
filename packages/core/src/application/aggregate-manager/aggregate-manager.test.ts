@@ -5,7 +5,7 @@ import {
     aggregateMetadataRegistry,
     type AggregateMetadata
 } from "../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
-import type { IMessageSerdes } from "../../ports/common/message-broker/i-message-serdes.js";
+import type { IOutboundMessageMapper } from "../../ports/index.js";
 import type { IMessageProducer } from "../../ports/outbound/message-broker/i-message-producer.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
@@ -14,7 +14,7 @@ import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggr
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import type { ILogger } from "../logger/i-logger.js";
 import { AggregateManager } from "./aggregate-manager.js";
-import { MissingProducerOrSerdesError } from "./errors/missing-producer-or-serdes.error.js";
+import { MissingProducerOrMapperError } from "./errors/missing-producer-or-mapper.error.js";
 
 describe("AggregateManager", () => {
     const mockAggregateClass = vi.fn();
@@ -24,7 +24,7 @@ describe("AggregateManager", () => {
     const mockDomainEventRepository = mock<IDomainEventRepository>();
     const mockSnapshotRepository = mock<ISnapshotRepository>();
     const mockMessageProducer = mock<IMessageProducer<any>>();
-    const mockMessageSerdes = mock<IMessageSerdes<any>>();
+    const mockOutboundMessageMapper = mock<IOutboundMessageMapper<any>>();
     const mockLogger = mock<ILogger>();
 
     const mockAggregateMetadata: AggregateMetadata = {
@@ -38,7 +38,7 @@ describe("AggregateManager", () => {
         mockReset(mockDomainEventRepository);
         mockReset(mockSnapshotRepository);
         mockReset(mockMessageProducer);
-        mockReset(mockMessageSerdes);
+        mockReset(mockOutboundMessageMapper);
         mockReset(mockLogger);
 
         vi.clearAllMocks();
@@ -59,14 +59,14 @@ describe("AggregateManager", () => {
                     domainEventRepository: mockDomainEventRepository,
                     snapshotRepository: mockSnapshotRepository,
                     messageProducer: mockMessageProducer,
-                    messageSerdes: mockMessageSerdes,
+                    outboundMessageMapper: mockOutboundMessageMapper,
                     currentOrigin: "CurrentOrigin",
                     logger: mockLogger
                 });
             }).toThrow(AggregateMetadataNotFoundError);
         });
 
-        it("should throw an error if messageProducer is set without messageSerdes", () => {
+        it("should throw an error if messageProducer is set without outboundMessageMapper", () => {
             expect(() => {
                 new AggregateManager({
                     aggregateClass: mockAggregateClass,
@@ -74,11 +74,11 @@ describe("AggregateManager", () => {
                     domainEventRepository: mockDomainEventRepository,
                     snapshotRepository: mockSnapshotRepository,
                     messageProducer: mockMessageProducer,
-                    messageSerdes: undefined,
+                    outboundMessageMapper: undefined,
                     currentOrigin: "CurrentOrigin",
                     logger: mockLogger
                 });
-            }).toThrow(MissingProducerOrSerdesError);
+            }).toThrow(MissingProducerOrMapperError);
         });
 
         it("should construct a valid instance", () => {
@@ -88,7 +88,7 @@ describe("AggregateManager", () => {
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
-                messageSerdes: mockMessageSerdes,
+                outboundMessageMapper: mockOutboundMessageMapper,
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });
@@ -107,7 +107,7 @@ describe("AggregateManager", () => {
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
-                messageSerdes: mockMessageSerdes,
+                outboundMessageMapper: mockOutboundMessageMapper,
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });
@@ -131,7 +131,7 @@ describe("AggregateManager", () => {
                 transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
-                messageSerdes: mockMessageSerdes,
+                outboundMessageMapper: mockOutboundMessageMapper,
                 messageProducer: mockMessageProducer,
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
@@ -161,7 +161,7 @@ describe("AggregateManager", () => {
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
-                messageSerdes: mockMessageSerdes,
+                outboundMessageMapper: mockOutboundMessageMapper,
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });
@@ -182,7 +182,7 @@ describe("AggregateManager", () => {
             expect(mockDomainEventRepository.saveDomainEvents).toHaveBeenCalledWith(manager.getTransactionContext(), [
                 "serialized-event"
             ]);
-            expect(mockMessageSerdes.wrapDomainEvent).toHaveBeenCalled();
+            expect(mockOutboundMessageMapper.map).toHaveBeenCalled();
             expect(mockMessageProducer.publishMessages).toHaveBeenCalled();
             expect(mockAggregate.clearStagedDomainEvents).toHaveBeenCalled();
         });
@@ -201,7 +201,7 @@ describe("AggregateManager", () => {
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
-                messageSerdes: mockMessageSerdes,
+                outboundMessageMapper: mockOutboundMessageMapper,
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });
@@ -228,7 +228,7 @@ describe("AggregateManager", () => {
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
-                messageSerdes: mockMessageSerdes,
+                outboundMessageMapper: mockOutboundMessageMapper,
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });
@@ -256,7 +256,7 @@ describe("AggregateManager", () => {
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
                 messageProducer: mockMessageProducer,
-                messageSerdes: mockMessageSerdes,
+                outboundMessageMapper: mockOutboundMessageMapper,
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });

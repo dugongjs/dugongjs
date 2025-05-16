@@ -1,6 +1,6 @@
 import type { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
 import { aggregateDomainEventApplier } from "../../domain/aggregate-domain-event-applier/aggregate-domain-event-applier.js";
-import type { IMessageSerdes } from "../../ports/common/message-broker/i-message-serdes.js";
+import type { IOutboundMessageMapper } from "../../ports/index.js";
 import type { IMessageProducer } from "../../ports/outbound/message-broker/i-message-producer.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
@@ -11,14 +11,14 @@ import {
     type AbstractAggregateHandlerOptions
 } from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
-import { MissingProducerOrSerdesError } from "./errors/missing-producer-or-serdes.error.js";
+import { MissingProducerOrMapperError } from "./errors/missing-producer-or-mapper.error.js";
 
 export type AggregateManagerOptions<TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>> =
     AbstractAggregateHandlerOptions<TAggregateRootClass> & {
         domainEventRepository: IDomainEventRepository;
         snapshotRepository: ISnapshotRepository;
         messageProducer?: IMessageProducer<any>;
-        messageSerdes?: IMessageSerdes<any>;
+        outboundMessageMapper?: IOutboundMessageMapper<any>;
     };
 
 export type CommitOptions = {
@@ -34,17 +34,20 @@ export class AggregateManager<
     private readonly domainEventRepository: IDomainEventRepository;
     private readonly snapshotRepository: ISnapshotRepository;
     private readonly messageProducer?: IMessageProducer<any>;
-    private readonly messageSerdes?: IMessageSerdes<any>;
+    private readonly outboundMessageMapper?: IOutboundMessageMapper<any>;
 
     constructor(options: AggregateManagerOptions<TAggregateRootClass>) {
         super(options);
         this.domainEventRepository = options.domainEventRepository;
         this.snapshotRepository = options.snapshotRepository;
         this.messageProducer = options.messageProducer;
-        this.messageSerdes = options.messageSerdes;
+        this.outboundMessageMapper = options.outboundMessageMapper;
 
-        if ((this.messageProducer && !this.messageSerdes) || (!this.messageProducer && this.messageSerdes)) {
-            throw new MissingProducerOrSerdesError();
+        if (
+            (this.messageProducer && !this.outboundMessageMapper) ||
+            (!this.messageProducer && this.outboundMessageMapper)
+        ) {
+            throw new MissingProducerOrMapperError();
         }
     }
 
@@ -96,7 +99,7 @@ export class AggregateManager<
             `${serializedDomainEvents.length} staged domain events committed to event log for ${this.aggregateType} aggregate ${aggregateId}`
         );
 
-        if (this.messageProducer && this.messageSerdes) {
+        if (this.messageProducer && this.outboundMessageMapper) {
             const channelId = this.messageProducer.generateMessageChannelIdForAggregate(
                 this.aggregateOrigin,
                 this.aggregateType
@@ -108,7 +111,7 @@ export class AggregateManager<
             );
 
             const messages = serializedDomainEvents.map((serializedDomainEvent) =>
-                this.messageSerdes!.wrapDomainEvent(serializedDomainEvent)
+                this.outboundMessageMapper!.map(serializedDomainEvent)
             );
 
             await this.messageProducer.publishMessages(this.getTransactionContext(), channelId, messages);

@@ -4,8 +4,8 @@ import type { AbstractDomainEvent } from "../../domain/abstract-domain-event/abs
 import type { SerializedDomainEvent } from "../../domain/abstract-domain-event/serialized-domain-event.js";
 import { aggregateMetadataRegistry } from "../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
-import type { IMessageSerdes } from "../../ports/common/message-broker/i-message-serdes.js";
 import type { IMessageConsumer } from "../../ports/inbound/message-broker/i-message-consumer.js";
+import type { IInboundMessageMapper } from "../../ports/index.js";
 import type { IConsumedMessageRepository } from "../../ports/outbound/repository/i-consumed-message-repository.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type {
@@ -20,14 +20,14 @@ describe("AggregateMessageConsumer", () => {
     const mockDomainEventRepository = mock<IDomainEventRepository>();
     const mockConsumedMessageRepository = mock<IConsumedMessageRepository>();
     const mockLogger = mock<ILogger>();
-    const mockMessageSerdes = mock<IMessageSerdes<any>>();
+    const mockInboundMessageMapper = mock<IInboundMessageMapper<any>>();
     const mockMessageConsumer = mock<IMessageConsumer<any>>();
 
     beforeEach(() => {
         mockReset(mockTransactionManager);
         mockReset(mockDomainEventRepository);
         mockReset(mockConsumedMessageRepository);
-        mockReset(mockMessageSerdes);
+        mockReset(mockInboundMessageMapper);
         mockReset(mockMessageConsumer);
         mockReset(mockLogger);
         mockReset(mockMessageConsumer);
@@ -49,7 +49,7 @@ describe("AggregateMessageConsumer", () => {
         domainEventRepository: mockDomainEventRepository,
         consumedMessageRepository: mockConsumedMessageRepository,
         messageConsumer: mockMessageConsumer,
-        messageSerdes: mockMessageSerdes,
+        inboundMessageMapper: mockInboundMessageMapper,
         logger: mockLogger,
         aggregateClass: class {},
         currentOrigin: "TestOrigin"
@@ -91,7 +91,7 @@ describe("AggregateMessageConsumer", () => {
         const mockMessage = { id: faker.string.uuid() };
         const handleMessage = vi.fn();
 
-        mockMessageSerdes.unwrapMessage.mockReturnValue(serializedDomainEvent);
+        mockInboundMessageMapper.map.mockReturnValue(serializedDomainEvent);
         mockConsumedMessageRepository.checkIfMessageIsConsumed.mockResolvedValue(false);
 
         mockTransactionManager.transaction.mockImplementation(async (fn) => {
@@ -110,7 +110,7 @@ describe("AggregateMessageConsumer", () => {
             "consumer-id",
             expect.any(Function)
         );
-        expect(mockMessageSerdes.unwrapMessage).toHaveBeenCalledWith(mockMessage);
+        expect(mockInboundMessageMapper.map).toHaveBeenCalledWith(mockMessage);
         expect(domainEventDeserializer.deserializeDomainEvents).toHaveBeenCalledWith(serializedDomainEvent);
         expect(mockTransactionManager.transaction).toHaveBeenCalled();
         expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenCalledWith(
@@ -139,7 +139,7 @@ describe("AggregateMessageConsumer", () => {
         const mockMessage = { id: faker.string.uuid() };
         const handleMessage = vi.fn();
 
-        mockMessageSerdes.unwrapMessage.mockReturnValue(serializedDomainEvent);
+        mockInboundMessageMapper.map.mockReturnValue(serializedDomainEvent);
         mockConsumedMessageRepository.checkIfMessageIsConsumed.mockResolvedValue(true);
 
         mockTransactionManager.transaction.mockImplementation(async (fn) => {
@@ -158,7 +158,7 @@ describe("AggregateMessageConsumer", () => {
             "consumer-id",
             expect.any(Function)
         );
-        expect(mockMessageSerdes.unwrapMessage).toHaveBeenCalledWith(mockMessage);
+        expect(mockInboundMessageMapper.map).toHaveBeenCalledWith(mockMessage);
         expect(domainEventDeserializer.deserializeDomainEvents).toHaveBeenCalledWith(serializedDomainEvent);
         expect(mockTransactionManager.transaction).toHaveBeenCalled();
         expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenCalledWith(
@@ -177,7 +177,7 @@ describe("AggregateMessageConsumer", () => {
         const mockMessage = { id: faker.string.uuid() };
         const handleMessage = vi.fn();
 
-        mockMessageSerdes.unwrapMessage.mockReturnValue(serializedDomainEvent);
+        mockInboundMessageMapper.map.mockReturnValue(serializedDomainEvent);
         mockConsumedMessageRepository.checkIfMessageIsConsumed.mockResolvedValue(false);
 
         mockTransactionManager.transaction.mockImplementation(async (fn) => {
@@ -205,7 +205,7 @@ describe("AggregateMessageConsumer", () => {
         const mockMessage = { id: faker.string.uuid() };
         const handleMessage = vi.fn();
 
-        mockMessageSerdes.unwrapMessage.mockReturnValue(serializedDomainEvent);
+        mockInboundMessageMapper.map.mockReturnValue(serializedDomainEvent);
         mockConsumedMessageRepository.checkIfMessageIsConsumed.mockResolvedValue(false);
 
         mockTransactionManager.transaction.mockImplementation(async (fn) => {

@@ -1,13 +1,15 @@
 import { faker } from "@faker-js/faker";
 import { mock, mockReset } from "vitest-mock-extended";
-import { MessageSerdesInMemory } from "../../../src/adapters/common/message-broker/message-serdes-in-memory.js";
+import { InboundMessageMapperInMemory } from "../../../src/adapters/inbound/message-broker/inbound-message-mapper-in-memory.js";
 import { MessageConsumerInMemory } from "../../../src/adapters/inbound/message-broker/message-consumer-in-memory.js";
 import { MessageProducerInMemory } from "../../../src/adapters/outbound/message-broker/message-producer-in-memory.js";
+import { OutboundMessageMapperInMemory } from "../../../src/adapters/outbound/message-broker/outbound-message-mapper-in-memory.js";
 import { AggregateManager } from "../../../src/application/aggregate-manager/aggregate-manager.js";
 import { AggregateMessageConsumer } from "../../../src/application/aggregate-message-consumer/aggregate-message-consumer.js";
 import type { ILogger } from "../../../src/application/logger/i-logger.js";
 import type { SerializedDomainEvent } from "../../../src/domain/abstract-domain-event/serialized-domain-event.js";
 import { InMemoryMessageBus } from "../../../src/infrastructure/in-memory-message-bus/in-memory-message-bus.js";
+import type { IInboundMessageMapper } from "../../../src/ports/inbound/message-broker/i-inbound-message-mapper.js";
 import type { IConsumedMessageRepository } from "../../../src/ports/outbound/repository/i-consumed-message-repository.js";
 import type { IDomainEventRepository } from "../../../src/ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../../src/ports/outbound/repository/i-snapshot-repository.js";
@@ -20,7 +22,8 @@ describe("InMemoryMessageBus", () => {
     let messageBus: InMemoryMessageBus<SerializedDomainEvent>;
     let messageProducer: MessageProducerInMemory;
     let messageConsumer: MessageConsumerInMemory;
-    let messageSerdes: MessageSerdesInMemory;
+    let inboundMessageMapper: IInboundMessageMapper<SerializedDomainEvent>;
+    let outboundMessageMapper: IInboundMessageMapper<SerializedDomainEvent>;
 
     const transactionManager = mock<ITransactionManager>({
         transaction: (fn) => fn({})
@@ -39,7 +42,8 @@ describe("InMemoryMessageBus", () => {
         messageBus = new InMemoryMessageBus<SerializedDomainEvent>();
         messageProducer = new MessageProducerInMemory(messageBus);
         messageConsumer = new MessageConsumerInMemory(messageBus);
-        messageSerdes = new MessageSerdesInMemory();
+        inboundMessageMapper = new InboundMessageMapperInMemory();
+        outboundMessageMapper = new OutboundMessageMapperInMemory();
 
         aggregateManager = new AggregateManager({
             aggregateClass: UserAggregate,
@@ -47,7 +51,7 @@ describe("InMemoryMessageBus", () => {
             domainEventRepository,
             snapshotRepository,
             messageProducer,
-            messageSerdes,
+            outboundMessageMapper,
             currentOrigin,
             logger
         });
@@ -58,7 +62,7 @@ describe("InMemoryMessageBus", () => {
             consumedMessageRepository,
             transactionManager,
             messageConsumer,
-            messageSerdes,
+            inboundMessageMapper,
             currentOrigin,
             logger
         });

@@ -1,8 +1,8 @@
 import type { AbstractDomainEvent } from "../../domain/abstract-domain-event/abstract-domain-event.js";
 import type { AbstractEventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
-import type { IMessageSerdes } from "../../ports/common/message-broker/i-message-serdes.js";
 import type { IMessageConsumer } from "../../ports/inbound/message-broker/i-message-consumer.js";
+import type { IInboundMessageMapper } from "../../ports/index.js";
 import type { IConsumedMessageRepository } from "../../ports/outbound/repository/i-consumed-message-repository.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { TransactionContext } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
@@ -19,7 +19,7 @@ export type AggregateMessageConsumerOptions<
     domainEventRepository: IDomainEventRepository;
     consumedMessageRepository: IConsumedMessageRepository;
     messageConsumer: IMessageConsumer<TMessage>;
-    messageSerdes: IMessageSerdes<TMessage, any>;
+    inboundMessageMapper: IInboundMessageMapper<TMessage>;
 };
 
 export type HandleMessageOptions = {
@@ -44,13 +44,13 @@ export class AggregateMessageConsumer<
     private readonly domainEventRepository: IDomainEventRepository;
     private readonly consumedMessageRepository: IConsumedMessageRepository;
     private readonly messageConsumer: IMessageConsumer<TMessage>;
-    private readonly messageSerdes: IMessageSerdes<TMessage>;
+    private readonly inboundMessageMapper: IInboundMessageMapper<TMessage>;
 
     constructor(options: AggregateMessageConsumerOptions<TAggregateRootClass, TMessage>) {
         super(options);
         this.domainEventRepository = options.domainEventRepository;
         this.consumedMessageRepository = options.consumedMessageRepository;
-        this.messageSerdes = options.messageSerdes;
+        this.inboundMessageMapper = options.inboundMessageMapper;
         this.messageConsumer = options.messageConsumer;
     }
 
@@ -86,7 +86,7 @@ export class AggregateMessageConsumer<
 
                 return this.retryOnFailure(
                     async () => {
-                        const serializedDomainEvent = this.messageSerdes.unwrapMessage(message);
+                        const serializedDomainEvent = this.inboundMessageMapper.map(message);
                         const domainEvent = domainEventDeserializer.deserializeDomainEvents(serializedDomainEvent)[0];
 
                         if (!domainEvent) {
