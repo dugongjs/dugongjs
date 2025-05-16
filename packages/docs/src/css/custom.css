@@ -23,3 +23,11 @@
     --ifm-navbar-background-color: #2e3138;
     --ifm-navbar-link-color: #ffffff;
 }
+
+:root {
+    --docusaurus-highlighted-code-line-bg: #e1e4e8;
+}
+
+[data-theme="dark"] {
+    --docusaurus-highlighted-code-line-bg: rgb(100, 100, 100);
+}

@@ -63,14 +63,14 @@ If you do not use microservices or only have a single microservice to get starte
 
 ## Defining Domain Events
 
-DugongJS provides the `AbstractDomainEvent` base class for creating domain events. Classes that derive from `AbstractDomainEvent` must define four static properties; otherwise an error will be thrown upon construction:
+DugongJS provides the `AbstractDomainEvent` base class for creating domain events. Classes that derive from `AbstractDomainEvent` must define four constant properties:
 
 - `origin`
 - `aggregateType`
 - `type`
 - `version`
 
-Together, these four static properties uniquely identify a domain event. Let's explore these in turn.
+Together, these four constant properties uniquely identify a domain event. Let's explore these in turn.
 
 ### Origin
 
@@ -98,9 +98,9 @@ It's generally a good idea to begin by defining a base class for the domain even
 abstract class AbstractBankAccountDomainEvent<
     TPayload extends DomainEventPayload | null = null
 > extends AbstractDomainEvent<TPayload> {
-    public static readonly origin = "BankingContext-AccountService";
-    public static readonly aggregateType = "BankAccount";
-    public static readonly version = 1;
+    public readonly origin = "BankingContext-AccountService";
+    public readonly aggregateType = "BankAccount";
+    public readonly version = 1;
 }
 ```
 
@@ -115,22 +115,22 @@ We can now define the concrete domain events for the `BankAccount` aggregate by 
 ```typescript
 @DomainEvent()
 export class AccountOpenedEvent extends AbstractBankAccountDomainEvent<{ owner: string; initialAmount: number }> {
-    public static readonly type = "AccountOpened";
+    public readonly type = "AccountOpened";
 }
 
 @DomainEvent()
 export class AccountClosedEvent extends AbstractBankAccountDomainEvent {
-    public static readonly type = "AccountClosed";
+    public readonly type = "AccountClosed";
 }
 
 @DomainEvent()
 export class MoneyDepositedEvent extends AbstractBankAccountDomainEvent<{ amount: number }> {
-    public static readonly type = "MoneyDeposited";
+    public readonly type = "MoneyDeposited";
 }
 
 @DomainEvent()
 export class MoneyWithdrawnEvent extends AbstractBankAccountDomainEvent<{ amount: number }> {
-    public static readonly type = "MoneyWithdrawn";
+    public readonly type = "MoneyWithdrawn";
 }
 ```
 
@@ -188,7 +188,7 @@ The following table lists the available getters that you can call on a domain ev
 | `getTriggeredByUserId()`  | Returns the ID of the user who triggered the creation of the current event. This is an optional, user-defined field.                 | `string \| undefined`             |
 | `getMetadata()`           | Returns metadata associated with the domain event. This must be a serializable object and can be used to store auxiliary data.       | `SerializableObject \| undefined` |
 
-All non-static properties also have corresponding **setter methods**, which can be used in testing or when manually constructing domain events outside the normal aggregate flow.
+All non-constant properties also have corresponding **setter methods**, which can be used in testing or when manually constructing domain events outside the normal aggregate flow.
 
 ## Lifecycle Hooks
 
@@ -211,9 +211,9 @@ import { z } from "zod";
 abstract class AbstractBankAccountDomainEvent<
     TPayload extends DomainEventPayload | null = null
 > extends AbstractDomainEvent<TPayload> {
-    public static readonly origin = "BankingContext-AccountService";
-    public static readonly aggregateType = "BankAccount";
-    public static readonly version = 1;
+    public readonly origin = "BankingContext-AccountService";
+    public readonly aggregateType = "BankAccount";
+    public readonly version = 1;
 
     protected validatePayload(payloadSchema: z.ZodType<TPayload>): void {
         const validationResult = payloadSchema.safeParse(this.payload);
@@ -237,7 +237,7 @@ type AccountOpenedPayload = z.infer<typeof AccountOpenedPayloadSchema>;
 
 @DomainEvent()
 export class AccountOpenedEvent extends AbstractBankAccountDomainEvent<AccountOpenedPayload> {
-    public static readonly type = "AccountOpened";
+    public readonly type = "AccountOpened";
 
     public onCreate(): void {
         this.validatePayload(AccountOpenedPayloadSchema);

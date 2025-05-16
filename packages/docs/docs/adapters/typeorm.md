@@ -14,7 +14,7 @@ It has adapters for the following ports:
 | [`IConsumedMessageRepository`](../ports/repositories.md#iconsumedmessagerepository) | `ConsumedMessageRepositoryTypeOrm` |
 | [`ITransactionManager`](../ports/transaction-manager.md#itransactionmanager)        | `TransactionManagerTypeOrm`        |
 | [`IMessageProducer`](../ports/message-producer.md#imessageproducer)                 | `OutboxMessageProducerTypeOrm`     |
-| [`IMessageSerdes`](../ports/message-serdes.md#imessageserdes)                       | `OutboxMessageSerdesTypeOrm`       |
+| [`IOutboundMessageMapper`](../ports/message-mappers.md#ioutboundmessagemapper)      | `OutboxMessageMapperTypeOrm`       |
 
 ### Installation
 

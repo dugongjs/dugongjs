@@ -25,5 +25,5 @@ Here, `TMessage` should be a type corresponding to the message format of the bro
 ### Related Ports
 
 - [`IMessageConsumer`](./message-consumer.md) – listens to inbound messages.
-- [`IMessageSerdes`](./message-serdes.md) – handles message serialization.
+- [`IOutboundMessageMapper`](./message-mappers.md#ioutboundmessagemapper) – maps messages to domain events.
 - [`ITransactionManager`](./transaction-manager.md) – used to ensure transactional consistency.

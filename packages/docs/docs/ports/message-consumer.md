@@ -25,4 +25,4 @@ Here, `TMessage` should be a type corresponding to the message format of the bro
 ### Related Ports
 
 - [`IMessageProducer`](./message-producer.md) – sends outbound messages.
-- [`IMessageSerdes`](./message-serdes.md) – serializes/deserializes domain events in transit.
+- [`IInboundMessageMapper`](./message-mappers.md#iinboundmessagemapper) – maps messages to domain events.
