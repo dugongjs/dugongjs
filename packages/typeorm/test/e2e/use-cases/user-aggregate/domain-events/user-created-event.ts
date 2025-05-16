@@ -11,7 +11,7 @@ type Payload = z.infer<typeof payloadSchema>;
 
 @DomainEvent()
 export class UserCreatedEvent extends AbstractUserDomainEvent<Payload> {
-    public static readonly type = "UserCreated";
+    public readonly type = "UserCreated";
 
     public onCreate(): void {
         this.validatePayload(payloadSchema);

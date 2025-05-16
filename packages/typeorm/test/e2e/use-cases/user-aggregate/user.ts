@@ -2,10 +2,10 @@ import { AbstractAggregateRoot, Aggregate, Apply, Process, Snapshotable } from "
 import type { CreateUserCommand } from "./commands/create-user-command.js";
 import type { UpdateEmailCommand } from "./commands/update-email-command.js";
 import type { UpdateUsernameCommand } from "./commands/update-username-command.js";
-import { EmailUpdatedEvent } from "./events/email-updated-event.js";
-import { UserCreatedEvent } from "./events/user-created-event.js";
-import { UserDeletedEvent } from "./events/user-deleted-event.js";
-import { UsernameUpdatedEvent } from "./events/username-updated-event.js";
+import { EmailUpdatedEvent } from "./domain-events/email-updated-event.js";
+import { UserCreatedEvent } from "./domain-events/user-created-event.js";
+import { UserDeletedEvent } from "./domain-events/user-deleted-event.js";
+import { UsernameUpdatedEvent } from "./domain-events/username-updated-event.js";
 
 @Aggregate("User")
 @Snapshotable({ snapshotInterval: 10 })
