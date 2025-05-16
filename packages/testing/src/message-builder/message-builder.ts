@@ -1,8 +1,8 @@
-import type { AbstractDomainEvent, IMessageSerdes } from "@dugongjs/core";
+import type { AbstractDomainEvent, IOutboundMessageMapper } from "@dugongjs/core";
 import { v4 as uuid } from "uuid";
 
 export type MessageBuilderOptions<TMessage> = {
-    messageSerdes: IMessageSerdes<any, TMessage>;
+    outboundMessageMapper: IOutboundMessageMapper<TMessage>;
     initialSequenceNumber?: number;
     autoIncrementSequenceNumber?: boolean;
 };
@@ -14,13 +14,13 @@ export type BuildResult<TMessage> = {
 };
 
 export class MessageBuilder<TMessage> {
-    private readonly messageSerdes: IMessageSerdes<any, TMessage>;
+    private readonly outboundMessageMapper: IOutboundMessageMapper<TMessage>;
     private readonly domainEvents: AbstractDomainEvent[] = [];
     private initialSequenceNumber: number;
     private autoIncrementSequenceNumber: boolean;
 
     constructor(options: MessageBuilderOptions<TMessage>) {
-        this.messageSerdes = options.messageSerdes;
+        this.outboundMessageMapper = options.outboundMessageMapper;
         this.initialSequenceNumber = options?.initialSequenceNumber ?? 1;
         this.autoIncrementSequenceNumber = options?.autoIncrementSequenceNumber ?? true;
     }
@@ -56,7 +56,7 @@ export class MessageBuilder<TMessage> {
         }
 
         return {
-            messages: domainEvents.map((event) => this.messageSerdes.wrapDomainEvent(event.serialize())),
+            messages: domainEvents.map((event) => this.outboundMessageMapper.map(event.serialize())),
             domainEvents,
             domainEventIds: domainEvents.map((event) => event.getId() as string)
         };
