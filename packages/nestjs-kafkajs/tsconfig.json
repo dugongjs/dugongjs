@@ -1,0 +1,8 @@
+{
+    "extends": "@dugongjs/typescript-config/nodejs.json",
+    "compilerOptions": {
+        "types": ["vitest/globals", "vitest-mock-extended"]
+    },
+    "include": ["src", "test", "scripts", "vitest.config.unit.ts"],
+    "exclude": ["node_modules", "dist"]
+}
