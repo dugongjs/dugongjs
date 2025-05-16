@@ -1,5 +1,11 @@
 # @dugongjs/kafkajs
 
+## 0.0.5
+
+### Patch Changes
+
+- 66c14fc: Initial release
+
 ## 0.0.4
 
 ### Patch Changes
