@@ -19,8 +19,8 @@ export class MessageConsumerKafkaJS
     constructor(
         private readonly kafka: Kafka,
         private readonly consumerConfig?: ConsumerConfig,
-        private readonly consumerSubscription?: ConsumerSubscribeTopics,
-        private readonly runConfig?: ConsumerRunConfig
+        private readonly consumerSubscribeTopics?: ConsumerSubscribeTopics,
+        private readonly consumerRunConfig?: ConsumerRunConfig
     ) {
         super();
     }
@@ -41,8 +41,8 @@ export class MessageConsumerKafkaJS
         this.consumer = this.kafka.consumer({ groupId: consumerId, ...(this.consumerConfig ?? {}) });
 
         await this.consumer.connect();
-        await this.consumer.subscribe({ topic: channelId, ...(this.consumerSubscription ?? {}) });
-        await this.consumer.run({ eachMessage: onMessage, ...(this.runConfig ?? {}) });
+        await this.consumer.subscribe({ topic: channelId, ...(this.consumerSubscribeTopics ?? {}) });
+        await this.consumer.run({ eachMessage: onMessage, ...(this.consumerRunConfig ?? {}) });
     }
 
     public async disconnect(): Promise<void> {
