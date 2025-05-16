@@ -4,7 +4,7 @@ import {
     type AggregateManagerOptions,
     type RemoveAbstract
 } from "@dugongjs/core";
-import { OutboxMessageSerdesTypeOrm } from "../../../../src/adapters/common/message-broker/outbox-message-serdes-typeorm.js";
+import { OutboxMessageMapperTypeOrm } from "../../../../src/adapters/outbound/message-broker/outbox-message-mapper-typeorm.js";
 import { OutboxMessageProducerTypeOrm } from "../../../../src/adapters/outbound/message-broker/outbox-message-producer-typeorm.js";
 import { DomainEventRepositoryTypeOrm } from "../../../../src/adapters/outbound/repository/domain-event-repository-typeorm.js";
 import { SnapshotRepositoryTypeOrm } from "../../../../src/adapters/outbound/repository/snapshot-repository-typeorm.js";
@@ -29,7 +29,7 @@ export class AggregateManagerTypeOrm<
             domainEventRepository: new DomainEventRepositoryTypeOrm(dataSource.getRepository(DomainEventEntity)),
             snapshotRepository: new SnapshotRepositoryTypeOrm(dataSource.getRepository(SnapshotEntity)),
             messageProducer: new OutboxMessageProducerTypeOrm(dataSource.getRepository(OutboxEntity)),
-            messageSerdes: new OutboxMessageSerdesTypeOrm(),
+            outboundMessageMapper: new OutboxMessageMapperTypeOrm(),
             logger: new Logger()
         });
     }
