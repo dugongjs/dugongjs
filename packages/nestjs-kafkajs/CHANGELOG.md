@@ -1,5 +1,11 @@
 # @dugongjs/nestjs-kafkajs
 
+## 0.0.5
+
+### Patch Changes
+
+- be16fa4: Added missing `forRoot()` in `MessageBrokerKafkaJSModule`
+
 ## 0.0.4
 
 ### Patch Changes
