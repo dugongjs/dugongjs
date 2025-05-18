@@ -1,5 +1,11 @@
 # @dugongjs/nestjs-kafkajs
 
+## 0.0.6
+
+### Patch Changes
+
+- 2dcbc53: Added missing `connect()` and `disconnect()` calls
+
 ## 0.0.5
 
 ### Patch Changes
