@@ -807,9 +807,15 @@ importers:
       '@dugongjs/core':
         specifier: ^0.0.4
         version: 0.0.4
+      '@dugongjs/kafkajs':
+        specifier: ^0.0.5
+        version: 0.0.5(@dugongjs/core@0.0.4)(kafkajs@2.2.4)
       '@dugongjs/nestjs':
         specifier: ^0.0.5
         version: 0.0.5(@dugongjs/core@0.0.4)(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17)(@nestjs/platform-express@10.4.17)(reflect-metadata@0.2.2)(rxjs@7.8.2))
+      '@dugongjs/nestjs-kafkajs':
+        specifier: ^0.0.6
+        version: 0.0.6(@dugongjs/core@0.0.4)(@dugongjs/kafkajs@0.0.5(@dugongjs/core@0.0.4)(kafkajs@2.2.4))(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17)(@nestjs/platform-express@10.4.17)(reflect-metadata@0.2.2)(rxjs@7.8.2))(kafkajs@2.2.4)
       '@dugongjs/nestjs-microservice-query':
         specifier: ^0.0.6
         version: 0.0.6(@dugongjs/core@0.0.4)(@dugongjs/nestjs@0.0.5(@dugongjs/core@0.0.4)(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17)(@nestjs/platform-express@10.4.17)(reflect-metadata@0.2.2)(rxjs@7.8.2)))(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17)(@nestjs/platform-express@10.4.17)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17(@grpc/grpc-js@1.13.3)(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
@@ -834,6 +840,9 @@ importers:
       '@nestjs/typeorm':
         specifier: ^10.0.2
         version: 10.0.2(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17)(@nestjs/platform-express@10.4.17)(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.22(pg@8.15.6)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.11.21(@swc/helpers@0.5.17))(@types/node@20.17.30)(typescript@5.8.2)))
+      kafkajs:
+        specifier: ^2.2.4
+        version: 2.2.4
       reflect-metadata:
         specifier: ^0.2.0
         version: 0.2.2
@@ -2094,6 +2103,23 @@ packages:
   '@dugongjs/core@0.0.4':
     resolution: {integrity: sha512-uFBSq4YkMbpoyDMo1FN0Et2FheaE5rJGcROALxBZngPJ5xBYCBpXZyFbAABwW8Tk7vqxYy5XoM8HPsccEuDPAw==}
     engines: {node: '>=18.0.0'}
+
+  '@dugongjs/kafkajs@0.0.5':
+    resolution: {integrity: sha512-ZARohYzSaiu/KqgOlrfkmpLliygOZbhrgQNct0xHvEzXe4U7HOYATRGZS4JrnmG0tSQiI/f23ysiPsgQZedb4g==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@dugongjs/core': 0.0.4
+      kafkajs: ^2.2.4
+
+  '@dugongjs/nestjs-kafkajs@0.0.6':
+    resolution: {integrity: sha512-uwQNOT6szeoFZJPN5iSfO69xVETA/0V17u2cHMKy0O8PtzYSAVEup0+jvfzssRgNEvNRziANo9vtMD+vQ24tBg==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@dugongjs/core': 0.0.4
+      '@dugongjs/kafkajs': 0.0.5
+      '@nestjs/common': ^10.4.13
+      '@nestjs/core': ^10.4.13
+      kafkajs: ^2.2.4
 
   '@dugongjs/nestjs-microservice-query@0.0.5':
     resolution: {integrity: sha512-yR3RcZevfXCCU3ZMDWPwMvFEZ8J9lDPa0Atk07Lnf0kh/Gb+ovgKJbFYmyYp8b+ns3yWaG44UC8ukjoLBwRYXA==}
@@ -11487,6 +11513,20 @@ snapshots:
     dependencies:
       class-transformer: 0.5.1
       uuid: 9.0.1
+
+  '@dugongjs/kafkajs@0.0.5(@dugongjs/core@0.0.4)(kafkajs@2.2.4)':
+    dependencies:
+      '@dugongjs/core': 0.0.4
+      change-case: 5.4.4
+      kafkajs: 2.2.4
+
+  '@dugongjs/nestjs-kafkajs@0.0.6(@dugongjs/core@0.0.4)(@dugongjs/kafkajs@0.0.5(@dugongjs/core@0.0.4)(kafkajs@2.2.4))(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17)(@nestjs/platform-express@10.4.17)(reflect-metadata@0.2.2)(rxjs@7.8.2))(kafkajs@2.2.4)':
+    dependencies:
+      '@dugongjs/core': 0.0.4
+      '@dugongjs/kafkajs': 0.0.5(@dugongjs/core@0.0.4)(kafkajs@2.2.4)
+      '@nestjs/common': 10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17)(@nestjs/platform-express@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17))(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      kafkajs: 2.2.4
 
   ? '@dugongjs/nestjs-microservice-query@0.0.5(@dugongjs/core@0.0.3)(@dugongjs/nestjs@0.0.4(@dugongjs/core@0.0.3)(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17)(@nestjs/platform-express@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17))(reflect-metadata@0.2.2)(rxjs@7.8.2)))(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17)(@nestjs/platform-express@10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17))(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.17(@grpc/grpc-js@1.13.3)(@nestjs/common@10.4.17(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)'
   : dependencies:
