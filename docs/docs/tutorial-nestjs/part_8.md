@@ -1,5 +1,5 @@
 ---
-title: "Part 8 -  Testing Transactionality"
+title: "Part 8 - Testing Transactionality (In-Memory)"
 sidebar_position: 9
 ---
 
@@ -60,11 +60,11 @@ If you configured the Dugong CLI from [part 5](part_5.md), you can use it to che
 
 ### Why Does this Work?
 
-When using the in-memory message broker, DugongJS shares the transaction context between the command and query sides. Since message consumption happens in the same process, it’s possible to coordinate rollback if the command transaction fails. In this case, the query model is never updated because the message is only consumed if the surrounding transaction completes successfully.
+When using the in-memory message broker, DugongJS shares the transaction context between the command and query sides. Since message consumption happens in the same process, it’s possible to coordinate rollback if the command transaction fails. In this case, the query model is never updated because the message is only consumed if the surrounding transaction completes successfully. This is a luxury not given when using distributed messaging.
 
 ### Challenges With Transactionality in Distributed Messaging
 
-However, this setup only works because everything runs _in-process_. In a production system, you’ll typically use an _inter-process_ message broker like Kafka. This introduces a few important implications:
+The current setup is only transactional because everything runs _in-process_. In a production system, you’ll typically use an _inter-process_ message broker like Kafka. This introduces a few important implications:
 
 - Messages are persisted and dispatched asynchronously.
 - Once a message has been dispatched, it cannot be easily undone.

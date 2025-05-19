@@ -63,7 +63,7 @@ npm install @nestjs/microservices @dugongjs/nestjs-microservice-query
 
 Next, we'll need to convert our application to a [hybrid application](https://docs.nestjs.com/faq/hybrid-application), because we'll be listening for requests from both HTTP and TCP:
 
-```typescript title="src/main.ts"
+```typescript title="src/main.ts" showLineNumbers
 import { NestFactory } from "@nestjs/core";
 import { Transport, type MicroserviceOptions } from "@nestjs/microservices";
 import { AppModule } from "./app.module.js";
@@ -92,7 +92,7 @@ Here, we are setting up a TCP microservice on port 3001. **This port should not 
 
 Finally, we'll add the `AggregateQueryMicroserviceModule` to the `AppModule`:
 
-```typescript title="src/app.module.ts"
+```typescript title="src/app.module.ts" showLineNumbers
 import { EventIssuerModule } from "@dugongjs/nestjs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
 import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";

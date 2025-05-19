@@ -62,7 +62,7 @@ All events for the same aggregate type should extend a common abstract base. Thi
 
 Create a file for the base event:
 
-```typescript title="src/bank-account/domain/domain-events/abstract-bank-account-domain-event.ts"
+```typescript title="src/bank-account/domain/domain-events/abstract-bank-account-domain-event.ts" showLineNumbers
 import { AbstractDomainEvent, type DomainEventPayload } from "@dugongjs/core";
 
 export abstract class AbstractBankAccountDomainEvent<
@@ -76,7 +76,7 @@ export abstract class AbstractBankAccountDomainEvent<
 
 Now, define each concrete event by extending this base:
 
-```typescript title="src/bank-account/domain/domain-events/account-opened.event.ts"
+```typescript title="src/bank-account/domain/domain-events/account-opened.event.ts" showLineNumbers
 import { DomainEvent } from "@dugongjs/core";
 import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.js";
 
@@ -86,7 +86,7 @@ export class AccountOpenedEvent extends AbstractBankAccountDomainEvent<{ owner: 
 }
 ```
 
-```typescript title="src/bank-account/domain/domain-events/account-closed.event.ts"
+```typescript title="src/bank-account/domain/domain-events/account-closed.event.ts" showLineNumbers
 import { DomainEvent } from "@dugongjs/core";
 import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.js";
 
@@ -96,7 +96,7 @@ export class AccountClosedEvent extends AbstractBankAccountDomainEvent {
 }
 ```
 
-```typescript title="src/bank-account/domain/domain-events/money-deposited.event.ts"
+```typescript title="src/bank-account/domain/domain-events/money-deposited.event.ts" showLineNumbers
 import { DomainEvent } from "@dugongjs/core";
 import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.js";
 
@@ -106,7 +106,7 @@ export class MoneyDepositedEvent extends AbstractBankAccountDomainEvent<{ amount
 }
 ```
 
-```typescript title="src/bank-account/domain/domain-events/money-withdrawn.event.ts"
+```typescript title="src/bank-account/domain/domain-events/money-withdrawn.event.ts" showLineNumbers
 import { DomainEvent } from "@dugongjs/core";
 import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-event.js";
 
@@ -122,20 +122,20 @@ _Commands_ represent operations that can be performed on an aggregate. They are 
 
 Each command corresponds to a public method on the aggregate:
 
-```typescript title="src/bank-account/domain/commands/open-account.command.ts"
+```typescript title="src/bank-account/domain/commands/open-account.command.ts" showLineNumbers
 export type OpenAccountCommand = {
     owner: string;
     initialBalance: number;
 };
 ```
 
-```typescript title="src/bank-account/domain/commands/deposit-money.command.ts"
+```typescript title="src/bank-account/domain/commands/deposit-money.command.ts" showLineNumbers
 export type DepositMoneyCommand = {
     amount: number;
 };
 ```
 
-```typescript title="src/bank-account/domain/commands/deposit-money.command.ts"
+```typescript title="src/bank-account/domain/commands/deposit-money.command.ts" showLineNumbers
 export type WithdrawMoneyCommand = {
     amount: number;
 };
@@ -150,7 +150,7 @@ With commands and events in place, we can now define the `BankAccount` [aggregat
 - Stage domain events.
 - Apply domain events to mutate internal state.
 
-```typescript title="src/bank-account/domain/bank-account.aggregate.ts"
+```typescript title="src/bank-account/domain/bank-account.aggregate.ts" showLineNumbers
 import { AbstractAggregateRoot, Aggregate, Apply, CreationProcess, Process } from "@dugongjs/core";
 import type { DepositMoneyCommand } from "./commands/deposit-money.command.js";
 import type { OpenAccountCommand } from "./commands/open-account.command.js";

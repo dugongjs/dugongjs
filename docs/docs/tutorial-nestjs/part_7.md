@@ -11,7 +11,7 @@ In this part, we'll implement the query side of the application layer.
 
 First, we need to create a read repository port and adapter:
 
-```typescript title="src/bank-account/ports/repository/i-bank-account-query-model-read-repository.ts"
+```typescript title="src/bank-account/ports/repository/i-bank-account-query-model-read-repository.ts" showLineNumbers
 import { BankAccountQueryModel } from "./bank-account-query-model.js";
 
 export interface IBankAccountQueryModelReadRepository {
@@ -24,7 +24,7 @@ export const IBankAccountQueryModelReadRepository = "IBankAccountQueryModelReadR
 
 Next, we implement the adapter using TypeORM:
 
-```typescript title="src/bank-account/adapters/repository/bank-account-query-model-read-repository-typeorm.service.ts"
+```typescript title="src/bank-account/adapters/repository/bank-account-query-model-read-repository-typeorm.service.ts" showLineNumbers
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { BankAccountQueryModel } from "../../ports/repository/bank-account-query-model.js";
@@ -55,7 +55,7 @@ Unlike the write repository, these methods will be called outside transactions a
 
 Next, we create the `BankAccountQueryService`, which is relatively straightforward:
 
-```typescript title="src/bank-account/application/query/bank-account.query.service.ts"
+```typescript title="src/bank-account/application/query/bank-account.query.service.ts" showLineNumbers
 import { Inject, Injectable } from "@nestjs/common";
 import { BankAccountQueryModel } from "../../ports/repository/bank-account-query-model.js";
 import { IBankAccountQueryModelReadRepository } from "../../ports/repository/i-bank-account-query-model-read-repository.js";
@@ -81,7 +81,7 @@ export class BankAccountQueryService {
 
 Before we create the query controller, we'll make a slight adjustment to the `BankAccountDTO` defined previously. Here, we add another static method to generate the DTO from the query model:
 
-```typescript title="src/bank-account/application/dtos/bank-account.dto.ts"
+```typescript title="src/bank-account/application/dtos/bank-account.dto.ts" showLineNumbers
 import type { BankAccount } from "../../domain/bank-account.aggregate.js";
 import type { BankAccountQueryModel } from "../../ports/repository/bank-account-query-model.js";
 
@@ -120,7 +120,7 @@ In many cases, it makes sense to have separate DTOs for command calls and query 
 
 Next, we create a REST controller to expose the query methods:
 
-```typescript title="src/bank-account/application/query/bank-account.query.controller.ts"
+```typescript title="src/bank-account/application/query/bank-account.query.controller.ts" showLineNumbers
 import { Controller, Get, NotFoundException, Param } from "@nestjs/common";
 import { BankAccountDto } from "../dtos/bank-account.dto.js";
 import { BankAccountQueryService } from "./bank-account.query.service.js";
@@ -153,7 +153,7 @@ export class BankAccountQueryController {
 
 Next, we create a module to wire everything together:
 
-```typescript title="src/bank-account/application/query/bank-account.query.module.ts"
+```typescript title="src/bank-account/application/query/bank-account.query.module.ts" showLineNumbers
 import { Constructor } from "@dugongjs/core";
 import { ModuleImports, ModuleProviders } from "@dugongjs/nestjs";
 import { DynamicModule, Module } from "@nestjs/common";
@@ -190,7 +190,7 @@ export class BankAccountQueryModule {
 
 Finally, we'll register this module in `AppModule`:
 
-```typescript title="src/app.module.ts"
+```typescript title="src/app.module.ts" showLineNumbers
 import { EventIssuerModule, MessageBrokerInMemoryModule } from "@dugongjs/nestjs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
 import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";

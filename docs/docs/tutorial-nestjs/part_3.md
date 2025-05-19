@@ -11,7 +11,7 @@ In an event-sourced system, commands and queries must be implemented separately.
 
 We'll begin by creating a NestJS service in the application layer that interacts with the `BankAccount` aggregate in the domain layer by calling its commands:
 
-```typescript title="src/bank-account/application/command/bank-account.command.service.ts"
+```typescript title="src/bank-account/application/command/bank-account.command.service.ts" showLineNumbers
 import { EventSourcingService } from "@dugongjs/nestjs";
 import { Injectable } from "@nestjs/common";
 import { BankAccount } from "../../domain/bank-account.aggregate.js";
@@ -180,7 +180,7 @@ We proceed like before by calling the `depositMoney()` command, applying and com
 
 Next, we'll define a NestJS controller to expose the `BankAccountCommandService` methods through. Before creating the controller, we will create a data transfer object (DTO) - a serialized version of the `BankAccount` aggregate that will be returned by API calls.
 
-```typescript title="src/bank-account/application/dtos/bank-account.dto.ts"
+```typescript title="src/bank-account/application/dtos/bank-account.dto.ts" showLineNumbers
 import type { BankAccount } from "../../domain/bank-account.aggregate.js";
 
 export class BankAccountDto {
@@ -203,7 +203,7 @@ We create a static `fromAggregate()` method to transform the aggregate to the DT
 
 Next, we define the controller. We are free to choose between multiple controller types supported by NestJS, such as REST, GraphQL, gRPC, etc. In this example, we define a simple REST controller:
 
-```typescript title="src/bank-account/application/command/bank-account.command.controller.ts"
+```typescript title="src/bank-account/application/command/bank-account.command.controller.ts" showLineNumbers
 import { Body, Controller, Delete, Param, Post } from "@nestjs/common";
 import { BankAccountDto } from "../dtos/bank-account.dto.js";
 import { BankAccountCommandService } from "./bank-account.command.service.js";
@@ -253,7 +253,7 @@ export class BankAccountCommandController {
 
 Finally, we'll expose the command controller using a NestJS module:
 
-```typescript title="src/bank-account/application/command/bank-account.command.module.ts"
+```typescript title="src/bank-account/application/command/bank-account.command.module.ts" showLineNumbers
 import { EventSourcingModule } from "@dugongjs/nestjs";
 import { Module } from "@nestjs/common";
 import { BankAccountCommandController } from "./bank-account.command.controller.js";
@@ -269,7 +269,7 @@ export class BankAccountCommandModule {}
 
 Finally, we'll add the module to our `AppModule`:
 
-```typescript title="src/app.module.ts"
+```typescript title="src/app.module.ts" showLineNumbers
 import { EventIssuerModule } from "@dugongjs/nestjs";
 import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";

@@ -27,7 +27,7 @@ npm install --save-dev vite vite-node vite-plugin-node dotenv-cli
 
 Then create a `vite.config.ts` file:
 
-```typescript title="vite.config.ts"
+```typescript title="vite.config.ts" showLineNumbers
 import { defineConfig } from "vite";
 import { VitePluginNode } from "vite-plugin-node";
 
@@ -113,7 +113,7 @@ To keep things organized, we’ll store our database configuration in a dedicate
 
 Create a data source configuration file:
 
-```typescript title="src/db/data-source-options.ts"
+```typescript title="src/db/data-source-options.ts" showLineNumbers
 import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm";
 import type { DataSourceOptions } from "typeorm";
 
@@ -140,7 +140,7 @@ In this tutorial, we're just using `process.env` to access environmental variabl
 
 Create a `.env` file at the root of your project with your database settings:
 
-```conf title=".env"
+```conf title=".env" showLineNumbers
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres_user
@@ -152,23 +152,25 @@ DB_NAME=account_service_db
 
 If you don’t already have a PostgreSQL instance, you can spin one up with Docker. Create a `docker-compose.yaml` file:
 
-```yaml title="docker-compose.yaml"
+```yaml title="docker-compose.yaml" showLineNumbers
+<!-- prettier-ignore-start -->
 services:
-    postgres:
-        image: postgres:14
-        container_name: nestjs_tutorial_account_service_db
-        restart: unless-stopped
-        environment:
-            POSTGRES_USER: postgres_user
-            POSTGRES_PASSWORD: postgres_password
-            POSTGRES_DB: account_service_db
-        ports:
-            - "5432:5432"
-        volumes:
-            - postgres_data:/var/lib/postgresql/data
+  postgres:
+    image: postgres:14
+    container_name: nestjs_tutorial_account_service_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: account_service_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-    postgres_data:
+  postgres_data:
+<!-- prettier-ignore-end -->
 ```
 
 Start the container:
@@ -181,7 +183,7 @@ docker compose up
 
 In `src/app.module.ts`, connect TypeORM, the DugongJS adapters, and set the current origin for event publishing:
 
-```typescript title="src/app.module.ts"
+```typescript title="src/app.module.ts"showLineNumbers
 import { EventIssuerModule } from "@dugongjs/nestjs";
 import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";

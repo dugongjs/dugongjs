@@ -37,7 +37,7 @@ We’ll start by adding two new folders to the bank-account feature module: `por
 
 In the `ports/repository` folder, we define a basic interface that represents the query model:
 
-```typescript title="src/bank-account/ports/repository/bank-account-query-model.ts"
+```typescript title="src/bank-account/ports/repository/bank-account-query-model.ts" showLineNumbers
 export type BankAccountQueryModel = {
     id: string;
     owner: string;
@@ -47,7 +47,7 @@ export type BankAccountQueryModel = {
 
 Next, we define a TypeORM entity adapter for this port:
 
-```typescript title="src/bank-account/adapters/repository/bank-account-query-model.entity.ts"
+```typescript title="src/bank-account/adapters/repository/bank-account-query-model.entity.ts" showLineNumbers
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { BankAccountQueryModel } from "../../ports/repository/bank-account-query-model.js";
 
@@ -66,7 +66,7 @@ export class BankAccountQueryModelEntity implements BankAccountQueryModel {
 
 Make sure to include this entity in `data-source-options.ts`:
 
-```typescript title="src/db/data-source-options.ts"
+```typescript title="src/db/data-source-options.ts" showLineNumbers
 import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm";
 import type { DataSourceOptions } from "typeorm";
 import { BankAccountQueryModelEntity } from "../bank-account/adapters/repository/bank-account-query-model.entity.js";
@@ -95,12 +95,12 @@ export const dataSourceOptions: DataSourceOptions = {
 To keep our query models in sync with domain events, we’ll introduce a message broker. To begin, we'll use an in-memory message broker suitable for local testing and demos.
 
 :::warning
-The in-memory broker is not suitable for production environments. In later steps, we’ll show how to replace it with Kafka or another production-ready transport.
+The in-memory broker is not suitable for production environments. In later parts, we’ll show how to replace it with Kafka.
 :::
 
 Enable it in `AppModule` by importing `MessageBrokerInMemoryModule` and calling `forRoot()`:
 
-```typescript title="src/app.module.ts"
+```typescript title="src/app.module.ts" showLineNumbers
 import { EventIssuerModule, MessageBrokerInMemoryModule } from "@dugongjs/nestjs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
 import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";
@@ -142,7 +142,7 @@ To respond to these messages and update the query model, we define a new port an
 
 First we define the port. Notice that both methods receive a `transactionContext` as their first argument. This is because they will always be called from within a transaction:
 
-```typescript title="src/bank-account/ports/repository/i-bank-account-query-model-write-repository.ts"
+```typescript title="src/bank-account/ports/repository/i-bank-account-query-model-write-repository.ts" showLineNumbers
 import { TransactionContext } from "@dugongjs/core";
 import { BankAccount } from "../../domain/bank-account.aggregate.js";
 
@@ -165,7 +165,7 @@ Note that we define both an `interface` and a `const` named `IBankAccountQueryMo
 
 Next, we implement the adapter using TypeORM:
 
-```typescript title="src/bank-account/adapters/repository/bank-account-query-model-write-repository-typeorm.service.ts"
+```typescript title="src/bank-account/adapters/repository/bank-account-query-model-write-repository-typeorm.service.ts" showLineNumbers
 import { Injectable } from "@nestjs/common";
 import { BankAccount } from "src/bank-account/domain/bank-account.aggregate.js";
 import { EntityManager } from "typeorm";
@@ -197,7 +197,7 @@ export class BankAccountQueryModelWriteRepositoryTypeOrmService implements IBank
 
 Next, we create a projection handler that listens for messages and calls our write repository by implementing the `IQueryModelProjectionHandler` interface from `@dugongjs/nestjs`:
 
-```typescript title="src/bank-account/application/consumer/bank-account-query-model-projection-handler.service.ts"
+```typescript title="src/bank-account/application/consumer/bank-account-query-model-projection-handler.service.ts" showLineNumbers
 import { TransactionContext } from "@dugongjs/core";
 import { IQueryModelProjectionHandler } from "@dugongjs/nestjs";
 import { Inject, Injectable } from "@nestjs/common";
@@ -231,7 +231,7 @@ By implementing this interface, query models will automatically be updated and d
 
 Finally, we'll create a module that wraps the built-in `QueryModelProjectionConsumerModule`:
 
-```typescript title="src/bank-account/application/consumer/bank-account-query-model-projection-consumer.module.ts"
+```typescript title="src/bank-account/application/consumer/bank-account-query-model-projection-consumer.module.ts" showLineNumbers
 import { Constructor } from "@dugongjs/core";
 import { QueryModelProjectionConsumerModule, QueryModelProjectionConsumerModuleOptions } from "@dugongjs/nestjs";
 import { DynamicModule, Module } from "@nestjs/common";
@@ -270,7 +270,7 @@ This module might look complex, but it’s actually a simple wrapper around `Que
 
 Finally, we'll register this module in `AppModule`:
 
-```typescript title="src/app.module.ts"
+```typescript title="src/app.module.ts" showLineNumbers
 import { EventIssuerModule, MessageBrokerInMemoryModule } from "@dugongjs/nestjs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
 import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";
