@@ -13,5 +13,6 @@
     "material-icon-theme.files.associations": {
         "vitest.config.unit.ts": "vitest",
         "vitest.config.e2e.ts": "vitest"
-    }
+    },
+    "cSpell.words": ["dugongjs", "kafkajs", "Debezium", "transactionality"]
 }
