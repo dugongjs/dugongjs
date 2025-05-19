@@ -1,6 +1,6 @@
 {
     "name": "@dugongjs/tutorial-nestjs",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "",
     "author": "",
     "private": true,
@@ -14,7 +14,7 @@
         "@dugongjs/core": "^0.0.4",
         "@dugongjs/nestjs": "^0.0.5",
         "@dugongjs/nestjs-microservice-query": "^0.0.6",
-        "@dugongjs/nestjs-typeorm": "^0.0.6",
+        "@dugongjs/nestjs-typeorm": "^0.0.7",
         "@dugongjs/typeorm": "^0.0.5",
         "@nestjs/common": "^10.0.0",
         "@nestjs/core": "^10.0.0",
