@@ -1,5 +1,11 @@
 # @dugongjs/nestjs-typeorm
 
+## 0.0.7
+
+### Patch Changes
+
+- 613bb0a: Added missing `OutboxMessageMapperTypeOrmService`
+
 ## 0.0.6
 
 ### Patch Changes
