@@ -1,5 +1,6 @@
-import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm";
+import { ConsumedMessageEntity, DomainEventEntity, OutboxEntity, SnapshotEntity } from "@dugongjs/typeorm";
 import type { DataSourceOptions } from "typeorm";
+import { BankAccountQueryModelEntity } from "../bank-account/adapters/repository/bank-account-query-model.entity.js";
 
 export const dataSourceOptions: DataSourceOptions = {
     type: "postgres",
@@ -10,5 +11,5 @@ export const dataSourceOptions: DataSourceOptions = {
     database: process.env.DB_NAME,
     synchronize: true,
     logging: false,
-    entities: [DomainEventEntity, SnapshotEntity, ConsumedMessageEntity]
+    entities: [DomainEventEntity, SnapshotEntity, ConsumedMessageEntity, OutboxEntity, BankAccountQueryModelEntity]
 };

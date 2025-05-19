@@ -1,0 +1,36 @@
+{
+    "name": "outbox-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+        "tasks.max": "1",
+        "plugin.name": "pgoutput",
+        "topic.prefix": "outbox",
+        "table.include.list": "public.outbox",
+
+        "database.hostname": "postgres",
+        "database.port": "5432",
+        "database.user": "postgres_user",
+        "database.password": "postgres_password",
+        "database.dbname": "account_service_db",
+
+        "transforms": "outbox",
+        "transforms.outbox.type": "io.debezium.transforms.outbox.EventRouter",
+        "transforms.outbox.route.by.field": "channelId",
+        "transforms.outbox.route.topic.replacement": "${routedByValue}",
+        "transforms.outbox.table.field.event.id": "id",
+        "transforms.outbox.table.field.event.key": "aggregateId",
+        "transforms.outbox.table.field.event.payload": "payload",
+        "transforms.outbox.table.fields.additional.placement": "origin:header,aggregateType:header,type:header,version:header,sequenceNumber:header,timestamp:header,correlationId:header,triggeredByUserId:header,triggeredByEventId:header,metadata:header",
+        "transforms.outbox.table.expand.json.payload": "true",
+        "transforms.outbox.table.json.payload.null.behavior": "ignore",
+        "transforms.outbox.route.tombstone.on.empty.payload": "true",
+
+        "key.converter": "io.debezium.converters.BinaryDataConverter",
+        "key.converter.delegate.converter.type": "org.apache.kafka.connect.storage.StringConverter",
+        "key.converter.delegate.converter.type.schemas.enable": "false",
+
+        "value.converter": "io.debezium.converters.BinaryDataConverter",
+        "value.converter.delegate.converter.type": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter.delegate.converter.type.schemas.enable": "false"
+    }
+}

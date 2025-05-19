@@ -1,16 +1,94 @@
+networks:
+  kafka-net:
+    driver: bridge
+
 services:
-    postgres:
-        image: postgres:14
-        container_name: nestjs_tutorial_account_service_db
-        restart: unless-stopped
-        environment:
-            POSTGRES_USER: postgres_user
-            POSTGRES_PASSWORD: postgres_password
-            POSTGRES_DB: account_service_db
-        ports:
-            - "5432:5432"
-        volumes:
-            - postgres_data:/var/lib/postgresql/data
+  postgres:
+    image: postgres:14
+    container_name: dugongjs_nestjs_tutorial_account_service_db
+    restart: unless-stopped
+    networks:
+      - kafka-net
+    environment:
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: account_service_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "max_wal_senders=1"
+      - "-c"
+      - "max_replication_slots=1"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: dugongjs_nestjs_tutorial_zookeeper
+    networks:
+      - kafka-net
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: dugongjs_nestjs_tutorial_kafka
+    networks:
+      - kafka-net
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LISTENERS: PLAINTEXT_INTERNAL://0.0.0.0:29092,PLAINTEXT_C://0.0.0.0:9093,PLAINTEXT_L://0.0.0.0:9092,
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_INTERNAL://kafka:29092,PLAINTEXT_L://localhost:9092,PLAINTEXT_C://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT_INTERNAL:PLAINTEXT,PLAINTEXT_L:PLAINTEXT,PLAINTEXT_C:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+
+  kafka-connect:
+    image: debezium/connect:2.4
+    container_name: dugongjs_nestjs_tutorial_kafka_connect
+    depends_on:
+    - kafka
+    - postgres
+    ports:
+    - "8083:8083"
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9093
+      GROUP_ID: kafka-connect-group
+      CONFIG_STORAGE_TOPIC: kafka-connect-configs
+      OFFSET_STORAGE_TOPIC: kafka-connect-offsets
+      STATUS_STORAGE_TOPIC: kafka-connect-status
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      CONNECT_REST_PORT: 8083
+      CONNECT_PLUGIN_PATH: /kafka/connect,/debezium/connectors
+    networks:
+      - kafka-net
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: dugongjs_nestjs_tutorial_kafka_ui
+    networks:
+      - kafka-net
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
 
 volumes:
-    postgres_data:
+  postgres_data:

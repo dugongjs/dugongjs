@@ -3,5 +3,5 @@ import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-e
 
 @DomainEvent()
 export class MoneyWithdrawnEvent extends AbstractBankAccountDomainEvent<{ amount: number }> {
-    public static readonly type = "MoneyWithdrawn";
+    public readonly type = "MoneyWithdrawn";
 }
