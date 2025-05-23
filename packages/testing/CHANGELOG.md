@@ -1,5 +1,11 @@
 # @dugongjs/testing
 
+## 0.0.5
+
+### Patch Changes
+
+- f8d0cdf: Initial release
+
 ## 0.0.4
 
 ### Patch Changes
