@@ -33,3 +33,4 @@ export {
     type QueryModelProjectionConsumerModuleOptions
 } from "./query-model-projection-consumer/query-model-projection-consumer.module.js";
 export { QueryModelProjectionConsumerService } from "./query-model-projection-consumer/query-model-projection-consumer.service.js";
+export { WaitForMessageConsumerService } from "./wait-for-message-consumer/wait-for-message-consumer.service.js";
