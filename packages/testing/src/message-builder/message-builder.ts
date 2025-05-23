@@ -61,4 +61,12 @@ export class MessageBuilder<TMessage> {
             domainEventIds: domainEvents.map((event) => event.getId() as string)
         };
     }
+
+    public clear(): MessageBuilder<TMessage> {
+        return new MessageBuilder({
+            outboundMessageMapper: this.outboundMessageMapper,
+            initialSequenceNumber: this.initialSequenceNumber,
+            autoIncrementSequenceNumber: this.autoIncrementSequenceNumber
+        });
+    }
 }
