@@ -53,13 +53,13 @@ export class EventSourcingService {
         );
 
         const factory = context.getFactory();
-        const manager = context.getManager();
 
         factory.setTransactionContext(transactionContext);
 
-        if (manager) {
-            context.getManager().setTransactionContext(transactionContext);
-        }
+        try {
+            const manager = context.getManager();
+            manager.setTransactionContext(transactionContext);
+        } catch {}
 
         return context;
     }
