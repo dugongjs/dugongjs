@@ -1,5 +1,12 @@
 # @dugongjs/nestjs-microservice-query
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [92dde63]
+    - @dugongjs/nestjs@0.0.9
+
 ## 0.0.9
 
 ### Patch Changes
