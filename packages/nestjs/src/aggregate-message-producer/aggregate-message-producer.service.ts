@@ -1,6 +1,6 @@
 import {
-    AbstractAggregateRoot,
     AbstractDomainEvent,
+    AbstractEventSourcedAggregateRoot,
     AggregateMessageProducer,
     IMessageProducer,
     IOutboundMessageMapper,
@@ -25,7 +25,7 @@ export class AggregateMessageProducerService {
     ) {}
 
     public async publishDomainEventsAsMessages<
-        TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
+        TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
     >(aggregateClass: TAggregateRootClass, domainEvents: AbstractDomainEvent[]): Promise<void> {
         const aggregateMessageProducer = new AggregateMessageProducer({
             aggregateClass,
