@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.9
+
+### Patch Changes
+
+- 92dde63: Fix type parameter in `AggregateMessageConsumerService.registerMessageConsumerForAggregate`
+
 ## 0.0.8
 
 ### Patch Changes
