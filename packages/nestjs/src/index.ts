@@ -1,3 +1,4 @@
+export { AggregateMessageProducerService } from "./aggregate-message-producer/aggregate-message-producer.service.js";
 export { AggregateQueryService } from "./aggregate-query/aggregate-query.service.js";
 export { InjectConsumedMessageRepository } from "./decorators/inject-comsumed-message-repository.decorator.js";
 export { InjectCurrentOrigin } from "./decorators/inject-current-origin.decorator.js";
