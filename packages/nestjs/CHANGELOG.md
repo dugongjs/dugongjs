@@ -1,5 +1,12 @@
 # @dugongjs/nestjs
 
+## 0.0.8
+
+### Patch Changes
+
+- e67a9f9: Added missing export of `AggregateMessageConsumerService`
+- e67a9f9: Fixed incorrect type parameter in `AggregateMessageProducerService.publishDomainEventsAsMessages`
+
 ## 0.0.7
 
 ### Patch Changes
