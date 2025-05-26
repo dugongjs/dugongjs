@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.10
+
+### Patch Changes
+
+- 4e5dd9b: Fixed an error when calling `EventSourcingService.createAggregateContext` with type `AbstractEventSourcedAggregateRoot`
+
 ## 0.0.9
 
 ### Patch Changes
