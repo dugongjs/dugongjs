@@ -24,10 +24,10 @@ export class AggregateMessageProducerService {
         @InjectCurrentOrigin() private readonly currentOrigin: string
     ) {}
 
-    public async publishDomainEventsAsMessages<
+    public getAggregateMessageProducer<
         TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-    >(aggregateClass: TAggregateRootClass, domainEvents: AbstractDomainEvent[]): Promise<void> {
-        const aggregateMessageProducer = new AggregateMessageProducer({
+    >(aggregateClass: TAggregateRootClass): AggregateMessageProducer<TAggregateRootClass, any> {
+        return new AggregateMessageProducer({
             aggregateClass,
             currentOrigin: this.currentOrigin,
             transactionManager: this.transactionManager,
@@ -35,6 +35,12 @@ export class AggregateMessageProducerService {
             outboundMessageMapper: this.outboundMessageMapper,
             logger: this.logger
         });
+    }
+
+    public async publishDomainEventsAsMessages<
+        TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
+    >(aggregateClass: TAggregateRootClass, domainEvents: AbstractDomainEvent[]): Promise<void> {
+        const aggregateMessageProducer = this.getAggregateMessageProducer(aggregateClass);
 
         await aggregateMessageProducer.publishDomainEventsAsMessages(domainEvents);
     }

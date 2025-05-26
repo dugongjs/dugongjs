@@ -1,5 +1,5 @@
 import {
-    AbstractAggregateRoot,
+    AbstractEventSourcedAggregateRoot,
     AggregateMessageConsumer,
     IConsumedMessageRepository,
     IDomainEventRepository,
@@ -31,15 +31,10 @@ export class AggregateMessageConsumerService {
         @InjectCurrentOrigin() private readonly currentOrigin: string
     ) {}
 
-    public async registerMessageConsumerForAggregate<
-        TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
-    >(
-        aggregateClass: TAggregateRootClass,
-        consumerName: string,
-        handleMessage?: HandleMessage,
-        options?: HandleMessageOptions
-    ): Promise<void> {
-        const aggregateMessageConsumer = new AggregateMessageConsumer({
+    public getAggregateMessageConsumer<
+        TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
+    >(aggregateClass: TAggregateRootClass): AggregateMessageConsumer<TAggregateRootClass, any> {
+        return new AggregateMessageConsumer({
             aggregateClass,
             transactionManager: this.transactionManager,
             domainEventRepository: this.domainEventRepository,
@@ -49,6 +44,17 @@ export class AggregateMessageConsumerService {
             currentOrigin: this.currentOrigin,
             logger: this.logger
         });
+    }
+
+    public async registerMessageConsumerForAggregate<
+        TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
+    >(
+        aggregateClass: TAggregateRootClass,
+        consumerName: string,
+        handleMessage?: HandleMessage,
+        options?: HandleMessageOptions
+    ): Promise<void> {
+        const aggregateMessageConsumer = this.getAggregateMessageConsumer(aggregateClass);
 
         await aggregateMessageConsumer.registerMessageConsumerForAggregate(consumerName, handleMessage, options);
     }
