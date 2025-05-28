@@ -14,7 +14,7 @@ export class MessageConsumerKafkaJS
     extends MessageChannelParticipantKafkaJS
     implements IMessageConsumer<EachMessagePayload>
 {
-    private consumer: Consumer;
+    private consumers: Consumer[] = [];
 
     constructor(
         private readonly kafka: Kafka,
@@ -38,14 +38,16 @@ export class MessageConsumerKafkaJS
         consumerId: string,
         onMessage?: (message: EachMessagePayload) => Promise<void>
     ): Promise<void> {
-        this.consumer = this.kafka.consumer({ groupId: consumerId, ...(this.consumerConfig ?? {}) });
+        const consumer = this.kafka.consumer({ groupId: consumerId, ...(this.consumerConfig ?? {}) });
 
-        await this.consumer.connect();
-        await this.consumer.subscribe({ topic: channelId, ...(this.consumerSubscribeTopics ?? {}) });
-        await this.consumer.run({ eachMessage: onMessage, ...(this.consumerRunConfig ?? {}) });
+        await consumer.connect();
+        await consumer.subscribe({ topic: channelId, ...(this.consumerSubscribeTopics ?? {}) });
+        await consumer.run({ eachMessage: onMessage, ...(this.consumerRunConfig ?? {}) });
+
+        this.consumers.push(consumer);
     }
 
     public async disconnect(): Promise<void> {
-        await this.consumer.disconnect();
+        await Promise.all(this.consumers.map(async (consumer) => consumer.disconnect()));
     }
 }
