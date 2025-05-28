@@ -1,4 +1,4 @@
-import type { IMessageConsumer } from "../../ports/index.js";
+import type { IDomainEventRepository, IMessageConsumer } from "../../ports/index.js";
 import type { IConsumedMessageRepository } from "../../ports/outbound/repository/i-consumed-message-repository.js";
 import {
     AbstractAggregateHandler,
@@ -7,6 +7,7 @@ import {
 
 export type WaitForMessageConsumerOptions = Omit<
     AbstractAggregateHandlerOptions<any> & {
+        domainEventRepository: IDomainEventRepository;
         consumedMessageRepository: IConsumedMessageRepository;
         messageConsumer: IMessageConsumer<any>;
         pollingInterval?: number;
@@ -18,12 +19,14 @@ export type WaitForMessageConsumerOptions = Omit<
  * Utility class to wait for a message to be consumed. This is primarily intended for testing purposes.
  */
 export class WaitForMessageConsumer extends AbstractAggregateHandler<any> {
+    private readonly domainEventRepository: IDomainEventRepository;
     private readonly consumedMessageRepository: IConsumedMessageRepository;
     private readonly messageConsumer: IMessageConsumer<any>;
     private readonly pollingInterval: number;
 
     constructor(options: WaitForMessageConsumerOptions) {
         super({ ...options, transactionManager: { transaction: (fn) => fn({}) } });
+        this.domainEventRepository = options.domainEventRepository;
         this.consumedMessageRepository = options.consumedMessageRepository;
         this.messageConsumer = options.messageConsumer;
         this.pollingInterval = options.pollingInterval ?? 100;
@@ -77,5 +80,27 @@ export class WaitForMessageConsumer extends AbstractAggregateHandler<any> {
 
             await new Promise((resolve) => setTimeout(resolve, this.pollingInterval));
         }
+    }
+
+    public async waitForAggregateDomainEventsToBeConsumed(
+        consumerName: string,
+        aggregateId: string,
+        fromSequenceNumber?: number
+    ): Promise<void> {
+        const domainEvents = await this.domainEventRepository.getAggregateDomainEvents(
+            null,
+            this.aggregateOrigin,
+            this.aggregateType,
+            aggregateId,
+            fromSequenceNumber
+        );
+
+        if (domainEvents.length === 0) {
+            this.logger?.verbose("No domain events to wait for");
+            return;
+        }
+
+        const ids = domainEvents.map((event) => event.id);
+        await this.waitForMessagesToBeConsumed(consumerName, ...ids);
     }
 }
