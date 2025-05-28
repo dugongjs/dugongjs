@@ -1,5 +1,11 @@
 # @dugongjs/kafkajs
 
+## 0.0.6
+
+### Patch Changes
+
+- 2f2e240: Fixed an issue with consumer management
+
 ## 0.0.5
 
 ### Patch Changes

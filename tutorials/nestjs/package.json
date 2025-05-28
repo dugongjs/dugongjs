@@ -12,9 +12,9 @@
     },
     "dependencies": {
         "@dugongjs/core": "^0.0.4",
-        "@dugongjs/kafkajs": "^0.0.5",
+        "@dugongjs/kafkajs": "^0.0.6",
         "@dugongjs/nestjs": "^0.0.5",
-        "@dugongjs/nestjs-kafkajs": "^0.0.6",
+        "@dugongjs/nestjs-kafkajs": "^0.0.7",
         "@dugongjs/nestjs-microservice-query": "^0.0.6",
         "@dugongjs/nestjs-typeorm": "^0.0.7",
         "@dugongjs/typeorm": "^0.0.5",
