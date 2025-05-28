@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.12
+
+### Patch Changes
+
+- e50cf89: `QueryModelProjectionConsumerModule` now exposes `handleMessageOptions` which is passed to the internal `AggregateMessageConsumerService`
+
 ## 0.0.11
 
 ### Patch Changes
