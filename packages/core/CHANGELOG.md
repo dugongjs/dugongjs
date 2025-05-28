@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.5
+
+### Patch Changes
+
+- 40ad156: Added `waitForMessagesToBeConsumed` method to `WaitForMessageConsumer`
+
 ## 0.0.4
 
 ### Patch Changes

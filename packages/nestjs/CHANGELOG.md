@@ -1,5 +1,13 @@
 # @dugongjs/nestjs
 
+## 0.0.11
+
+### Patch Changes
+
+- 40ad156: Added `waitForMessagesToBeConsumed` method to `WaitForMessageConsumer`
+- Updated dependencies [40ad156]
+    - @dugongjs/core@0.0.5
+
 ## 0.0.10
 
 ### Patch Changes
