@@ -1,19 +1,17 @@
-import type { Constructor } from "@dugongjs/core";
-import { Module, type DynamicModule } from "@nestjs/common";
+import type { Constructor, HandleMessageOptions } from "@dugongjs/core";
+import { Module, type DynamicModule, type ModuleMetadata } from "@nestjs/common";
 import { AggregateMessageConsumerService } from "../aggregate-message-consumer/aggregate-message-consumer.service.js";
 import { EventSourcingModule } from "../event-sourcing/event-sourcing.module.js";
-import type {
-    InboundMessageMapperProvider,
-    MessageConsumerProvider,
-    ModuleInjectables
-} from "../providers/module-providers.js";
+import type { InboundMessageMapperProvider, MessageConsumerProvider } from "../providers/module-providers.js";
 import { IQueryModelProjectionHandler } from "./i-query-model-projection-handler.js";
+import { QUERY_MODEL_PROJECTION_CONSUMER_OPTIONS_TOKEN } from "./query-model-projection-consumer.constants.js";
 import { QueryModelProjectionConsumerController } from "./query-model-projection-consumer.controller.js";
 import { QueryModelProjectionConsumerService } from "./query-model-projection-consumer.service.js";
 
 export type QueryModelProjectionConsumerModuleOptions = {
-    module?: ModuleInjectables;
+    module?: Pick<ModuleMetadata, "imports" | "providers">;
     queryModelProjectionHandler: Constructor<IQueryModelProjectionHandler<any>>;
+    handleMessageOptions?: HandleMessageOptions;
     messageBroker?: Partial<MessageConsumerProvider> & Partial<InboundMessageMapperProvider>;
 };
 
@@ -32,6 +30,10 @@ export class QueryModelProjectionConsumerModule {
                 {
                     provide: IQueryModelProjectionHandler,
                     useClass: options.queryModelProjectionHandler
+                },
+                {
+                    provide: QUERY_MODEL_PROJECTION_CONSUMER_OPTIONS_TOKEN,
+                    useValue: options.handleMessageOptions
                 }
             ]
         };

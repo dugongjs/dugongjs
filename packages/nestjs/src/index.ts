@@ -29,6 +29,10 @@ export type {
     TransactionManagerProvider
 } from "./providers/module-providers.js";
 export { IQueryModelProjectionHandler } from "./query-model-projection-consumer/i-query-model-projection-handler.js";
+export {
+    QUERY_MODEL_PROJECTION_CONSUMER,
+    QUERY_MODEL_PROJECTION_CONSUMER_OPTIONS_TOKEN
+} from "./query-model-projection-consumer/query-model-projection-consumer.constants.js";
 export { QueryModelProjectionConsumerController } from "./query-model-projection-consumer/query-model-projection-consumer.controller.js";
 export {
     QueryModelProjectionConsumerModule,
