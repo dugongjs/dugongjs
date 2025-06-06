@@ -9,6 +9,7 @@ import {
     AbstractAggregateHandler,
     type AbstractAggregateHandlerOptions
 } from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
+import type { AggregateQueryService } from "../aggregate-query-service/aggregate-query-service.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import { MissingAggregateIdError } from "./errors/missing-aggregate-id.error.js";
 
@@ -17,6 +18,7 @@ export type AggregateFactoryOptions<
 > = AbstractAggregateHandlerOptions<TAggregateRootClass> & {
     domainEventRepository: IDomainEventRepository;
     snapshotRepository?: ISnapshotRepository;
+    externalOriginMap?: Map<string, AggregateQueryService>;
 };
 
 export type BuildOptions = {
@@ -33,11 +35,13 @@ export class AggregateFactory<
 > extends AbstractAggregateHandler<TAggregateRootClass> {
     private readonly domainEventRepository: IDomainEventRepository;
     private readonly snapshotRepository?: ISnapshotRepository;
+    private readonly externalOriginMap: Map<string, AggregateQueryService>;
 
     constructor(options: AggregateFactoryOptions<TAggregateRootClass>) {
         super(options);
         this.domainEventRepository = options.domainEventRepository;
         this.snapshotRepository = options.snapshotRepository;
+        this.externalOriginMap = options.externalOriginMap ?? new Map<string, AggregateQueryService>();
     }
 
     public async build(
@@ -101,24 +105,14 @@ export class AggregateFactory<
             logContext,
             `Fetching domain events from event log for ${this.aggregateType} aggregate ${aggregateId}`
         );
-        const serializedDomainEvents = await this.domainEventRepository.getAggregateDomainEvents(
-            this.getTransactionContext(),
-            this.aggregateOrigin,
-            this.aggregateType,
-            aggregateId
-        );
+
+        const serializedDomainEvents = await this.getSerializedDomainEvents(aggregateId);
 
         if (serializedDomainEvents.length === 0) {
             this.logger.verbose(
                 logContext,
-                `No domain events found for ${this.aggregateType} aggregate ${aggregateId} in event log`
+                `No domain events found for ${this.aggregateType} aggregate ${aggregateId}`
             );
-
-            if (this.isInternalAggregate) {
-                return null;
-            }
-
-            // TODO: try fetch from remote using outbound port
             return null;
         }
 
@@ -202,6 +196,65 @@ export class AggregateFactory<
         );
 
         return this.deserializeAndApplyDomainEventsToAggregate(aggregate, serializedDomainEvents);
+    }
+
+    private async getSerializedDomainEvents(aggregateId: string): Promise<SerializedDomainEvent[]> {
+        const serializedDomainEvents = await this.domainEventRepository.getAggregateDomainEvents(
+            this.getTransactionContext(),
+            this.aggregateOrigin,
+            this.aggregateType,
+            aggregateId
+        );
+
+        const isEventLogEmpty = serializedDomainEvents.length === 0;
+        const isEventLogIncomplete = isEventLogEmpty
+            ? false
+            : serializedDomainEvents[serializedDomainEvents.length - 1].sequenceNumber !==
+              serializedDomainEvents.length;
+
+        if (this.isInternalAggregate) {
+            return serializedDomainEvents;
+        }
+
+        if (isEventLogEmpty || isEventLogIncomplete) {
+            if (!this.externalOriginMap.has(this.aggregateOrigin)) {
+                if (isEventLogIncomplete) {
+                    this.logger.warn(
+                        this.getLogContext(aggregateId),
+                        `Event log for ${this.aggregateType} aggregate ${aggregateId} is incomplete, and no external origin is configured to fetch missing events - aggregate will not be built`
+                    );
+                }
+
+                return [];
+            }
+
+            const externalAggregateQueryService = this.externalOriginMap.get(this.aggregateOrigin)!;
+
+            try {
+                this.logger.verbose(
+                    this.getLogContext(aggregateId),
+                    `Attempting to fetch ${this.aggregateType} aggregate domain events ${aggregateId} from external origin ${this.aggregateOrigin}`
+                );
+
+                const serializedDomainEvents = await externalAggregateQueryService.getDomainEventsForAggregate(
+                    this.aggregateOrigin,
+                    this.aggregateType,
+                    aggregateId
+                );
+
+                await this.domainEventRepository.saveDomainEvents(this.getTransactionContext(), serializedDomainEvents);
+
+                return serializedDomainEvents;
+            } catch (error) {
+                this.logger.error(
+                    this.getLogContext(aggregateId),
+                    `Failed to fetch ${this.aggregateType} aggregate ${aggregateId} from external origin`
+                );
+                return [];
+            }
+        }
+
+        return serializedDomainEvents;
     }
 
     private deserializeAndApplyDomainEventsToAggregate(
