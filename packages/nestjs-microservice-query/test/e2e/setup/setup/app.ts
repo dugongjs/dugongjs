@@ -7,8 +7,8 @@ import { Test } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Logger, LoggerModule } from "nestjs-pino";
 import { DataSource } from "typeorm";
-import { AggregateQueryMicroserviceModule } from "../../../../src/modules/aggregate-query-microservice/aggregate-query-microservice.module.js";
-import { AggregateQueryClientProxyService } from "../../../../src/services/aggregate-query-client-proxy.service.js";
+import { AggregateQueryClientProxyService } from "../../../../src/client/aggregate-query-client-proxy.service.js";
+import { AggregateQueryMicroserviceModule } from "../../../../src/server/aggregate-query-microservice.module.js";
 import { UserCommandModule } from "../../use-cases/user-aggregate/application/command/user.command.module.js";
 import { UserQueryModule } from "../../use-cases/user-aggregate/application/query/user.query.module.js";
 

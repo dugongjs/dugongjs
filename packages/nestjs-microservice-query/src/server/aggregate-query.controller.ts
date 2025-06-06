@@ -7,7 +7,7 @@ import {
     GET_AGGREGATE_TOKEN,
     GET_AGGREGATE_TYPES_TOKEN,
     GET_DOMAIN_EVENTS_FOR_AGGREGATE_TOKEN
-} from "./aggregate-query.tokens.js";
+} from "../tokens/aggregate-query.tokens.js";
 
 @Controller()
 export class AggregateQueryController {
