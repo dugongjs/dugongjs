@@ -6,8 +6,10 @@ import {
     type FactoryProvider,
     type ValueProvider
 } from "@nestjs/common";
+import type { ModuleInjectables } from "../providers/module-providers.js";
 
 export type ExternalOriginModuleOptions = {
+    module?: ModuleInjectables;
     externalOriginMap:
         | Omit<FactoryProvider<IExternalOriginMap>, "provide">
         | Omit<ClassProvider<IExternalOriginMap>, "provide">
@@ -20,11 +22,13 @@ export class ExternalOriginModule {
     public static register(options: ExternalOriginModuleOptions): DynamicModule {
         return {
             module: ExternalOriginModule,
+            imports: options.module?.imports,
             providers: [
                 {
                     provide: IExternalOriginMap,
                     ...options.externalOriginMap
-                }
+                },
+                ...(options.module?.providers ?? [])
             ],
             exports: [IExternalOriginMap],
             global: options.isGlobal
