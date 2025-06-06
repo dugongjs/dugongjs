@@ -2,6 +2,7 @@ import type { SerializedDomainEvent } from "../../domain/abstract-domain-event/s
 import type { AbstractEventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
 import { aggregateDomainEventApplier } from "../../domain/aggregate-domain-event-applier/aggregate-domain-event-applier.js";
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
+import type { IExternalOriginMap } from "../../ports/outbound/ipc/i-external-origin-map.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
@@ -18,7 +19,7 @@ export type AggregateFactoryOptions<
 > = AbstractAggregateHandlerOptions<TAggregateRootClass> & {
     domainEventRepository: IDomainEventRepository;
     snapshotRepository?: ISnapshotRepository;
-    externalOriginMap?: Map<string, AggregateQueryService>;
+    externalOriginMap?: IExternalOriginMap;
 };
 
 export type BuildOptions = {
@@ -35,7 +36,7 @@ export class AggregateFactory<
 > extends AbstractAggregateHandler<TAggregateRootClass> {
     private readonly domainEventRepository: IDomainEventRepository;
     private readonly snapshotRepository?: ISnapshotRepository;
-    private readonly externalOriginMap: Map<string, AggregateQueryService>;
+    private readonly externalOriginMap: IExternalOriginMap;
 
     constructor(options: AggregateFactoryOptions<TAggregateRootClass>) {
         super(options);
