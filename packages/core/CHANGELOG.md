@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.6
+
+### Patch Changes
+
+- fbf3393: `AggregateFactory` can now accept an `externalOriginMap` constructor parameter to fetch missing domain events from other origins
+
 ## 0.0.5
 
 ### Patch Changes
