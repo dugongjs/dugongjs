@@ -853,9 +853,6 @@ importers:
         specifier: ^0.3.22
         version: 0.3.22(pg@8.15.6)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.11.21(@swc/helpers@0.5.17))(@types/node@20.17.30)(typescript@5.8.2))
     devDependencies:
-      '@dugongjs/cli':
-        specifier: workspace:*
-        version: link:../../packages/cli
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.21
