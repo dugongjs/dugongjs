@@ -29,7 +29,6 @@
         "typeorm": "^0.3.22"
     },
     "devDependencies": {
-        "@dugongjs/cli": "workspace:*",
         "@types/express": "^4.17.17",
         "@types/node": "^20.3.1",
         "@types/supertest": "^6.0.0",
