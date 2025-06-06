@@ -1,5 +1,13 @@
 # @dugongjs/nestjs
 
+## 0.0.13
+
+### Patch Changes
+
+- eb49f11: Added `ExternalOriginModule` and support for injecting `IExternalOriginMap` into `EventSourcingService`
+- Updated dependencies [fbf3393]
+    - @dugongjs/core@0.0.6
+
 ## 0.0.12
 
 ### Patch Changes
