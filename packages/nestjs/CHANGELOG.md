@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.14
+
+### Patch Changes
+
+- c4be0ee: Added missing `module` option in `ExternalOriginModule`
+
 ## 0.0.13
 
 ### Patch Changes
