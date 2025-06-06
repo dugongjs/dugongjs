@@ -11,6 +11,7 @@ export { InjectTransactionManager } from "./decorators/inject-transaction-manage
 export { EventIssuerModule, type EventIssuerModuleOptions } from "./event-issuer/event-issuer.module.js";
 export { EventSourcingModule, type EventSourcingModuleOptions } from "./event-sourcing/event-sourcing.module.js";
 export { EventSourcingService } from "./event-sourcing/event-sourcing.service.js";
+export { ExternalOriginModule, type ExternalOriginModuleOptions } from "./external-origin/external-origin.module.js";
 export { InMemoryMessageBusService } from "./message-broker-in-memory/in-memory-message-bus.service.js";
 export { InboundMessageMapperInMemoryService } from "./message-broker-in-memory/inbound-message-mapper-in-memory.service.js";
 export { MessageBrokerInMemoryModule } from "./message-broker-in-memory/message-broker-in-memory.module.js";
