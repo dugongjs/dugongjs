@@ -14,5 +14,5 @@
         "vitest.config.unit.ts": "vitest",
         "vitest.config.e2e.ts": "vitest"
     },
-    "cSpell.words": ["dugongjs", "kafkajs", "Debezium", "transactionality"]
+    "cSpell.words": ["Debezium", "dugongjs", "kafkajs", "snapshotable", "transactionality"]
 }
