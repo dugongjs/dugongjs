@@ -65,14 +65,8 @@ export class AggregateFactory<
 
         if (this.snapshotRepository && this.isSnapshotable && !options.skipSnapshot) {
             try {
-                this.logger.verbose(logCtx, "Attempting to build from snapshot");
                 aggregate = await this.buildFromLatestSnapshot(aggregateId);
-
-                if (!aggregate) {
-                    this.logger.verbose(logCtx, `No snapshot found for ${this.aggregateType} aggregate ${aggregateId}`);
-                }
             } catch (error) {
-                this.logger.error(logCtx, "Failed to build from snapshot");
                 this.logger.error(error);
             }
         }
@@ -157,7 +151,7 @@ export class AggregateFactory<
             return null;
         }
 
-        this.logger.verbose(logCtx, "Fetching latest snapshot for aggregate");
+        this.logger.verbose(logCtx, "Fetching latest snapshot");
 
         let latestSnapshot: SerializedSnapshot | null = null;
 
@@ -170,13 +164,13 @@ export class AggregateFactory<
                 this.tenantId
             );
         } catch (error) {
-            this.logger.error(logCtx, "Failed to fetch latest snapshot for aggregate");
+            this.logger.error(logCtx, "Failed to fetch latest snapshot");
             this.logger.error(error);
             return null;
         }
 
         if (!latestSnapshot) {
-            this.logger.verbose(logCtx, "No snapshot available for aggregate");
+            this.logger.verbose(logCtx, "No snapshot available");
             return null;
         }
 
