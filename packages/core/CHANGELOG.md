@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.7
+
+### Patch Changes
+
+- 18ef4ca: Added initial support for soft multi-tenancy
+
 ## 0.0.6
 
 ### Patch Changes
