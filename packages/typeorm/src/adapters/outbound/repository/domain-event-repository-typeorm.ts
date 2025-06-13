@@ -10,6 +10,7 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
         origin: string,
         aggregateType: string,
         aggregateId: string,
+        tenantId?: string,
         fromSequenceNumber?: number
     ): Promise<SerializedDomainEvent[]> {
         const domainEventRepository =
@@ -20,6 +21,7 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
                 origin,
                 aggregateType,
                 aggregateId,
+                tenantId,
                 sequenceNumber: fromSequenceNumber ? MoreThan(fromSequenceNumber) : undefined
             },
             order: {
@@ -33,7 +35,8 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
     public async getAggregateIds(
         transactionContext: EntityManager | null,
         origin: string,
-        aggregateType: string
+        aggregateType: string,
+        tenantId?: string | null
     ): Promise<string[]> {
         const domainEventRepository =
             transactionContext?.getRepository(DomainEventEntity) ?? this.domainEventRepository;
@@ -43,6 +46,7 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
             .select("DISTINCT domainEvent.aggregateId", "aggregateId")
             .where("domainEvent.origin = :origin", { origin })
             .andWhere("domainEvent.aggregateType = :aggregateType", { aggregateType })
+            .andWhere(tenantId ? "domainEvent.tenantId = :tenantId" : "TRUE", { tenantId })
             .orderBy("domainEvent.aggregateId", "ASC")
             .getRawMany();
 

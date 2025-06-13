@@ -15,6 +15,9 @@ export class SnapshotEntity implements SerializedSnapshot {
     @Column({ type: "uuid" })
     aggregateId: string;
 
+    @Column({ type: "varchar", length: 255, nullable: true })
+    tenantId?: string | null;
+
     @Column({ type: "int" })
     domainEventSequenceNumber: number;
 

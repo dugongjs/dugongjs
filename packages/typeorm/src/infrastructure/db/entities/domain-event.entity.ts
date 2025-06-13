@@ -2,7 +2,7 @@ import type { SerializedDomainEvent } from "@dugongjs/core";
 import { Column, Entity, Index, PrimaryColumn, Unique } from "typeorm";
 
 @Entity("domain_events")
-@Unique(["origin", "aggregateType", "aggregateId", "sequenceNumber"])
+@Unique(["origin", "aggregateType", "aggregateId", "tenantId", "sequenceNumber"])
 export class DomainEventEntity implements SerializedDomainEvent {
     @PrimaryColumn({ type: "uuid" })
     id: string;
@@ -32,8 +32,11 @@ export class DomainEventEntity implements SerializedDomainEvent {
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP", update: false })
     timestamp: Date;
 
+    @Column({ type: "varchar", length: 255, nullable: true })
+    tenantId?: string;
+
     @Column({ type: "uuid", nullable: true })
-    correlationId?: string | undefined;
+    correlationId?: string;
 
     @Column({ type: "uuid", nullable: true })
     triggeredByEventId?: string;
