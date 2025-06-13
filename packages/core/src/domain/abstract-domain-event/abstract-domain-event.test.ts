@@ -46,6 +46,7 @@ describe("AbstractDomainEvent", () => {
             event.setId(faker.string.uuid());
             event.setSequenceNumber(faker.number.int({ min: 1, max: 100 }));
             event.setTimestamp(faker.date.past());
+            event.setTenantId(faker.string.uuid());
             event.setCorrelationId(faker.string.uuid());
             event.setTriggeredByEventId(faker.string.uuid());
             event.setTriggeredByUserId(faker.string.uuid());
@@ -63,6 +64,7 @@ describe("AbstractDomainEvent", () => {
                 payload: payload,
                 sequenceNumber: event.getSequenceNumber(),
                 timestamp: event.getTimestamp(),
+                tenantId: event.getTenantId(),
                 correlationId: event.getCorrelationId(),
                 triggeredByEventId: event.getTriggeredByEventId(),
                 triggeredByUserId: event.getTriggeredByUserId(),
@@ -83,6 +85,7 @@ describe("AbstractDomainEvent", () => {
                 payload: { key: faker.string.uuid() },
                 sequenceNumber: faker.number.int({ min: 1, max: 100 }),
                 timestamp: faker.date.past(),
+                tenantId: faker.string.uuid(),
                 correlationId: faker.string.uuid(),
                 triggeredByEventId: faker.string.uuid(),
                 triggeredByUserId: faker.string.uuid(),
@@ -97,6 +100,7 @@ describe("AbstractDomainEvent", () => {
             expect(event.getPayload()).toEqual(serializedDomainEvent.payload);
             expect(event.getSequenceNumber()).toBe(serializedDomainEvent.sequenceNumber);
             expect(event.getTimestamp()).toBe(serializedDomainEvent.timestamp);
+            expect(event.getTenantId()).toBe(serializedDomainEvent.tenantId);
             expect(event.getCorrelationId()).toBe(serializedDomainEvent.correlationId);
             expect(event.getTriggeredByEventId()).toBe(serializedDomainEvent.triggeredByEventId);
             expect(event.getTriggeredByUserId()).toBe(serializedDomainEvent.triggeredByUserId);
@@ -114,6 +118,7 @@ describe("AbstractDomainEvent", () => {
                 payload: { key: faker.string.uuid() },
                 sequenceNumber: faker.number.int({ min: 1, max: 100 }),
                 timestamp: faker.date.past(),
+                tenantId: faker.string.uuid(),
                 correlationId: faker.string.uuid(),
                 triggeredByEventId: faker.string.uuid(),
                 triggeredByUserId: faker.string.uuid(),

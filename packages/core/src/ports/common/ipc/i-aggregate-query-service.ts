@@ -14,15 +14,17 @@ export interface IAggregateQueryService {
      * Retrieves a list of aggregate IDs for a specific origin and aggregate type.
      * @param origin The origin of the aggregate (or null to use the current origin), used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
+     * @param tenantId Optional tenant ID for multi-tenancy support, or null if not applicable.
      * @returns A promise that resolves to an array of aggregate IDs.
      */
-    getAggregateIds(origin: string | null, aggregateType: string): Promise<string[]>;
+    getAggregateIds(origin: string | null, aggregateType: string, tenantId?: string | null): Promise<string[]>;
 
     /**
      * Retrieves an aggregate by its origin, type, and ID.
      * @param origin The origin of the aggregate (or null to use the current origin), used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateId The ID of the aggregate, used to uniquely identify the aggregate.
+     * @param tenantId Optional tenant ID for multi-tenancy support, or null if not applicable.
      * @param toSequenceNumber The sequence number to build the aggregate up to (inclusive).
      * @returns A promise that resolves to the aggregate object, or null if not found.
      */
@@ -30,6 +32,7 @@ export interface IAggregateQueryService {
         origin: string | null,
         aggregateType: string,
         aggregateId: string,
+        tenantId?: string | null,
         toSequenceNumber?: number
     ): Promise<object | null>;
 
@@ -38,12 +41,14 @@ export interface IAggregateQueryService {
      * @param origin The origin of the aggregate (or null to use the current origin), used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateId The ID of the aggregate, used to uniquely identify the aggregate.
+     * @param tenantId Optional tenant ID for multi-tenancy support, or null if not applicable.
      * @returns A promise that resolves to an array of serialized domain events.
      */
     getDomainEventsForAggregate(
         origin: string | null,
         aggregateType: string,
-        aggregateId: string
+        aggregateId: string,
+        tenantId?: string | null
     ): Promise<SerializedDomainEvent[]>;
 }
 

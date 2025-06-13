@@ -1,14 +1,13 @@
-import type { AbstractEventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
+import type { EventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/event-sourced-aggregate-root.js";
 import type { AbstractDomainEvent } from "../../domain/index.js";
 import type { IMessageProducer, IOutboundMessageMapper } from "../../ports/index.js";
-import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 import {
     AbstractAggregateHandler,
     type AbstractAggregateHandlerOptions
 } from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
 
 export type AggregateMessageProducerOptions<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>,
+    TAggregateRootClass extends EventSourcedAggregateRoot,
     TMessage
 > = AbstractAggregateHandlerOptions<TAggregateRootClass> & {
     messageProducer: IMessageProducer<TMessage>;
@@ -16,7 +15,7 @@ export type AggregateMessageProducerOptions<
 };
 
 export class AggregateMessageProducer<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>,
+    TAggregateRootClass extends EventSourcedAggregateRoot,
     TMessage
 > extends AbstractAggregateHandler<TAggregateRootClass> {
     private readonly messageProducer: IMessageProducer<TMessage>;
