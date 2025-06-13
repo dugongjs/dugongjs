@@ -1,11 +1,10 @@
 import type { SerializedDomainEvent } from "../../domain/abstract-domain-event/serialized-domain-event.js";
-import type { AbstractEventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
+import type { EventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/event-sourced-aggregate-root.js";
 import { aggregateDomainEventApplier } from "../../domain/aggregate-domain-event-applier/aggregate-domain-event-applier.js";
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
 import type { IExternalOriginMap } from "../../ports/outbound/ipc/i-external-origin-map.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
-import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
-import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
+import type { ISnapshotRepository, SerializedSnapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
 import {
     AbstractAggregateHandler,
     type AbstractAggregateHandlerOptions
@@ -14,13 +13,12 @@ import type { AggregateQueryService } from "../aggregate-query-service/aggregate
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import { MissingAggregateIdError } from "./errors/missing-aggregate-id.error.js";
 
-export type AggregateFactoryOptions<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-> = AbstractAggregateHandlerOptions<TAggregateRootClass> & {
-    domainEventRepository: IDomainEventRepository;
-    snapshotRepository?: ISnapshotRepository;
-    externalOriginMap?: IExternalOriginMap;
-};
+export type AggregateFactoryOptions<TAggregateRootClass extends EventSourcedAggregateRoot> =
+    AbstractAggregateHandlerOptions<TAggregateRootClass> & {
+        domainEventRepository: IDomainEventRepository;
+        snapshotRepository?: ISnapshotRepository;
+        externalOriginMap?: IExternalOriginMap;
+    };
 
 export type BuildOptions = {
     returnDeleted?: boolean;
@@ -31,8 +29,12 @@ export type BuildFromEventLogOptions = {
     toSequenceNumber?: number;
 };
 
+/**
+ * Factory class for building aggregates from event logs and snapshots.
+ * Can build both internal and external aggregates.
+ */
 export class AggregateFactory<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
+    TAggregateRootClass extends EventSourcedAggregateRoot
 > extends AbstractAggregateHandler<TAggregateRootClass> {
     private readonly domainEventRepository: IDomainEventRepository;
     private readonly snapshotRepository?: ISnapshotRepository;
@@ -45,28 +47,27 @@ export class AggregateFactory<
         this.externalOriginMap = options.externalOriginMap ?? new Map<string, AggregateQueryService>();
     }
 
+    /**
+     * Builds an aggregate from the event log or snapshot.
+     * @param aggregateId The ID of the aggregate to build.
+     * @param options Options for building the aggregate.
+     * @returns The built aggregate or null if not found.
+     */
     public async build(
         aggregateId: string,
         options: BuildOptions = {}
     ): Promise<InstanceType<TAggregateRootClass> | null> {
         this.validateAggregateId(aggregateId);
 
-        const logContext = this.getLogContext(aggregateId);
+        const logCtx = this.getLogContext(aggregateId);
 
         let aggregate: InstanceType<TAggregateRootClass> | null = null;
 
         if (this.snapshotRepository && this.isSnapshotable && !options.skipSnapshot) {
-            this.logger.verbose(
-                logContext,
-                `${this.aggregateType} aggregate is snapshotable, attempting to build from snapshot`
-            );
-            aggregate = await this.buildFromLatestSnapshot(aggregateId);
-
-            if (!aggregate) {
-                this.logger.verbose(
-                    logContext,
-                    `Failed to build ${this.aggregateType} aggregate ${aggregateId} from snapshot, falling back to event log`
-                );
+            try {
+                aggregate = await this.buildFromLatestSnapshot(aggregateId);
+            } catch (error) {
+                this.logger.error(error);
             }
         }
 
@@ -75,200 +76,191 @@ export class AggregateFactory<
         }
 
         if (!aggregate) {
-            this.logger.verbose(logContext, `${this.aggregateType} aggregate ${aggregateId} not found`);
+            this.logger.verbose(logCtx, "Aggregate not found");
             return null;
         }
 
-        if (aggregate.isDeleted()) {
-            this.logger.verbose(logContext, `${this.aggregateType} aggregate ${aggregateId} is deleted`);
-
-            if (options.returnDeleted) {
-                return aggregate;
-            }
-
+        if (aggregate.isDeleted() && !options.returnDeleted) {
+            this.logger.verbose(logCtx, "Aggregate is deleted");
             return null;
         }
 
         return aggregate;
     }
 
+    /**
+     * Builds an aggregate from the event log.
+     * @param aggregateId The ID of the aggregate to build.
+     * @param options Options for building the aggregate from the event log.
+     * @returns The built aggregate or null if not found.
+     */
     public async buildFromEventLog(
         aggregateId: string,
         options: BuildFromEventLogOptions = {}
     ): Promise<InstanceType<TAggregateRootClass> | null> {
         this.validateAggregateId(aggregateId);
 
-        const logContext = this.getLogContext(aggregateId);
+        const logCtx = this.getLogContext(aggregateId);
 
-        this.logger.verbose(logContext, `Building ${this.aggregateType} aggregate ${aggregateId} from event log`);
+        this.logger.verbose(logCtx, "Building aggregate from event log");
 
-        this.logger.verbose(
-            logContext,
-            `Fetching domain events from event log for ${this.aggregateType} aggregate ${aggregateId}`
-        );
+        const domainEvents = await this.loadDomainEventsForAggregate(aggregateId);
 
-        const serializedDomainEvents = await this.getSerializedDomainEvents(aggregateId);
-
-        if (serializedDomainEvents.length === 0) {
-            this.logger.verbose(
-                logContext,
-                `No domain events found for ${this.aggregateType} aggregate ${aggregateId}`
-            );
+        if (domainEvents.length === 0) {
+            this.logger.verbose(logCtx, "No domain events found");
             return null;
         }
 
-        this.logger.verbose(
-            logContext,
-            `Found ${serializedDomainEvents.length} domain events for ${this.aggregateType} aggregate ${aggregateId} in event log`
-        );
+        this.logger.verbose(logCtx, `Found ${domainEvents.length} domain events in event log`);
 
-        const aggregate = new this.aggregateClass().setId(aggregateId) as InstanceType<TAggregateRootClass>;
-
-        let serializedDomainEventsToApply = serializedDomainEvents;
+        let domainEventsToApply = domainEvents;
 
         if (options.toSequenceNumber) {
-            const maxSequenceNumber = Math.max(...serializedDomainEvents.map((event) => event.sequenceNumber));
+            const maxSequenceNumber = Math.max(...domainEvents.map((event) => event.sequenceNumber));
 
             if (options.toSequenceNumber > maxSequenceNumber) {
                 this.logger.error(
-                    logContext,
-                    `Requested toSequenceNumber ${options.toSequenceNumber} is greater than the maximum sequence number ${maxSequenceNumber} for ${this.aggregateType} aggregate ${aggregateId}`
+                    logCtx,
+                    `Requested toSequenceNumber ${options.toSequenceNumber} exceeds maximum sequence number ${maxSequenceNumber}`
                 );
                 return null;
             }
 
-            this.logger.verbose(
-                logContext,
-                `Building ${this.aggregateType} aggregate ${aggregateId} to sequence number ${options.toSequenceNumber}`
-            );
+            this.logger.verbose(logCtx, `Building aggregate to sequence number ${options.toSequenceNumber}`);
 
-            serializedDomainEventsToApply = serializedDomainEvents.filter(
-                (event) => event.sequenceNumber <= options.toSequenceNumber!
-            );
+            domainEventsToApply = domainEvents.filter((event) => event.sequenceNumber <= options.toSequenceNumber!);
         }
 
-        return this.deserializeAndApplyDomainEventsToAggregate(aggregate, serializedDomainEventsToApply);
+        const aggregate = new this.aggregateClass().setId(aggregateId) as InstanceType<TAggregateRootClass>;
+
+        return this.applySerializedDomainEvents(aggregate, domainEventsToApply);
     }
 
+    /**
+     * Builds an aggregate from the latest snapshot if available.
+     * @param aggregateId The ID of the aggregate to build from the latest snapshot.
+     * @returns The built aggregate or null if no snapshot is available.
+     */
     public async buildFromLatestSnapshot(aggregateId: string): Promise<InstanceType<TAggregateRootClass> | null> {
         this.validateAggregateId(aggregateId);
 
-        const logContext = this.getLogContext(aggregateId);
+        const logCtx = this.getLogContext(aggregateId);
 
         if (!this.snapshotRepository) {
-            this.logger.verbose(logContext, `Snapshot repository not available, skipping snapshot build`);
+            this.logger.verbose(logCtx, `Snapshot repository not available, skipping snapshot build`);
             return null;
         }
 
-        this.logger.verbose(logContext, `Fetching latest snapshot for ${this.aggregateType} aggregate ${aggregateId}`);
+        this.logger.verbose(logCtx, "Fetching latest snapshot");
 
-        const latestSnapshot = await this.snapshotRepository.getLatestSnapshot(
-            this.getTransactionContext(),
-            this.aggregateOrigin,
-            this.aggregateType,
-            aggregateId
-        );
+        let latestSnapshot: SerializedSnapshot | null = null;
+
+        try {
+            latestSnapshot = await this.snapshotRepository.getLatestSnapshot(
+                this.getTransactionContext(),
+                this.aggregateOrigin,
+                this.aggregateType,
+                aggregateId,
+                this.tenantId
+            );
+        } catch (error) {
+            this.logger.error(logCtx, "Failed to fetch latest snapshot");
+            this.logger.error(error);
+            return null;
+        }
 
         if (!latestSnapshot) {
-            this.logger.verbose(logContext, `No snapshot found for ${this.aggregateType} aggregate ${aggregateId}`);
+            this.logger.verbose(logCtx, "No snapshot available");
             return null;
         }
 
-        this.logger.verbose(
-            logContext,
-            `Snapshot found for ${this.aggregateType} aggregate ${aggregateId}, sequence number is ${latestSnapshot.domainEventSequenceNumber}`
-        );
+        this.logger.verbose(logCtx, `Snapshot found at sequence number ${latestSnapshot.domainEventSequenceNumber}`);
 
         const aggregate = aggregateSnapshotTransformer.restoreFromSnapshot(this.aggregateClass, latestSnapshot);
 
         const fromSequenceNumber = latestSnapshot.domainEventSequenceNumber + 1;
 
-        this.logger.verbose(
-            logContext,
-            `Fetching domain events from event log from sequence number ${fromSequenceNumber} for ${this.aggregateType} aggregate ${aggregateId}`
-        );
+        this.logger.verbose(logCtx, `Fetching domain events from event log from sequence number ${fromSequenceNumber}`);
 
-        const serializedDomainEvents = await this.domainEventRepository.getAggregateDomainEvents(
+        const domainEvents = await this.domainEventRepository.getAggregateDomainEvents(
             this.getTransactionContext(),
             this.aggregateOrigin,
             this.aggregateType,
             aggregateId,
+            this.tenantId,
             fromSequenceNumber
         );
 
-        return this.deserializeAndApplyDomainEventsToAggregate(aggregate, serializedDomainEvents);
+        return this.applySerializedDomainEvents(aggregate, domainEvents);
     }
 
-    private async getSerializedDomainEvents(aggregateId: string): Promise<SerializedDomainEvent[]> {
-        const serializedDomainEvents = await this.domainEventRepository.getAggregateDomainEvents(
+    private async loadDomainEventsForAggregate(aggregateId: string): Promise<SerializedDomainEvent[]> {
+        const domainEvents = await this.domainEventRepository.getAggregateDomainEvents(
             this.getTransactionContext(),
             this.aggregateOrigin,
             this.aggregateType,
-            aggregateId
+            aggregateId,
+            this.tenantId
         );
 
-        const isEventLogEmpty = serializedDomainEvents.length === 0;
-        const isEventLogIncomplete = isEventLogEmpty
-            ? false
-            : serializedDomainEvents[serializedDomainEvents.length - 1].sequenceNumber !==
-              serializedDomainEvents.length;
-
         if (this.isInternalAggregate) {
-            return serializedDomainEvents;
+            return domainEvents;
         }
 
-        if (isEventLogEmpty || isEventLogIncomplete) {
-            if (!this.externalOriginMap.has(this.aggregateOrigin)) {
-                if (isEventLogIncomplete) {
-                    this.logger.warn(
-                        this.getLogContext(aggregateId),
-                        `Event log for ${this.aggregateType} aggregate ${aggregateId} is incomplete, and no external origin is configured to fetch missing events - aggregate will not be built`
-                    );
-                }
+        const isEventLogEmpty = domainEvents.length === 0;
 
-                return [];
-            }
-
-            const externalAggregateQueryService = this.externalOriginMap.get(this.aggregateOrigin)!;
-
-            try {
-                this.logger.verbose(
-                    this.getLogContext(aggregateId),
-                    `Attempting to fetch ${this.aggregateType} aggregate domain events ${aggregateId} from external origin ${this.aggregateOrigin}`
-                );
-
-                const serializedDomainEvents = await externalAggregateQueryService.getDomainEventsForAggregate(
-                    this.aggregateOrigin,
-                    this.aggregateType,
-                    aggregateId
-                );
-
-                await this.domainEventRepository.saveDomainEvents(this.getTransactionContext(), serializedDomainEvents);
-
-                return serializedDomainEvents;
-            } catch (error) {
-                this.logger.error(
-                    this.getLogContext(aggregateId),
-                    `Failed to fetch ${this.aggregateType} aggregate ${aggregateId} from external origin`
-                );
-                return [];
-            }
+        if (isEventLogEmpty || this.isEventLogIncomplete(domainEvents)) {
+            return this.fetchDomainEventsFromExternalOrigin(aggregateId);
         }
 
-        return serializedDomainEvents;
+        return domainEvents;
     }
 
-    private deserializeAndApplyDomainEventsToAggregate(
+    private async fetchDomainEventsFromExternalOrigin(aggregateId: string): Promise<SerializedDomainEvent[]> {
+        const logCtx = this.getLogContext(aggregateId);
+
+        if (!this.externalOriginMap.has(this.aggregateOrigin)) {
+            this.logger.warn(logCtx, "No external origin configured in external origin map");
+            return Promise.resolve([]);
+        }
+
+        const externalAggregateQueryService = this.externalOriginMap.get(this.aggregateOrigin)!;
+
+        try {
+            this.logger.verbose(logCtx, `Fetching domain events from external origin ${this.aggregateOrigin}`);
+            const domainEvents = await externalAggregateQueryService.getDomainEventsForAggregate(
+                this.aggregateOrigin,
+                this.aggregateType,
+                aggregateId,
+                this.tenantId
+            );
+
+            this.logger.verbose(
+                logCtx,
+                `Fetched ${domainEvents.length} domain events from external origin ${this.aggregateOrigin}`
+            );
+
+            await this.domainEventRepository.saveDomainEvents(this.getTransactionContext(), domainEvents);
+
+            return domainEvents;
+        } catch (error) {
+            this.logger.error(logCtx, `Failed to fetch domain events from external origin ${this.aggregateOrigin}`);
+            this.logger.error(error);
+            return Promise.resolve([]);
+        }
+    }
+
+    private applySerializedDomainEvents(
         aggregate: InstanceType<TAggregateRootClass>,
         serializedDomainEvents: SerializedDomainEvent[]
     ): InstanceType<TAggregateRootClass> {
-        const logContext = this.getLogContext(aggregate.getId());
+        const logCtx = this.getLogContext(aggregate.getId());
 
         const domainEvents = domainEventDeserializer.deserializeDomainEvents(...serializedDomainEvents);
 
         if (serializedDomainEvents.length !== domainEvents.length) {
             this.logger.warn(
-                logContext,
+                logCtx,
                 `Failed to deserialize all domain events, ${serializedDomainEvents.length} were found for the aggregate but ${domainEvents.length} were deserialized - this may be caused by a stale domain event collection or a missing '@DomainEvent()' decorator on the domain event class`
             );
         }
@@ -280,8 +272,15 @@ export class AggregateFactory<
         return aggregate;
     }
 
+    private isEventLogIncomplete(domainEvents: SerializedDomainEvent[]): boolean {
+        if (domainEvents.length === 0) {
+            return false;
+        }
+        const lastSequenceNumber = domainEvents[domainEvents.length - 1].sequenceNumber;
+        return lastSequenceNumber !== domainEvents.length;
+    }
+
     private validateAggregateId(aggregateId: string | undefined): void {
-        // Should normally not happen, but can lead to serious issues if it does
         if (!aggregateId) {
             throw new MissingAggregateIdError();
         }

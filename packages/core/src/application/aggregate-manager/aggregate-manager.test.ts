@@ -266,7 +266,42 @@ describe("AggregateManager", () => {
             expect(aggregateSnapshotTransformer.takeSnapshot).toHaveBeenCalledWith(
                 "TestOrigin",
                 "TestType",
-                mockAggregate
+                mockAggregate,
+                undefined
+            );
+            expect(mockSnapshotRepository.saveSnapshot).toHaveBeenCalled();
+        });
+
+        it("should create a snapshot if the aggregate is snapshotable and the interval is met (with tenant ID if provided)", async () => {
+            const mockAggregate = {
+                getId: vi.fn(() => "aggregate-id"),
+                getCurrentDomainEventSequenceNumber: vi.fn(() => 10)
+            } as any;
+
+            aggregateMetadataRegistry.getAggregateSnapshotMetadata = vi.fn(() => ({
+                isSnapshotable: true,
+                snapshotInterval: 10
+            }));
+
+            const manager = new AggregateManager({
+                aggregateClass: mockAggregateClass,
+                transactionManager: mockTransactionManager,
+                domainEventRepository: mockDomainEventRepository,
+                snapshotRepository: mockSnapshotRepository,
+                messageProducer: mockMessageProducer,
+                outboundMessageMapper: mockOutboundMessageMapper,
+                currentOrigin: "CurrentOrigin",
+                tenantId: "TestTenant",
+                logger: mockLogger
+            });
+
+            await manager["createSnapshotIfNecessary"](mockAggregate);
+
+            expect(aggregateSnapshotTransformer.takeSnapshot).toHaveBeenCalledWith(
+                "TestOrigin",
+                "TestType",
+                mockAggregate,
+                "TestTenant"
             );
             expect(mockSnapshotRepository.saveSnapshot).toHaveBeenCalled();
         });

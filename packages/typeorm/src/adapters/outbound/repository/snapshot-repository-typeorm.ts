@@ -9,7 +9,8 @@ export class SnapshotRepositoryTypeOrm implements ISnapshotRepository {
         transactionContext: EntityManager | null,
         origin: string,
         aggregateType: string,
-        aggregateId: string
+        aggregateId: string,
+        tenantId?: string
     ): Promise<SerializedSnapshot | null> {
         const snapshotRepository = transactionContext?.getRepository(SnapshotEntity) ?? this.snapshotRepository;
 
@@ -17,7 +18,8 @@ export class SnapshotRepositoryTypeOrm implements ISnapshotRepository {
             where: {
                 origin,
                 aggregateType,
-                aggregateId
+                aggregateId,
+                tenantId
             },
             order: {
                 domainEventSequenceNumber: "DESC"

@@ -1,10 +1,11 @@
-import type { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
+import type { AggregateRoot } from "../../domain/abstract-aggregate-root/aggregate-root.js";
+import type { AbstractDomainEvent } from "../../domain/abstract-domain-event/abstract-domain-event.js";
+import type { SerializedDomainEvent } from "../../domain/abstract-domain-event/serialized-domain-event.js";
 import { aggregateDomainEventApplier } from "../../domain/aggregate-domain-event-applier/aggregate-domain-event-applier.js";
-import type { IOutboundMessageMapper } from "../../ports/index.js";
 import type { IMessageProducer } from "../../ports/outbound/message-broker/i-message-producer.js";
+import type { IOutboundMessageMapper } from "../../ports/outbound/message-broker/i-outbound-message-mapper.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
-import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 import type { SerializableObject } from "../../types/serializable-object.type.js";
 import {
     AbstractAggregateHandler,
@@ -13,7 +14,7 @@ import {
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import { MissingProducerOrMapperError } from "./errors/missing-producer-or-mapper.error.js";
 
-export type AggregateManagerOptions<TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>> =
+export type AggregateManagerOptions<TAggregateRootClass extends AggregateRoot> =
     AbstractAggregateHandlerOptions<TAggregateRootClass> & {
         domainEventRepository: IDomainEventRepository;
         snapshotRepository: ISnapshotRepository;
@@ -28,8 +29,12 @@ export type CommitOptions = {
     metadata?: SerializableObject;
 };
 
+/**
+ * Manager for handling aggregates in the application layer.
+ * Provides methods for applying and committing domain events, creating snapshots, and publishing domain events as messages.
+ */
 export class AggregateManager<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
+    TAggregateRootClass extends AggregateRoot
 > extends AbstractAggregateHandler<TAggregateRootClass> {
     private readonly domainEventRepository: IDomainEventRepository;
     private readonly snapshotRepository: ISnapshotRepository;
@@ -51,53 +56,88 @@ export class AggregateManager<
         }
     }
 
+    /**
+     * Applies staged domain events to the aggregate.
+     * @param aggregate The aggregate instance to which the domain events will be applied.
+     */
     public applyStagedDomainEvents(aggregate: InstanceType<TAggregateRootClass>): void {
         aggregateDomainEventApplier.applyStagedDomainEventsToAggregate(aggregate);
     }
 
+    /**
+     * Commits staged domain events to the event log and publishes them as messages if necessary.
+     * @param aggregate The aggregate instance whose staged domain events will be committed.
+     * @param options Options for committing domain events, such as correlation ID, triggered by user ID, and metadata.
+     */
     public async commitStagedDomainEvents(
         aggregate: InstanceType<TAggregateRootClass>,
         options: CommitOptions = {}
     ): Promise<void> {
         const aggregateId = aggregate.getId();
 
-        const logContext = this.getLogContext(aggregateId);
+        const logCtx = this.getLogContext(aggregateId);
 
         const stagedDomainEvents = aggregate.getStagedDomainEvents();
 
         if (stagedDomainEvents.length === 0) {
-            this.logger.verbose(logContext, `No staged domain events to commit for aggregate ${aggregateId}`);
+            this.logger.verbose(logCtx, "No staged domain events to commit");
             return;
         }
 
         for (const domainEvent of stagedDomainEvents) {
-            if (options.correlationId) {
-                domainEvent.setCorrelationId(options.correlationId);
-            }
-            if (options.triggeredByUserId) {
-                domainEvent.setTriggeredByUserId(options.triggeredByUserId);
-            }
-            if (options.triggeredByEventId) {
-                domainEvent.setTriggeredByEventId(options.triggeredByEventId);
-            }
-            if (options.metadata) {
-                domainEvent.setMetadata(options.metadata);
-            }
+            this.injectDomainEventMetadata(domainEvent, options);
         }
 
-        const serializedDomainEvents = stagedDomainEvents.map((domainEvent) => domainEvent.serialize());
+        const domainEvents = stagedDomainEvents.map((domainEvent) => domainEvent.serialize());
 
-        this.logger.verbose(
-            logContext,
-            `Committing ${serializedDomainEvents.length} staged domain events to event log for ${this.aggregateType} aggregate ${aggregateId}`
-        );
+        this.logger.verbose(logCtx, `Committing ${domainEvents.length} staged domain events to event log`);
 
-        await this.domainEventRepository.saveDomainEvents(this.getTransactionContext(), serializedDomainEvents);
+        await this.domainEventRepository.saveDomainEvents(this.getTransactionContext(), domainEvents);
 
-        this.logger.verbose(
-            logContext,
-            `${serializedDomainEvents.length} staged domain events committed to event log for ${this.aggregateType} aggregate ${aggregateId}`
-        );
+        await this.publishDomainEventsAsMessagesIfNecessary(aggregateId, domainEvents);
+
+        aggregate.clearStagedDomainEvents();
+
+        await this.createSnapshotIfNecessary(aggregate);
+    }
+
+    /**
+     * Applies and commits staged domain events for the given aggregate instance.
+     * This method combines the application and committing of staged domain events into a single operation.
+     * @param aggregate The aggregate instance for which the staged domain events will be applied and committed.
+     * @param options The options for committing the domain events, such as correlation ID, triggered by user ID, and metadata.
+     */
+    public async applyAndCommitStagedDomainEvents(
+        aggregate: InstanceType<TAggregateRootClass>,
+        options: CommitOptions = {}
+    ): Promise<void> {
+        this.applyStagedDomainEvents(aggregate);
+        await this.commitStagedDomainEvents(aggregate, options);
+    }
+
+    private injectDomainEventMetadata(domainEvent: AbstractDomainEvent, options: CommitOptions): void {
+        if (this.tenantId) {
+            domainEvent.setTenantId(this.tenantId);
+        }
+        if (options.correlationId) {
+            domainEvent.setCorrelationId(options.correlationId);
+        }
+        if (options.triggeredByUserId) {
+            domainEvent.setTriggeredByUserId(options.triggeredByUserId);
+        }
+        if (options.triggeredByEventId) {
+            domainEvent.setTriggeredByEventId(options.triggeredByEventId);
+        }
+        if (options.metadata) {
+            domainEvent.setMetadata(options.metadata);
+        }
+    }
+
+    private async publishDomainEventsAsMessagesIfNecessary(
+        aggregateId: string,
+        domainEvents: SerializedDomainEvent[]
+    ): Promise<void> {
+        const logCtx = this.getLogContext(aggregateId);
 
         if (this.messageProducer && this.outboundMessageMapper) {
             const channelId = this.messageProducer.generateMessageChannelIdForAggregate(
@@ -106,33 +146,19 @@ export class AggregateManager<
             );
 
             this.logger.verbose(
-                logContext,
-                `Publishing ${serializedDomainEvents.length} staged domain events to message broker on channel ${channelId}`
+                logCtx,
+                `Publishing ${domainEvents.length} staged domain events to message broker on channel ${channelId}`
             );
 
-            const messages = serializedDomainEvents.map((serializedDomainEvent) =>
-                this.outboundMessageMapper!.map(serializedDomainEvent)
-            );
+            const messages = domainEvents.map((domainEvent) => this.outboundMessageMapper!.map(domainEvent));
 
             await this.messageProducer.publishMessages(this.getTransactionContext(), channelId, messages);
 
             this.logger.verbose(
-                logContext,
-                `${serializedDomainEvents.length} staged domain events published to message broker on channel ${channelId}`
+                logCtx,
+                `${domainEvents.length} staged domain events published to message broker on channel ${channelId}`
             );
         }
-
-        aggregate.clearStagedDomainEvents();
-
-        await this.createSnapshotIfNecessary(aggregate);
-    }
-
-    public async applyAndCommitStagedDomainEvents(
-        aggregate: InstanceType<TAggregateRootClass>,
-        options: CommitOptions = {}
-    ): Promise<void> {
-        this.applyStagedDomainEvents(aggregate);
-        await this.commitStagedDomainEvents(aggregate, options);
     }
 
     private async createSnapshotIfNecessary(aggregate: InstanceType<TAggregateRootClass>): Promise<void> {
@@ -158,7 +184,12 @@ export class AggregateManager<
             `Creating snapshot for ${this.aggregateType} aggregate ${aggregateId} at sequence number ${currentDomainEventSequenceNumber}`
         );
 
-        const snapshot = aggregateSnapshotTransformer.takeSnapshot(this.aggregateOrigin, this.aggregateType, aggregate);
+        const snapshot = aggregateSnapshotTransformer.takeSnapshot(
+            this.aggregateOrigin,
+            this.aggregateType,
+            aggregate,
+            this.tenantId
+        );
 
         await this.snapshotRepository.saveSnapshot(this.getTransactionContext(), snapshot);
 

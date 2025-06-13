@@ -20,6 +20,7 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
     protected payload: TPayload;
     protected sequenceNumber: number;
     protected timestamp: Date;
+    protected tenantId?: string;
     protected correlationId?: string;
     protected triggeredByEventId?: string;
     protected triggeredByUserId?: string;
@@ -102,6 +103,10 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
         return this.timestamp;
     }
 
+    public getTenantId(): string | undefined {
+        return this.tenantId;
+    }
+
     public getCorrelationId(): string | undefined {
         return this.correlationId;
     }
@@ -138,6 +143,11 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
         return this;
     }
 
+    public setTenantId(tenantId: string | undefined): this {
+        this.tenantId = tenantId;
+        return this;
+    }
+
     public setCorrelationId(correlationId: string): this {
         this.correlationId = correlationId;
         return this;
@@ -169,6 +179,7 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
             payload: this.getPayload(),
             sequenceNumber: this.getSequenceNumber(),
             timestamp: this.getTimestamp(),
+            tenantId: this.getTenantId(),
             correlationId: this.getCorrelationId(),
             triggeredByEventId: this.getTriggeredByEventId(),
             triggeredByUserId: this.getTriggeredByUserId(),
@@ -186,6 +197,7 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
         instance.payload = serializedDomainEvent.payload as any;
         instance.sequenceNumber = serializedDomainEvent.sequenceNumber;
         instance.timestamp = serializedDomainEvent.timestamp;
+        instance.tenantId = serializedDomainEvent.tenantId;
         instance.correlationId = serializedDomainEvent.correlationId;
         instance.triggeredByEventId = serializedDomainEvent.triggeredByEventId;
         instance.triggeredByUserId = serializedDomainEvent.triggeredByUserId;

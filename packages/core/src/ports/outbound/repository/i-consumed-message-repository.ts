@@ -11,11 +11,13 @@ export interface IConsumedMessageRepository {
      * @param transactionContext Transaction context for the operation, or null if not using transactions.
      * @param domainEventId The ID of the domain event contained in the message.
      * @param consumerId The ID of the consumer that is consuming the message.
+     * @param tenantId Optional tenant ID for multi-tenancy support, or null if not applicable.
      */
     checkIfMessageIsConsumed(
         transactionContext: TransactionContext | null,
         domainEventId: string,
-        consumerId: string
+        consumerId: string,
+        tenantId?: string | null
     ): Promise<boolean>;
 
     /**
@@ -24,11 +26,13 @@ export interface IConsumedMessageRepository {
      * @param transactionContext Transaction context for the operation, or null if not using transactions.
      * @param domainEventId The ID of the domain event contained in the message.
      * @param consumerId The ID of the consumer that is consuming the message
+     * @param tenantId Optional tenant ID for multi-tenancy support, or null if not applicable.
      */
     markMessageAsConsumed(
         transactionContext: TransactionContext | null,
         domainEventId: string,
-        consumerId: string
+        consumerId: string,
+        tenantId?: string | null
     ): Promise<void>;
 }
 

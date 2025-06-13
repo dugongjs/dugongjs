@@ -8,7 +8,8 @@ export class ConsumedMessageRepositoryTypeOrm implements IConsumedMessageReposit
     public async checkIfMessageIsConsumed(
         transactionContext: EntityManager | null,
         domainEventId: string,
-        consumerId: string
+        consumerId: string,
+        tenantId?: string
     ): Promise<boolean> {
         const consumedMessageRepository =
             transactionContext?.getRepository(ConsumedMessageEntity) ?? this.consumedMessageRepository;
@@ -16,7 +17,8 @@ export class ConsumedMessageRepositoryTypeOrm implements IConsumedMessageReposit
         const consumedMessage = await consumedMessageRepository.findOne({
             where: {
                 domainEventId,
-                consumerId
+                consumerId,
+                tenantId
             }
         });
 
@@ -26,14 +28,16 @@ export class ConsumedMessageRepositoryTypeOrm implements IConsumedMessageReposit
     public async markMessageAsConsumed(
         transactionContext: EntityManager | null,
         domainEventId: string,
-        consumerId: string
+        consumerId: string,
+        tenantId?: string
     ): Promise<void> {
         const consumedMessageRepository =
             transactionContext?.getRepository(ConsumedMessageEntity) ?? this.consumedMessageRepository;
 
         await consumedMessageRepository.save({
             domainEventId,
-            consumerId
+            consumerId,
+            tenantId
         });
     }
 }

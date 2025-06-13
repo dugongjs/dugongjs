@@ -10,6 +10,7 @@ export type SerializedDomainEvent = {
     payload: SerializableObject | null;
     sequenceNumber: number;
     timestamp: Date;
+    tenantId?: string;
     correlationId?: string;
     triggeredByEventId?: string;
     triggeredByUserId?: string;

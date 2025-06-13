@@ -13,6 +13,7 @@ export interface IDomainEventRepository {
      * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateId The ID of the aggregate, used to uniquely identify the aggregate.
+     * @param tenantId Optional tenant ID for multi-tenancy support, or null if not applicable.
      * @param fromSequenceNumber The sequence number to start retrieving events from (inclusive).
      * @returns A promise that resolves to an array of serialized domain events.
      */
@@ -21,6 +22,7 @@ export interface IDomainEventRepository {
         origin: string,
         aggregateType: string,
         aggregateId: string,
+        tenantId?: string | null,
         fromSequenceNumber?: number
     ): Promise<SerializedDomainEvent[]>;
 
@@ -29,12 +31,14 @@ export interface IDomainEventRepository {
      * @param transactionContext Transaction context for the operation, or null if not using transactions.
      * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
+     * @param tenantId Optional tenant ID for multi-tenancy support, or null if not applicable.
      * @returns A promise that resolves to an array of aggregate IDs.
      */
     getAggregateIds(
         transactionContext: TransactionContext | null,
         origin: string,
-        aggregateType: string
+        aggregateType: string,
+        tenantId?: string | null
     ): Promise<string[]>;
 
     /**

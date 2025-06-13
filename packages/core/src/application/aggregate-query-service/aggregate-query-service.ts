@@ -26,14 +26,19 @@ export class AggregateQueryService implements IAggregateQueryService {
         return aggregateMetadataRegistry.getAggregateTypes();
     }
 
-    public async getAggregateIds(origin: string | null, aggregateType: string): Promise<string[]> {
-        return this.domainEventRepository.getAggregateIds(null, origin ?? this.currentOrigin, aggregateType);
+    public async getAggregateIds(
+        origin: string | null,
+        aggregateType: string,
+        tenantId?: string | null
+    ): Promise<string[]> {
+        return this.domainEventRepository.getAggregateIds(null, origin ?? this.currentOrigin, aggregateType, tenantId);
     }
 
     public async getAggregate(
         origin: string | null,
         aggregateType: string,
         aggregateId: string,
+        tenantId?: string | null,
         toSequenceNumber?: number
     ): Promise<object | null> {
         const aggregateClass = aggregateMetadataRegistry.getAggregateClass(aggregateType, origin ?? undefined);
@@ -47,6 +52,7 @@ export class AggregateQueryService implements IAggregateQueryService {
             transactionManager: { transaction: (fn) => fn({}) },
             domainEventRepository: this.domainEventRepository,
             currentOrigin: this.currentOrigin,
+            tenantId,
             logger: this.logger
         });
 
@@ -62,7 +68,8 @@ export class AggregateQueryService implements IAggregateQueryService {
             const snapshot = await aggregateSnapshotTransformer.takeSnapshot(
                 origin ?? this.currentOrigin,
                 aggregateType,
-                aggregate
+                aggregate,
+                tenantId
             );
 
             return snapshot.snapshotData;
@@ -74,13 +81,15 @@ export class AggregateQueryService implements IAggregateQueryService {
     public async getDomainEventsForAggregate(
         origin: string | null,
         aggregateType: string,
-        aggregateId: string
+        aggregateId: string,
+        tenantId?: string | null
     ): Promise<SerializedDomainEvent[]> {
         return this.domainEventRepository.getAggregateDomainEvents(
             null,
             origin ?? this.currentOrigin,
             aggregateType,
-            aggregateId
+            aggregateId,
+            tenantId
         );
     }
 }

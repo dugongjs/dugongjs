@@ -30,12 +30,13 @@ get.command("aggregate-ids")
     .alias("aggregateids")
     .description("Get all aggregate IDs for a given aggregate type")
     .option("-o, --origin <origin>", "The origin of the aggregate")
+    .option("-t, --tenant-id <tenantId>", "The tenant ID for multi-tenancy support")
     .argument("<aggregateType>", "The aggregate type to get IDs for")
     .action(async (aggregateType, options) => {
         try {
-            const { origin } = options;
+            const { origin, tenantId } = options;
             const { adapter, close } = getAggregateQueryAdapter();
-            const aggregateIds = await adapter.getAggregateIds(origin, aggregateType);
+            const aggregateIds = await adapter.getAggregateIds(origin, aggregateType, tenantId);
             await close?.();
 
             if (aggregateIds.length === 0) {
@@ -59,12 +60,13 @@ get.command("aggregate")
     .argument("<aggregateType>", "The aggregate type")
     .argument("<aggregateId>", "The aggregate ID")
     .option("-o, --origin <origin>", "The origin of the aggregate")
+    .option("-t, --tenant-id <tenantId>", "The tenant ID for multi-tenancy support")
     .option("-s, --sequence-number <sequenceNumber>", "The sequence number to build the aggregate up to", parseInt)
     .action(async (aggregateType, aggregateId, options) => {
         try {
-            const { origin, sequenceNumber } = options;
+            const { origin, tenantId, sequenceNumber } = options;
             const { adapter, close } = getAggregateQueryAdapter();
-            const aggregate = await adapter.getAggregate(origin, aggregateType, aggregateId, sequenceNumber);
+            const aggregate = await adapter.getAggregate(origin, aggregateType, aggregateId, tenantId, sequenceNumber);
             await close?.();
 
             if (!aggregate) {
@@ -91,12 +93,18 @@ get.command("domain-events")
     .argument("<aggregateType>", "The aggregate type")
     .argument("<aggregateId>", "The aggregate ID")
     .option("-o, --origin <origin>", "The origin of the aggregate")
+    .option("-t, --tenant-id <tenantId>", "The tenant ID for multi-tenancy support")
     .option("-f, --format <format>", "The format of the output", "json")
     .action(async (aggregateType, aggregateId, options) => {
         try {
-            const { origin, format } = options;
+            const { origin, tenantId, format } = options;
             const { adapter, close } = getAggregateQueryAdapter();
-            const domainEvents = await adapter.getDomainEventsForAggregate(origin, aggregateType, aggregateId);
+            const domainEvents = await adapter.getDomainEventsForAggregate(
+                origin,
+                aggregateType,
+                aggregateId,
+                tenantId
+            );
             await close?.();
 
             if (domainEvents.length === 0) {

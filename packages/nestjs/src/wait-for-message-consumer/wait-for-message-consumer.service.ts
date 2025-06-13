@@ -50,6 +50,7 @@ export class WaitForMessageConsumerService {
         aggregateClass: RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>,
         consumerName: string,
         aggregateId: string,
+        tenantId?: string | null,
         fromSequenceNumber?: number
     ): Promise<void> {
         const waitForMessageConsumer = this.getWaitForMessageConsumer(aggregateClass);
@@ -57,6 +58,7 @@ export class WaitForMessageConsumerService {
         return waitForMessageConsumer.waitForAggregateDomainEventsToBeConsumed(
             consumerName,
             aggregateId,
+            tenantId,
             fromSequenceNumber
         );
     }
