@@ -1,5 +1,11 @@
 # @dugongjs/typeorm
 
+## 0.0.9
+
+### Patch Changes
+
+- 4a1c6f9: Fixed an issue where domain events were not properly loaded after performing a snapshot recovery
+
 ## 0.0.8
 
 ### Patch Changes
