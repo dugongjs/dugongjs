@@ -1,21 +1,20 @@
 import type { AbstractDomainEvent } from "../../domain/abstract-domain-event/abstract-domain-event.js";
-import type { AbstractEventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
+import type { EventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/event-sourced-aggregate-root.js";
 import { domainEventDeserializer } from "../../domain/domain-event-deserializer/domain-event-deserializer.js";
 import type { IMessageConsumer } from "../../ports/inbound/message-broker/i-message-consumer.js";
 import type { IInboundMessageMapper } from "../../ports/index.js";
 import type { IConsumedMessageRepository } from "../../ports/outbound/repository/i-consumed-message-repository.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { TransactionContext } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
-import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 import {
     AbstractAggregateHandler,
     type AbstractAggregateHandlerOptions
 } from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
 
-export type AggregateMessageConsumerOptions<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>,
-    TMessage
-> = AbstractAggregateHandlerOptions<TAggregateRootClass> & {
+export type AggregateMessageConsumerOptions<TAggregateRootClass extends EventSourcedAggregateRoot, TMessage> = Omit<
+    AbstractAggregateHandlerOptions<TAggregateRootClass>,
+    "tenantId"
+> & {
     domainEventRepository: IDomainEventRepository;
     consumedMessageRepository: IConsumedMessageRepository;
     messageConsumer: IMessageConsumer<TMessage>;
@@ -38,7 +37,7 @@ export type HandleMessageContext<TMessage = any> = {
 export type HandleMessage = <TMessage>(context: HandleMessageContext<TMessage>) => Promise<void>;
 
 export class AggregateMessageConsumer<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>,
+    TAggregateRootClass extends EventSourcedAggregateRoot,
     TMessage
 > extends AbstractAggregateHandler<TAggregateRootClass> {
     private readonly domainEventRepository: IDomainEventRepository;
@@ -92,7 +91,7 @@ export class AggregateMessageConsumer<
                         if (!domainEvent) {
                             this.logger.warn(
                                 this.logContext,
-                                logPrefix + `Message received but domain event could not be determined: ${message}`
+                                logPrefix + `Could not extract domain event from message: ${message}`
                             );
                             return;
                         }
@@ -105,6 +104,7 @@ export class AggregateMessageConsumer<
                                 origin: domainEvent.getOrigin(),
                                 aggregateType: domainEvent.getAggregateType(),
                                 aggregateId: domainEvent.getAggregateId(),
+                                tenantId: domainEvent.getTenantId(),
                                 type: domainEvent.getType(),
                                 version: domainEvent.getVersion()
                             }
@@ -120,7 +120,8 @@ export class AggregateMessageConsumer<
                             const isConsumed = await this.consumedMessageRepository.checkIfMessageIsConsumed(
                                 transactionContext,
                                 domainEvent.getId(),
-                                messageConsumerId
+                                messageConsumerId,
+                                domainEvent.getTenantId()
                             );
 
                             if (isConsumed && !options?.processConsumedMessages) {
@@ -148,7 +149,8 @@ export class AggregateMessageConsumer<
                             await this.consumedMessageRepository.markMessageAsConsumed(
                                 transactionContext,
                                 domainEvent.getId(),
-                                messageConsumerId
+                                messageConsumerId,
+                                domainEvent.getTenantId()
                             );
 
                             try {
@@ -182,7 +184,9 @@ export class AggregateMessageConsumer<
                 return await fn();
             } catch (error: any) {
                 if (attempt >= maximumRetries) {
-                    this.logger.error(error, "Message processing failed permanently");
+                    // TODO: Implement dead-letter queue or other error handling strategy
+                    this.logger.error("Message processing failed permanently");
+                    this.logger.error(error);
                     return;
                 }
 

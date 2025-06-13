@@ -4,6 +4,7 @@ export type SerializedSnapshot = {
     origin: string;
     aggregateType: string;
     aggregateId: string;
+    tenantId?: string | null;
     domainEventSequenceNumber: number;
     snapshotData: any;
 };
@@ -20,13 +21,15 @@ export interface ISnapshotRepository {
      * @param origin The origin of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateType The type of the aggregate, used to uniquely identify the aggregate.
      * @param aggregateId The ID of the aggregate, used to uniquely identify the aggregate.
+     * @param tenantId Optional tenant ID for multi-tenancy support, or null if not applicable.
      * @returns A promise that resolves to the latest snapshot for the given aggregate, or null if no snapshot is found.
      */
     getLatestSnapshot(
         transactionContext: TransactionContext | null,
         origin: string,
         aggregateType: string,
-        aggregateId: string
+        aggregateId: string,
+        tenantId?: string | null
     ): Promise<SerializedSnapshot | null>;
 
     /**

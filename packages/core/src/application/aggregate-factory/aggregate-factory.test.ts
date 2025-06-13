@@ -27,11 +27,7 @@ describe("AggregateFactory", () => {
     const mockDomainEventRepository = mock<IDomainEventRepository>();
     const mockSnapshotRepository = mock<ISnapshotRepository>();
     const mockExternalOriginMap = mock<Map<string, AggregateQueryService>>();
-    const mockLogger = mock<ILogger>({
-        error: console.error,
-        verbose: console.log,
-        warn: console.warn
-    });
+    const mockLogger = mock<ILogger>();
 
     const mockAggregateMetadata: AggregateMetadata = {
         isInternal: false,
@@ -120,7 +116,60 @@ describe("AggregateFactory", () => {
                 factory.getTransactionContext(),
                 "TestOrigin",
                 "TestType",
-                aggregateId
+                aggregateId,
+                undefined
+            );
+            expect(domainEventDeserializer.deserializeDomainEvents).toHaveBeenCalledWith(...mockSerializedEvents);
+            expect(aggregateDomainEventApplier.applyDomainEventToAggregate).toHaveBeenCalledWith(
+                mockAggregateInstance,
+                mockSerializedEvents[0]
+            );
+            expect(aggregateDomainEventApplier.applyDomainEventToAggregate).toHaveBeenCalledWith(
+                mockAggregateInstance,
+                mockSerializedEvents[1]
+            );
+            expect(result).toBe(mockAggregateInstance);
+        });
+
+        it("should build the aggregate from the event log (with tenant ID if provided)", async () => {
+            const factory = new AggregateFactory({
+                aggregateClass: mockAggregateClass,
+                transactionManager: mockTransactionManager,
+                domainEventRepository: mockDomainEventRepository,
+                snapshotRepository: mockSnapshotRepository,
+                currentOrigin: "CurrentOrigin",
+                tenantId: "TestTenant",
+                logger: mockLogger
+            });
+
+            const mockSerializedEvents = [
+                { id: faker.string.uuid(), sequenceNumber: 1 },
+                { id: faker.string.uuid(), sequenceNumber: 2 }
+            ] as SerializedDomainEvent[];
+
+            mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce(mockSerializedEvents);
+
+            domainEventDeserializer.deserializeDomainEvents = vi.fn(
+                () => mockSerializedEvents as unknown as AbstractDomainEvent[]
+            );
+
+            const aggregateId = faker.string.uuid();
+
+            const mockAggregateInstance = {
+                getId: vi.fn().mockReturnValue(aggregateId),
+                setId: vi.fn().mockReturnThis()
+            } as unknown as InstanceType<typeof AbstractAggregateRoot>;
+
+            mockAggregateClass.mockReturnValueOnce(mockAggregateInstance);
+
+            const result = await factory.buildFromEventLog(aggregateId);
+
+            expect(mockDomainEventRepository.getAggregateDomainEvents).toHaveBeenCalledWith(
+                factory.getTransactionContext(),
+                "TestOrigin",
+                "TestType",
+                aggregateId,
+                "TestTenant"
             );
             expect(domainEventDeserializer.deserializeDomainEvents).toHaveBeenCalledWith(...mockSerializedEvents);
             expect(aggregateDomainEventApplier.applyDomainEventToAggregate).toHaveBeenCalledWith(
@@ -244,7 +293,51 @@ describe("AggregateFactory", () => {
             expect(mockAggregateQueryService.getDomainEventsForAggregate).toHaveBeenCalledWith(
                 "ExternalOrigin",
                 "TestType",
-                aggregateId
+                aggregateId,
+                undefined
+            );
+            expect(result).toBeNull();
+        });
+
+        it("should attempt to fetch events from the external origin if the origin is provided in the externalOriginMap and the event log is empty (with tenant ID if provided)", async () => {
+            aggregateMetadataRegistry.getAggregateMetadata = vi.fn(
+                () =>
+                    ({
+                        type: "TestType",
+                        isInternal: false,
+                        origin: "ExternalOrigin"
+                    }) as const
+            );
+
+            const mockAggregateQueryService = mock<AggregateQueryService>();
+            mockAggregateQueryService.getDomainEventsForAggregate.mockResolvedValueOnce([]);
+            mockExternalOriginMap.has.mockReturnValueOnce(true);
+            mockExternalOriginMap.get.mockReturnValueOnce(mockAggregateQueryService);
+
+            const factory = new AggregateFactory({
+                aggregateClass: mockAggregateClass,
+                transactionManager: mockTransactionManager,
+                domainEventRepository: mockDomainEventRepository,
+                snapshotRepository: mockSnapshotRepository,
+                currentOrigin: "ExternalOrigin",
+                tenantId: "TestTenant",
+                externalOriginMap: mockExternalOriginMap,
+                logger: mockLogger
+            });
+
+            mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([]);
+
+            const aggregateId = faker.string.uuid();
+
+            const result = await factory.buildFromEventLog(aggregateId);
+
+            expect(mockExternalOriginMap.has).toHaveBeenCalledWith("ExternalOrigin");
+            expect(mockExternalOriginMap.get).toHaveBeenCalledWith("ExternalOrigin");
+            expect(mockAggregateQueryService.getDomainEventsForAggregate).toHaveBeenCalledWith(
+                "ExternalOrigin",
+                "TestType",
+                aggregateId,
+                "TestTenant"
             );
             expect(result).toBeNull();
         });
@@ -290,7 +383,56 @@ describe("AggregateFactory", () => {
             expect(mockAggregateQueryService.getDomainEventsForAggregate).toHaveBeenCalledWith(
                 "ExternalOrigin",
                 "TestType",
-                aggregateId
+                aggregateId,
+                undefined
+            );
+            expect(result).toBeNull();
+        });
+
+        it("should attempt to fetch events from the external origin if the origin is provided in the externalOriginMap and the event log is incomplete (with tenant ID if provided)", async () => {
+            aggregateMetadataRegistry.getAggregateMetadata = vi.fn(
+                () =>
+                    ({
+                        type: "TestType",
+                        isInternal: false,
+                        origin: "ExternalOrigin"
+                    }) as const
+            );
+
+            const mockAggregateQueryService = mock<AggregateQueryService>();
+            mockAggregateQueryService.getDomainEventsForAggregate.mockResolvedValueOnce([]);
+            mockExternalOriginMap.has.mockReturnValueOnce(true);
+            mockExternalOriginMap.get.mockReturnValueOnce(mockAggregateQueryService);
+
+            const factory = new AggregateFactory({
+                aggregateClass: mockAggregateClass,
+                transactionManager: mockTransactionManager,
+                domainEventRepository: mockDomainEventRepository,
+                snapshotRepository: mockSnapshotRepository,
+                currentOrigin: "ExternalOrigin",
+                tenantId: "TestTenant",
+                externalOriginMap: mockExternalOriginMap,
+                logger: mockLogger
+            });
+
+            mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([
+                {
+                    id: faker.string.uuid(),
+                    sequenceNumber: 2 // Starting from 2, indicating an incomplete log
+                }
+            ] as SerializedDomainEvent[]);
+
+            const aggregateId = faker.string.uuid();
+
+            const result = await factory.buildFromEventLog(aggregateId);
+
+            expect(mockExternalOriginMap.has).toHaveBeenCalledWith("ExternalOrigin");
+            expect(mockExternalOriginMap.get).toHaveBeenCalledWith("ExternalOrigin");
+            expect(mockAggregateQueryService.getDomainEventsForAggregate).toHaveBeenCalledWith(
+                "ExternalOrigin",
+                "TestType",
+                aggregateId,
+                "TestTenant"
             );
             expect(result).toBeNull();
         });
@@ -396,7 +538,74 @@ describe("AggregateFactory", () => {
                 factory.getTransactionContext(),
                 "TestOrigin",
                 "TestType",
-                aggregateId
+                aggregateId,
+                undefined
+            );
+            expect(domainEventDeserializer.deserializeDomainEvents).toHaveBeenCalledWith(...mockSerializedEvents);
+            expect(aggregateDomainEventApplier.applyDomainEventToAggregate).toHaveBeenCalledWith(
+                mockAggregateInstance,
+                mockSerializedEvents[0]
+            );
+            expect(aggregateDomainEventApplier.applyDomainEventToAggregate).toHaveBeenCalledWith(
+                mockAggregateInstance,
+                mockSerializedEvents[1]
+            );
+            expect(result).toBe(mockAggregateInstance);
+        });
+
+        it("should build the aggregate from the latest snapshot (with tenant ID if provided)", async () => {
+            const factory = new AggregateFactory({
+                aggregateClass: mockAggregateClass,
+                transactionManager: mockTransactionManager,
+                domainEventRepository: mockDomainEventRepository,
+                snapshotRepository: mockSnapshotRepository,
+                currentOrigin: "CurrentOrigin",
+                tenantId: "TestTenant",
+                logger: mockLogger
+            });
+
+            const aggregateId = faker.string.uuid();
+
+            const mockSerializedEvents = [
+                { id: faker.string.uuid() },
+                { id: faker.string.uuid() }
+            ] as SerializedDomainEvent[];
+
+            mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce(mockSerializedEvents);
+            domainEventDeserializer.deserializeDomainEvents = vi.fn(
+                () => mockSerializedEvents as unknown as AbstractDomainEvent[]
+            );
+
+            const latestSnapshot: SerializedSnapshot = {
+                domainEventSequenceNumber: 1,
+                origin: "CurrentOrigin",
+                aggregateType: "TestType",
+                aggregateId: aggregateId,
+                snapshotData: {}
+            };
+
+            mockSnapshotRepository.getLatestSnapshot.mockResolvedValueOnce(latestSnapshot);
+
+            const mockAggregateInstance = {
+                getId: vi.fn().mockReturnValue(aggregateId),
+                setId: vi.fn().mockReturnThis()
+            } as unknown as InstanceType<typeof AbstractAggregateRoot>;
+
+            aggregateSnapshotTransformer.restoreFromSnapshot = vi.fn(
+                <TAggregateRootClass extends Constructor<AbstractAggregateRoot>>(
+                    aggregateClass: TAggregateRootClass,
+                    snapshot: SerializedSnapshot
+                ): InstanceType<TAggregateRootClass> => mockAggregateInstance as InstanceType<TAggregateRootClass>
+            );
+
+            const result = await factory.buildFromLatestSnapshot(aggregateId);
+
+            expect(mockSnapshotRepository.getLatestSnapshot).toHaveBeenCalledWith(
+                factory.getTransactionContext(),
+                "TestOrigin",
+                "TestType",
+                aggregateId,
+                "TestTenant"
             );
             expect(domainEventDeserializer.deserializeDomainEvents).toHaveBeenCalledWith(...mockSerializedEvents);
             expect(aggregateDomainEventApplier.applyDomainEventToAggregate).toHaveBeenCalledWith(

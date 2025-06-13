@@ -98,6 +98,25 @@ describe("AggregateContext", () => {
         });
     });
 
+    describe("withTenantId", () => {
+        it("should return a new AggregateContext with the specified tenantId", () => {
+            const aggregateContext = new AggregateContext({
+                aggregateClass: TestAggregate,
+                currentOrigin: "TestOrigin",
+                transactionManager: mockTransactionManager,
+                domainEventRepository: mockDomainEventRepository,
+                snapshotRepository: mockSnapshotRepository
+            });
+
+            const tenantId = "TestTenant";
+            const newContext = aggregateContext.withTenantId(tenantId);
+
+            expect(newContext).toBeInstanceOf(AggregateContext);
+            expect(newContext.getFactory()["tenantId"]).toBe(tenantId);
+            expect(newContext.getManager()["tenantId"]).toBe(tenantId);
+        });
+    });
+
     describe("type-safety", () => {
         it("should return the correct type for the factory for AbstractAggregateRoot", () => {
             const aggregateContext = new AggregateContext({

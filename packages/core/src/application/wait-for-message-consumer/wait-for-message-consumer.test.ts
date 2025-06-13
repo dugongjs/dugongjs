@@ -99,6 +99,7 @@ describe("WaitForMessageConsumer", () => {
             "TestOrigin",
             "Test",
             "aggregate-id",
+            undefined,
             undefined
         );
         expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenCalledTimes(2);

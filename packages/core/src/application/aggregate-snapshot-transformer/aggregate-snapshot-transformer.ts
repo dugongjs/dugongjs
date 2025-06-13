@@ -8,7 +8,8 @@ class AggregateSnapshotTransformer {
     public takeSnapshot(
         origin: string,
         aggregateType: string,
-        aggregate: InstanceType<typeof AbstractAggregateRoot>
+        aggregate: InstanceType<typeof AbstractAggregateRoot>,
+        tenantId?: string | null
     ): SerializedSnapshot {
         const aggregateSnapshot = instanceToPlain(aggregate);
 
@@ -16,6 +17,7 @@ class AggregateSnapshotTransformer {
             origin: origin,
             aggregateType: aggregateType,
             aggregateId: aggregate.getId(),
+            tenantId: tenantId,
             domainEventSequenceNumber: aggregate.getCurrentDomainEventSequenceNumber(),
             snapshotData: aggregateSnapshot
         };

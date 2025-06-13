@@ -64,6 +64,7 @@ describe("AggregateMessageConsumer", () => {
         version: 1,
         id: domainEventId,
         aggregateId: faker.string.uuid(),
+        tenantId: "TestTenant",
         payload: { key: faker.string.uuid() },
         sequenceNumber: 1,
         timestamp: faker.date.recent()
@@ -73,6 +74,7 @@ describe("AggregateMessageConsumer", () => {
         getId: vi.fn(() => domainEventId),
         getContext: vi.fn(() => "AggregateContext"),
         getOrigin: vi.fn(() => "AggregateOrigin"),
+        getTenantId: vi.fn(() => "TestTenant"),
         getAggregateType: vi.fn(() => "AggregateType"),
         getAggregateId: vi.fn(() => faker.string.uuid()),
         getType: vi.fn(() => "EventType"),
@@ -116,7 +118,8 @@ describe("AggregateMessageConsumer", () => {
         expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenCalledWith(
             expect.any(Object),
             domainEventId,
-            "consumer-id"
+            "consumer-id",
+            "TestTenant"
         );
         expect(mockDomainEventRepository.saveDomainEvents).toHaveBeenCalledWith(expect.any(Object), [
             serializedDomainEvent
@@ -124,7 +127,8 @@ describe("AggregateMessageConsumer", () => {
         expect(mockConsumedMessageRepository.markMessageAsConsumed).toHaveBeenCalledWith(
             expect.any(Object),
             domainEventId,
-            "consumer-id"
+            "consumer-id",
+            "TestTenant"
         );
         expect(handleMessage).toHaveBeenCalledWith({
             transactionContext: expect.any(Object),
@@ -164,7 +168,8 @@ describe("AggregateMessageConsumer", () => {
         expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenCalledWith(
             expect.any(Object),
             domainEventId,
-            "consumer-id"
+            "consumer-id",
+            "TestTenant"
         );
         expect(mockDomainEventRepository.saveDomainEvents).not.toHaveBeenCalled();
         expect(mockConsumedMessageRepository.markMessageAsConsumed).not.toHaveBeenCalled();

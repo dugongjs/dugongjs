@@ -82,9 +82,19 @@ export class WaitForMessageConsumer extends AbstractAggregateHandler<any> {
         }
     }
 
+    /**
+     * Waits for all domain events of a specific aggregate to be consumed by the specified consumer.
+     * This method retrieves the domain events for the specified aggregate and waits for them to be consumed by the given consumer.
+     * @param consumerName Name of the message consumer.
+     * @param aggregateId ID of the aggregate whose domain events are to be consumed.
+     * @param tenantId Optional tenant ID to scope the domain events.
+     * @param fromSequenceNumber Optional sequence number to start from when retrieving domain events.
+     * @returns A promise that resolves when all domain events are consumed.
+     */
     public async waitForAggregateDomainEventsToBeConsumed(
         consumerName: string,
         aggregateId: string,
+        tenantId?: string | null,
         fromSequenceNumber?: number
     ): Promise<void> {
         const domainEvents = await this.domainEventRepository.getAggregateDomainEvents(
@@ -92,6 +102,7 @@ export class WaitForMessageConsumer extends AbstractAggregateHandler<any> {
             this.aggregateOrigin,
             this.aggregateType,
             aggregateId,
+            tenantId,
             fromSequenceNumber
         );
 
