@@ -17,18 +17,27 @@ export class AggregateQueryClientProxyService implements IAggregateQueryService 
         return await firstValueFrom(this.queryClientProxy.send(GET_AGGREGATE_TYPES_TOKEN, {}));
     }
 
-    public async getAggregateIds(origin: string | null, aggregateType: string): Promise<string[]> {
-        return await firstValueFrom(this.queryClientProxy.send(GET_AGGREGATE_IDS_TOKEN, [origin, aggregateType]));
+    public async getAggregateIds(origin: string | null, aggregateType: string, tenantId?: string): Promise<string[]> {
+        return await firstValueFrom(
+            this.queryClientProxy.send(GET_AGGREGATE_IDS_TOKEN, [origin, aggregateType, tenantId])
+        );
     }
 
     public async getAggregate(
         origin: string | null,
         aggregateType: string,
         aggregateId: string,
+        tenantId?: string | null,
         toSequenceNumber?: number
     ): Promise<object | null> {
         const aggregate = await firstValueFrom(
-            this.queryClientProxy.send(GET_AGGREGATE_TOKEN, [origin, aggregateType, aggregateId, toSequenceNumber])
+            this.queryClientProxy.send(GET_AGGREGATE_TOKEN, [
+                origin,
+                aggregateType,
+                aggregateId,
+                tenantId,
+                toSequenceNumber
+            ])
         );
 
         if (aggregate === null) {
@@ -41,10 +50,16 @@ export class AggregateQueryClientProxyService implements IAggregateQueryService 
     public async getDomainEventsForAggregate(
         origin: string | null,
         aggregateType: string,
-        aggregateId: string
+        aggregateId: string,
+        tenantId?: string | null
     ): Promise<SerializedDomainEvent[]> {
         return await firstValueFrom(
-            this.queryClientProxy.send(GET_DOMAIN_EVENTS_FOR_AGGREGATE_TOKEN, [origin, aggregateType, aggregateId])
+            this.queryClientProxy.send(GET_DOMAIN_EVENTS_FOR_AGGREGATE_TOKEN, [
+                origin,
+                aggregateType,
+                aggregateId,
+                tenantId
+            ])
         );
     }
 
