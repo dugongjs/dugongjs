@@ -285,6 +285,60 @@ describe("User", () => {
 
             expect(restoredUser.getEmail()).toBe(newEmail);
         });
+
+        it("should be possible to execute additional commands after restoring from a snapshot", async () => {
+            const user = await userFactory.build(userId);
+
+            if (!user) {
+                throw new Error("User not found");
+            }
+
+            user.updateEmail({ email: faker.internet.email() });
+            user.updateEmail({ email: faker.internet.email() });
+            user.updateEmail({ email: faker.internet.email() });
+            user.updateEmail({ email: faker.internet.email() });
+            user.updateEmail({ email: faker.internet.email() });
+            user.updateEmail({ email: faker.internet.email() });
+            user.updateEmail({ email: faker.internet.email() });
+            user.updateEmail({ email: faker.internet.email() });
+            user.updateEmail({ email: faker.internet.email() });
+
+            await userManager.applyAndCommitStagedDomainEvents(user);
+
+            const snapshots = await dataSource.getRepository(SnapshotEntity).find({});
+
+            expect(snapshots).toHaveLength(1);
+
+            const restoredUser = await userFactory.build(userId);
+
+            if (!restoredUser) {
+                throw new Error("User not found");
+            }
+
+            const newEmail = faker.internet.email();
+
+            restoredUser.updateEmail({ email: newEmail });
+
+            await userManager.applyAndCommitStagedDomainEvents(restoredUser);
+
+            expect(restoredUser.getEmail()).toBe(newEmail);
+
+            const restoredUserAfterUpdate = await userFactory.build(userId);
+
+            if (!restoredUserAfterUpdate) {
+                throw new Error("User not found");
+            }
+
+            const newEmail2 = faker.internet.email();
+
+            restoredUser.updateEmail({ email: newEmail2 });
+
+            restoredUserAfterUpdate.updateEmail({ email: newEmail2 });
+
+            await userManager.applyAndCommitStagedDomainEvents(restoredUserAfterUpdate);
+
+            expect(restoredUserAfterUpdate.getEmail()).toBe(newEmail2);
+        });
     });
 
     describe("deleteUser", () => {

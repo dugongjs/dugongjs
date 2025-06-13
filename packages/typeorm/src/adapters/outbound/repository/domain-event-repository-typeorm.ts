@@ -1,5 +1,5 @@
 import type { IDomainEventRepository, SerializedDomainEvent } from "@dugongjs/core";
-import { MoreThan, type EntityManager, type Repository } from "typeorm";
+import { MoreThanOrEqual, type EntityManager, type Repository } from "typeorm";
 import { DomainEventEntity } from "../../../infrastructure/db/entities/domain-event.entity.js";
 
 export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
@@ -22,7 +22,7 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
                 aggregateType,
                 aggregateId,
                 tenantId,
-                sequenceNumber: fromSequenceNumber ? MoreThan(fromSequenceNumber) : undefined
+                sequenceNumber: fromSequenceNumber ? MoreThanOrEqual(fromSequenceNumber) : undefined
             },
             order: {
                 sequenceNumber: "ASC"
