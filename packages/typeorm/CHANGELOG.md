@@ -1,5 +1,13 @@
 # @dugongjs/typeorm
 
+## 0.0.8
+
+### Patch Changes
+
+- 18ef4ca: Fix breaking changes introduced in core
+- Updated dependencies [18ef4ca]
+    - @dugongjs/core@0.0.7
+
 ## 0.0.7
 
 ### Patch Changes
