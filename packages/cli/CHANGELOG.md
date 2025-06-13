@@ -1,5 +1,16 @@
 # @dugongjs/cli
 
+## 0.0.17
+
+### Patch Changes
+
+- 18ef4ca: Fix breaking changes introduced in core
+- Updated dependencies [18ef4ca]
+- Updated dependencies [18ef4ca]
+    - @dugongjs/nestjs-microservice-query@0.0.16
+    - @dugongjs/nestjs@0.0.15
+    - @dugongjs/core@0.0.7
+
 ## 0.0.16
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @dugongjs/nestjs-typeorm
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [18ef4ca]
+- Updated dependencies [18ef4ca]
+    - @dugongjs/typeorm@0.0.8
+    - @dugongjs/core@0.0.7
+
 ## 0.0.9
 
 ### Patch Changes
