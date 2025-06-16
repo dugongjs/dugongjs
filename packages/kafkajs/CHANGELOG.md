@@ -1,5 +1,11 @@
 # @dugongjs/kafkajs
 
+## 0.0.10
+
+### Patch Changes
+
+- 54b88d7: Added missing `tenantId` to message mappers
+
 ## 0.0.9
 
 ### Patch Changes
