@@ -24,6 +24,7 @@ export class InboundMessageMapperKafkaJS implements IInboundMessageMapper<EachMe
         const version = headers.version ? parseInt(headers.version!.toString()) : undefined;
         const sequenceNumber = headers.sequenceNumber ? parseInt(headers.sequenceNumber.toString()) : undefined;
         const timestamp = headers.timestamp ? new Date(parseInt(headers.timestamp.toString())) : undefined;
+        const tenantId = headers.tenantId?.toString();
         const correlationId = headers.correlationId?.toString();
         const triggeredByUserId = headers.triggeredByUserId?.toString();
         const triggeredByEventId = headers.triggeredByEventId?.toString();
@@ -63,6 +64,7 @@ export class InboundMessageMapperKafkaJS implements IInboundMessageMapper<EachMe
             version,
             sequenceNumber,
             timestamp,
+            tenantId,
             correlationId,
             triggeredByUserId,
             triggeredByEventId,
