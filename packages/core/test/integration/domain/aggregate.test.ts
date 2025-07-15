@@ -46,6 +46,35 @@ describe("Aggregate and Domain Event Integration", () => {
         expect(userAggregate.getStagedDomainEvents().length).toBe(2);
     });
 
+    it("should apply default domain event appliers to the aggregate", () => {
+        const userAggregate = new UserAggregate();
+        const username = "test_user";
+
+        userAggregate.createUser(username);
+
+        const stagedDomainEvents = userAggregate.getStagedDomainEvents();
+
+        const userCreatedEvent = stagedDomainEvents[0];
+
+        aggregateDomainEventApplier.applyDomainEventToAggregate(userAggregate, userCreatedEvent);
+
+        expect(userAggregate.getUsername()).toBe(username);
+        expect(userAggregate.getVersion()).toBe(1);
+
+        const newUsername = "updated_user";
+
+        userAggregate.updateUser(newUsername);
+
+        const updatedStagedDomainEvents = userAggregate.getStagedDomainEvents();
+
+        const userUpdatedEvent = updatedStagedDomainEvents[1];
+
+        aggregateDomainEventApplier.applyDomainEventToAggregate(userAggregate, userUpdatedEvent);
+
+        expect(userAggregate.getUsername()).toBe(newUsername);
+        expect(userAggregate.getVersion()).toBe(2);
+    });
+
     it("should throw an error when sequence numbers do not match", () => {
         const userAggregate = new UserAggregate();
         const username = "test_user";
