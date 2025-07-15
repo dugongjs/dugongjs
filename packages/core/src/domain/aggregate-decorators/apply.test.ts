@@ -4,7 +4,8 @@ import { Apply } from "./apply.js";
 
 vi.mock("../aggregate-metadata-registry/aggregate-metadata-registry.js", () => ({
     aggregateMetadataRegistry: {
-        registerAggregateDomainEventApplier: vi.fn()
+        registerAggregateDomainEventApplier: vi.fn(),
+        registerDefaultAggregateDomainEventApplier: vi.fn()
     }
 }));
 
@@ -27,6 +28,21 @@ describe("Apply decorator", () => {
         expect(aggregateMetadataRegistry.registerAggregateDomainEventApplier).toHaveBeenCalledWith(
             TestAggregate,
             TestDomainEvent,
+            method
+        );
+    });
+
+    it("should register the default domain event applier in the aggregate metadata registry", () => {
+        class TestAggregate {
+            @Apply()
+            handleAllEvents() {}
+        }
+
+        const instance = new TestAggregate();
+        const method = instance.handleAllEvents;
+
+        expect(aggregateMetadataRegistry.registerDefaultAggregateDomainEventApplier).toHaveBeenCalledWith(
+            TestAggregate,
             method
         );
     });

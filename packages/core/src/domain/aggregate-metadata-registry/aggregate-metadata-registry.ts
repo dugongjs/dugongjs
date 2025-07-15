@@ -30,6 +30,7 @@ class AggregateMetadataRegistry {
     private aggregateMetadataMap: Map<Constructor, AggregateMetadata> = new Map();
     private aggregateSnapshotMetadataMap: Map<Constructor, AggregateSnapshotMetadata> = new Map();
     private aggregateDomainEventAppliers: Map<Constructor, AggregateDomainEventApplierMap> = new Map();
+    private aggregateDefaultDomainEventAppliers: Map<Constructor, AggregateDomainEventApplier[]> = new Map();
 
     public registerAggregateMetadata(aggregateClass: Constructor, type: string): this {
         this.validateAggregateMetadata(aggregateClass);
@@ -87,6 +88,21 @@ class AggregateMetadataRegistry {
         return this;
     }
 
+    public registerDefaultAggregateDomainEventApplier(
+        aggregateClass: Constructor,
+        domainEventApplier: AggregateDomainEventApplier
+    ): this {
+        if (!this.aggregateDefaultDomainEventAppliers.has(aggregateClass)) {
+            this.aggregateDefaultDomainEventAppliers.set(aggregateClass, []);
+        }
+
+        const domainEventAppliers = this.aggregateDefaultDomainEventAppliers.get(aggregateClass)!;
+
+        domainEventAppliers.push(domainEventApplier);
+
+        return this;
+    }
+
     public getAggregateMetadata(aggregateClass: Constructor): AggregateMetadata | null {
         return this.aggregateMetadataMap.get(aggregateClass) ?? null;
     }
@@ -112,6 +128,13 @@ class AggregateMetadataRegistry {
                     appliers.push(...handlers);
                 }
             }
+
+            const defaultAppliers = this.aggregateDefaultDomainEventAppliers.get(currentClass);
+
+            if (defaultAppliers) {
+                appliers.push(...defaultAppliers);
+            }
+
             currentClass = Object.getPrototypeOf(currentClass);
         }
 

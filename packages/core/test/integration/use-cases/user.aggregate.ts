@@ -67,9 +67,14 @@ export class UserDeletedEvent extends AbstractUserDomainEvent {
 @Snapshotable()
 export class UserAggregate extends AbstractAggregateRoot {
     private username: string | null = null;
+    private version: number;
 
     public getUsername(): string | null {
         return this.username;
+    }
+
+    public getVersion(): number {
+        return this.version;
     }
 
     @Process({ isCreation: true })
@@ -103,5 +108,10 @@ export class UserAggregate extends AbstractAggregateRoot {
     @Apply(UserDeletedEvent)
     public applyUserDeleted(): void {
         this.delete();
+    }
+
+    @Apply()
+    public updateVersion(event: AbstractUserDomainEvent): void {
+        this.version = event.getSequenceNumber();
     }
 }

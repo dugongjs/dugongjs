@@ -83,6 +83,16 @@ describe("AggregateMetadataRegistry", () => {
         });
     });
 
+    describe("registerDefaultAggregateDomainEventApplier", () => {
+        it("should register a default domain event applier for an aggregate", () => {
+            const applier = () => {};
+            registry.registerDefaultAggregateDomainEventApplier(TestAggregateRoot, applier);
+
+            const retrievedAppliers = registry.getAggregateDomainEventAppliers(TestAggregateRoot, TestDomainEvent)!;
+            expect(retrievedAppliers[0]).toBe(applier);
+        });
+    });
+
     describe("getAggregateClass", () => {
         it("should return the aggregate class for the given type and origin", () => {
             registry.registerExternalAggregateMetadata(TestAggregateRoot, "TestType", "TestOrigin");
