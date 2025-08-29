@@ -1,8 +1,7 @@
 import {
-    AbstractEventSourcedAggregateRoot,
     AggregateMessageConsumer,
     type AggregateMessageConsumerOptions,
-    type RemoveAbstract
+    type EventSourcedAggregateRoot
 } from "@dugongjs/core";
 import {
     ConsumedMessageEntity,
@@ -18,9 +17,7 @@ import { dataSource } from "../setup/data-source.js";
 import { kafka } from "../setup/kafkajs.js";
 import { Logger } from "./logger.js";
 
-export type AggregateMessageConsumerKafkaJSOptions<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-> = Omit<
+export type AggregateMessageConsumerKafkaJSOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = Omit<
     AggregateMessageConsumerOptions<TAggregateRootClass, EachMessagePayload>,
     | "messageConsumer"
     | "inboundMessageMapper"
@@ -31,7 +28,7 @@ export type AggregateMessageConsumerKafkaJSOptions<
 >;
 
 export class AggregateMessageConsumerKafkaJS<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
+    TAggregateRootClass extends EventSourcedAggregateRoot
 > extends AggregateMessageConsumer<TAggregateRootClass, EachMessagePayload> {
     constructor(options: AggregateMessageConsumerKafkaJSOptions<TAggregateRootClass>) {
         super({
