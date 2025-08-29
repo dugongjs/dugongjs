@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.8
+
+### Patch Changes
+
+- d4b9b59: Added support for default domain event appliers in aggregates by using an empty `@Apply()` decorator
+
 ## 0.0.7
 
 ### Patch Changes
