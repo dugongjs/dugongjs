@@ -1,6 +1,6 @@
 import { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
+import type { AggregateRoot } from "../../domain/abstract-aggregate-root/aggregate-root.js";
 import type { EventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/event-sourced-aggregate-root.js";
-import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 import {
     AggregateFactory,
     type AggregateFactoryOptions,
@@ -14,7 +14,7 @@ import {
 import { AggregateManagerNotAvailableError } from "./errors/aggregate-manager-not-available-error.js";
 
 export type AggregateContextOptions<TAggregateRootClass extends EventSourcedAggregateRoot> =
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
+    TAggregateRootClass extends AggregateRoot
         ? AggregateFactoryOptions<TAggregateRootClass> & AggregateManagerOptions<TAggregateRootClass>
         : AggregateFactoryOptions<TAggregateRootClass>;
 
@@ -28,18 +28,14 @@ export type AggregateContextOptions<TAggregateRootClass extends EventSourcedAggr
 export class AggregateContext<TAggregateRootClass extends EventSourcedAggregateRoot> {
     private readonly options: AggregateContextOptions<TAggregateRootClass>;
     private readonly factory: AggregateFactory<TAggregateRootClass>;
-    private readonly manager: TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
-        ? AggregateManager<TAggregateRootClass>
-        : null;
+    private readonly manager: TAggregateRootClass extends AggregateRoot ? AggregateManager<TAggregateRootClass> : null;
 
     constructor(options: AggregateContextOptions<TAggregateRootClass>) {
         this.options = options;
         this.factory = new AggregateFactory(options as AggregateFactoryOptions<TAggregateRootClass>);
         this.manager = (
             this.isAggregateRootClass(options) ? new AggregateManager(options) : null
-        ) as TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
-            ? AggregateManager<TAggregateRootClass>
-            : null;
+        ) as TAggregateRootClass extends AggregateRoot ? AggregateManager<TAggregateRootClass> : null;
     }
 
     /**
@@ -55,11 +51,9 @@ export class AggregateContext<TAggregateRootClass extends EventSourcedAggregateR
      * If the `AggregateRootClass` is not an instance of `AbstractAggregateRoot`, this method will throw an error.
      * @returns The AggregateManager instance.
      */
-    public getManager(): TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
-        ? AggregateManager<TAggregateRootClass>
-        : never {
+    public getManager(): TAggregateRootClass extends AggregateRoot ? AggregateManager<TAggregateRootClass> : never {
         this.validateManagerExists();
-        return this.manager as TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
+        return this.manager as TAggregateRootClass extends AggregateRoot
             ? AggregateManager<TAggregateRootClass>
             : never;
     }
@@ -127,11 +121,11 @@ export class AggregateContext<TAggregateRootClass extends EventSourcedAggregateR
 
     private isAggregateRootClass(
         options: AggregateContextOptions<TAggregateRootClass>
-    ): options is AggregateContextOptions<TAggregateRootClass & RemoveAbstract<typeof AbstractAggregateRoot>> {
+    ): options is AggregateContextOptions<TAggregateRootClass & AggregateRoot> {
         return options.aggregateClass.prototype instanceof AbstractAggregateRoot;
     }
 
-    private validateManagerExists(): asserts this is AggregateContext<RemoveAbstract<typeof AbstractAggregateRoot>> {
+    private validateManagerExists(): asserts this is AggregateContext<AggregateRoot> {
         if (!this.manager) {
             throw new AggregateManagerNotAvailableError();
         }
