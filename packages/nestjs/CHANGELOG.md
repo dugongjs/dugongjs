@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.18
+
+### Patch Changes
+
+- ff4cf75: Updated `AggregateDomainEventConsumer` to create the consumer even when no handlers are registered
+
 ## 0.0.17
 
 ### Patch Changes
