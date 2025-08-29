@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.9
+
+### Patch Changes
+
+- d6bff86: Fixed an issue with default type parameter for `HandleMessage` and `HandleMessageContext` types
+
 ## 0.0.8
 
 ### Patch Changes
