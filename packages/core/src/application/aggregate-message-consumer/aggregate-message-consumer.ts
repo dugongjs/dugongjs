@@ -28,13 +28,21 @@ export type HandleMessageOptions = {
     retryInterval?: number;
 };
 
-export type HandleMessageContext<TMessage = any> = {
+export type HandleMessageContext<
+    TDomainEvent extends InstanceType<typeof AbstractDomainEvent> = InstanceType<typeof AbstractDomainEvent>,
+    TMessage = any
+> = {
     transactionContext: TransactionContext;
-    domainEvent: InstanceType<typeof AbstractDomainEvent>;
+    domainEvent: TDomainEvent;
     message: TMessage;
 };
 
-export type HandleMessage = <TMessage>(context: HandleMessageContext<TMessage>) => Promise<void>;
+export type HandleMessage = <
+    TDomainEvent extends InstanceType<typeof AbstractDomainEvent> = InstanceType<typeof AbstractDomainEvent>,
+    TMessage = any
+>(
+    context: HandleMessageContext<TDomainEvent, TMessage>
+) => Promise<void>;
 
 export class AggregateMessageConsumer<
     TAggregateRootClass extends EventSourcedAggregateRoot,
@@ -53,23 +61,50 @@ export class AggregateMessageConsumer<
         this.messageConsumer = options.messageConsumer;
     }
 
+    public getMessageChannelId(): string {
+        return this.messageConsumer.generateMessageChannelIdForAggregate(this.aggregateOrigin, this.aggregateType);
+    }
+
+    public getMessageConsumerId(consumerName: string): string {
+        return this.messageConsumer.generateMessageConsumerIdForAggregate(
+            this.currentOrigin,
+            this.aggregateType,
+            consumerName
+        );
+    }
+
+    public getLogPrefix(): string {
+        return "[Message consumer]: ";
+    }
+
+    public getMessageLogContext(consumerName: string, domainEvent: AbstractDomainEvent<any>): Record<string, any> {
+        const messageChannelId = this.getMessageChannelId();
+        const messageConsumerId = this.getMessageConsumerId(consumerName);
+
+        return {
+            messageChannelId,
+            messageConsumerId,
+            event: {
+                id: domainEvent.getId(),
+                origin: domainEvent.getOrigin(),
+                aggregateType: domainEvent.getAggregateType(),
+                aggregateId: domainEvent.getAggregateId(),
+                tenantId: domainEvent.getTenantId(),
+                type: domainEvent.getType(),
+                version: domainEvent.getVersion()
+            }
+        };
+    }
+
     public async registerMessageConsumerForAggregate(
         consumerName: string,
         handleMessage?: HandleMessage,
         options?: HandleMessageOptions
     ): Promise<void> {
-        const logPrefix = "[Message consumer]: ";
+        const logPrefix = this.getLogPrefix();
 
-        const messageChannelId = this.messageConsumer.generateMessageChannelIdForAggregate(
-            this.aggregateOrigin,
-            this.aggregateType
-        );
-
-        const messageConsumerId = this.messageConsumer.generateMessageConsumerIdForAggregate(
-            this.currentOrigin,
-            this.aggregateType,
-            consumerName
-        );
+        const messageChannelId = this.getMessageChannelId();
+        const messageConsumerId = this.getMessageConsumerId(consumerName);
 
         this.logger.verbose(
             this.logContext,
@@ -96,26 +131,14 @@ export class AggregateMessageConsumer<
                             return;
                         }
 
-                        const messageLogContext = {
-                            messageChannelId,
-                            messageConsumerId,
-                            event: {
-                                id: domainEvent.getId(),
-                                origin: domainEvent.getOrigin(),
-                                aggregateType: domainEvent.getAggregateType(),
-                                aggregateId: domainEvent.getAggregateId(),
-                                tenantId: domainEvent.getTenantId(),
-                                type: domainEvent.getType(),
-                                version: domainEvent.getVersion()
-                            }
-                        };
+                        const messageLogContext = this.getMessageLogContext(consumerName, domainEvent);
 
                         if (transactionContext) {
                             this.setTransactionContext(transactionContext);
                         }
 
                         await this.transaction(async (transactionContext: TransactionContext) => {
-                            this.logger.log(messageLogContext, logPrefix + "Message received");
+                            this.logger.verbose(messageLogContext, logPrefix + "Message received");
 
                             const isConsumed = await this.consumedMessageRepository.checkIfMessageIsConsumed(
                                 transactionContext,

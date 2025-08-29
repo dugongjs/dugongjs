@@ -3,6 +3,7 @@ export {
     IsInCreationContext,
     IsInProcessContext
 } from "./abstract-aggregate-root/abstract-aggregate-root.js";
+export type { AggregateRoot } from "./abstract-aggregate-root/aggregate-root.js";
 export { AggregateIdSetOutsideCreationContextError } from "./abstract-aggregate-root/errors/aggregate-id-set-outside-creation-context.error.js";
 export { MutateEventOutsideCommandContextError } from "./abstract-aggregate-root/errors/mutate-event-outside-command-context.error.js";
 export { AbstractDomainEvent, type DomainEventPayload } from "./abstract-domain-event/abstract-domain-event.js";
@@ -10,6 +11,7 @@ export type { DomainEventClass } from "./abstract-domain-event/domain-event-clas
 export type { SerializedDomainEvent } from "./abstract-domain-event/serialized-domain-event.js";
 export { AbstractEventSourcedAggregateRoot } from "./abstract-event-sourced-aggregate-root/abstract-event-sourced-aggregate-root.js";
 export { AggregateIdAlreadySetError } from "./abstract-event-sourced-aggregate-root/errors/aggregate-id-already-set.error.js";
+export type { EventSourcedAggregateRoot } from "./abstract-event-sourced-aggregate-root/event-sourced-aggregate-root.js";
 export { Aggregate } from "./aggregate-decorators/aggregate.js";
 export { Apply } from "./aggregate-decorators/apply.js";
 export { CreationProcess } from "./aggregate-decorators/creation-process.js";
