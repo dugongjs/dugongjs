@@ -1,9 +1,4 @@
-import {
-    AbstractAggregateRoot,
-    AggregateManager,
-    type AggregateManagerOptions,
-    type RemoveAbstract
-} from "@dugongjs/core";
+import { AggregateManager, type AggregateManagerOptions, type AggregateRoot } from "@dugongjs/core";
 import { OutboxMessageMapperTypeOrm } from "../../../../src/adapters/outbound/message-broker/outbox-message-mapper-typeorm.js";
 import { OutboxMessageProducerTypeOrm } from "../../../../src/adapters/outbound/message-broker/outbox-message-producer-typeorm.js";
 import { DomainEventRepositoryTypeOrm } from "../../../../src/adapters/outbound/repository/domain-event-repository-typeorm.js";
@@ -14,14 +9,13 @@ import { SnapshotEntity } from "../../../../src/infrastructure/db/entities/snaps
 import { dataSource } from "../setup/data-source.js";
 import { Logger } from "./logger.js";
 
-export type AggregateManagerTypeOrmOptions<TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>> =
-    Omit<
-        AggregateManagerOptions<TAggregateRootClass>,
-        "domainEventRepository" | "snapshotRepository" | "messageProducer" | "logger"
-    >;
+export type AggregateManagerTypeOrmOptions<TAggregateRootClass extends AggregateRoot> = Omit<
+    AggregateManagerOptions<TAggregateRootClass>,
+    "domainEventRepository" | "snapshotRepository" | "messageProducer" | "logger"
+>;
 
 export class AggregateManagerTypeOrm<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractAggregateRoot>
+    TAggregateRootClass extends AggregateRoot
 > extends AggregateManager<TAggregateRootClass> {
     constructor(options: AggregateManagerTypeOrmOptions<TAggregateRootClass>) {
         super({
