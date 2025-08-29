@@ -1,10 +1,9 @@
 import {
-    AbstractEventSourcedAggregateRoot,
     IConsumedMessageRepository,
     IDomainEventRepository,
     IMessageConsumer,
     WaitForMessageConsumer,
-    type RemoveAbstract
+    type EventSourcedAggregateRoot
 } from "@dugongjs/core";
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectConsumedMessageRepository } from "../decorators/inject-comsumed-message-repository.decorator.js";
@@ -23,9 +22,7 @@ export class WaitForMessageConsumerService {
         @InjectMessageConsumer() private readonly messageConsumer: IMessageConsumer<any>
     ) {}
 
-    public getWaitForMessageConsumer(
-        aggregateClass: RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-    ): WaitForMessageConsumer {
+    public getWaitForMessageConsumer(aggregateClass: EventSourcedAggregateRoot): WaitForMessageConsumer {
         return new WaitForMessageConsumer({
             aggregateClass,
             currentOrigin: this.currentOrigin,
@@ -37,7 +34,7 @@ export class WaitForMessageConsumerService {
     }
 
     public async waitForMessagesToBeConsumed(
-        aggregateClass: RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>,
+        aggregateClass: EventSourcedAggregateRoot,
         consumerName: string,
         ...ids: string[]
     ): Promise<void> {
@@ -47,7 +44,7 @@ export class WaitForMessageConsumerService {
     }
 
     public async waitForAggregateDomainEventsToBeConsumed(
-        aggregateClass: RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>,
+        aggregateClass: EventSourcedAggregateRoot,
         consumerName: string,
         aggregateId: string,
         tenantId?: string | null,

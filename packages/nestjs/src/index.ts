@@ -1,6 +1,12 @@
+export { AggregateDomainEventConsumerExplorerService } from "./aggregate-domain-event-consumer/aggregate-domain-event-consumer-explorer.service.js";
+export { AggregateDomainEventConsumerModule } from "./aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 export { AggregateMessageConsumerService } from "./aggregate-message-consumer/aggregate-message-consumer.service.js";
 export { AggregateMessageProducerService } from "./aggregate-message-producer/aggregate-message-producer.service.js";
 export { AggregateQueryService } from "./aggregate-query/aggregate-query.service.js";
+export {
+    AGGREGATE_DOMAIN_EVENT_CONSUMER_TOKEN,
+    AggregateDomainEventConsumer
+} from "./decorators/aggregate-domain-event-consumer.decorator.js";
 export { InjectConsumedMessageRepository } from "./decorators/inject-comsumed-message-repository.decorator.js";
 export { InjectCurrentOrigin } from "./decorators/inject-current-origin.decorator.js";
 export { InjectDomainEventRepository } from "./decorators/inject-domain-event-repository.decorator.js";
@@ -8,6 +14,7 @@ export { InjectMessageConsumer } from "./decorators/inject-message-consumer.deco
 export { InjectMessageProducer } from "./decorators/inject-message-producer.decorator.js";
 export { InjectSnapshotRepository } from "./decorators/inject-snapshot-repository.decorator.js";
 export { InjectTransactionManager } from "./decorators/inject-transaction-manager.decorator.js";
+export { ON_DOMAIN_EVENT_TOKEN, OnDomainEvent } from "./decorators/on-domain-event.decorator.js";
 export { EventIssuerModule, type EventIssuerModuleOptions } from "./event-issuer/event-issuer.module.js";
 export { EventSourcingModule, type EventSourcingModuleOptions } from "./event-sourcing/event-sourcing.module.js";
 export { EventSourcingService } from "./event-sourcing/event-sourcing.service.js";

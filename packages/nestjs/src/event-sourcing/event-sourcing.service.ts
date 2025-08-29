@@ -1,15 +1,14 @@
 import {
-    AbstractAggregateRoot,
     AggregateContext,
     IExternalOriginMap,
     IOutboundMessageMapper,
-    type AbstractEventSourcedAggregateRoot,
     type AggregateContextOptions,
+    type AggregateRoot,
+    type EventSourcedAggregateRoot,
     type IDomainEventRepository,
     type IMessageProducer,
     type ISnapshotRepository,
     type ITransactionManager,
-    type RemoveAbstract,
     type RunInTransaction,
     type TransactionContext
 } from "@dugongjs/core";
@@ -36,12 +35,12 @@ export class EventSourcingService {
         @Optional() @InjectOutboundMessageMapper() private readonly outboundMessageMapper?: IOutboundMessageMapper<any>
     ) {}
 
-    public createAggregateContext<TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>>(
+    public createAggregateContext<TAggregateRootClass extends EventSourcedAggregateRoot>(
         transactionContext: TransactionContext | null,
         aggregateClass: TAggregateRootClass
     ): AggregateContext<TAggregateRootClass> {
-        const aggregateContextOptions: AggregateContextOptions<RemoveAbstract<typeof AbstractAggregateRoot>> = {
-            aggregateClass: aggregateClass as unknown as RemoveAbstract<typeof AbstractAggregateRoot>,
+        const aggregateContextOptions: AggregateContextOptions<AggregateRoot> = {
+            aggregateClass: aggregateClass as unknown as AggregateRoot,
             transactionManager: this.transactionManager,
             domainEventRepository: this.domainEventRepository,
             snapshotRepository: this.snapshotRepository,
