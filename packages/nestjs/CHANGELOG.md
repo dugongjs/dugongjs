@@ -1,5 +1,13 @@
 # @dugongjs/nestjs
 
+## 0.0.16
+
+### Patch Changes
+
+- b778890: Added `AggregateDomainEventConsumer` and `OnDomainEvent` decorators
+- Updated dependencies [d4b9b59]
+    - @dugongjs/core@0.0.8
+
 ## 0.0.15
 
 ### Patch Changes
