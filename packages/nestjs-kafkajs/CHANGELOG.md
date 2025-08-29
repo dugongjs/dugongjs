@@ -1,5 +1,13 @@
 # @dugongjs/nestjs-kafkajs
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [d6bff86]
+    - @dugongjs/core@0.0.9
+    - @dugongjs/kafkajs@0.0.12
+
 ## 0.0.12
 
 ### Patch Changes
