@@ -1,11 +1,10 @@
 import {
     AbstractDomainEvent,
-    AbstractEventSourcedAggregateRoot,
     AggregateMessageProducer,
     IMessageProducer,
     IOutboundMessageMapper,
     ITransactionManager,
-    type RemoveAbstract
+    type EventSourcedAggregateRoot
 } from "@dugongjs/core";
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectCurrentOrigin } from "../decorators/inject-current-origin.decorator.js";
@@ -24,9 +23,9 @@ export class AggregateMessageProducerService {
         @InjectCurrentOrigin() private readonly currentOrigin: string
     ) {}
 
-    public getAggregateMessageProducer<
-        TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-    >(aggregateClass: TAggregateRootClass): AggregateMessageProducer<TAggregateRootClass, any> {
+    public getAggregateMessageProducer<TAggregateRootClass extends EventSourcedAggregateRoot>(
+        aggregateClass: TAggregateRootClass
+    ): AggregateMessageProducer<TAggregateRootClass, any> {
         return new AggregateMessageProducer({
             aggregateClass,
             currentOrigin: this.currentOrigin,
@@ -37,9 +36,10 @@ export class AggregateMessageProducerService {
         });
     }
 
-    public async publishDomainEventsAsMessages<
-        TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-    >(aggregateClass: TAggregateRootClass, domainEvents: AbstractDomainEvent[]): Promise<void> {
+    public async publishDomainEventsAsMessages<TAggregateRootClass extends EventSourcedAggregateRoot>(
+        aggregateClass: TAggregateRootClass,
+        domainEvents: AbstractDomainEvent[]
+    ): Promise<void> {
         const aggregateMessageProducer = this.getAggregateMessageProducer(aggregateClass);
 
         await aggregateMessageProducer.publishDomainEventsAsMessages(domainEvents);

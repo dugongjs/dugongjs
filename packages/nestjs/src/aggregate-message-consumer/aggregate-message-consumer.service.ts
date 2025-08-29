@@ -1,14 +1,13 @@
 import {
-    AbstractEventSourcedAggregateRoot,
     AggregateMessageConsumer,
     IConsumedMessageRepository,
     IDomainEventRepository,
     IInboundMessageMapper,
     IMessageConsumer,
     ITransactionManager,
+    type EventSourcedAggregateRoot,
     type HandleMessage,
-    type HandleMessageOptions,
-    type RemoveAbstract
+    type HandleMessageOptions
 } from "@dugongjs/core";
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectConsumedMessageRepository } from "../decorators/inject-comsumed-message-repository.decorator.js";
@@ -31,9 +30,9 @@ export class AggregateMessageConsumerService {
         @InjectCurrentOrigin() private readonly currentOrigin: string
     ) {}
 
-    public getAggregateMessageConsumer<
-        TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-    >(aggregateClass: TAggregateRootClass): AggregateMessageConsumer<TAggregateRootClass, any> {
+    public getAggregateMessageConsumer<TAggregateRootClass extends EventSourcedAggregateRoot>(
+        aggregateClass: TAggregateRootClass
+    ): AggregateMessageConsumer<TAggregateRootClass, any> {
         return new AggregateMessageConsumer({
             aggregateClass,
             transactionManager: this.transactionManager,
@@ -46,16 +45,16 @@ export class AggregateMessageConsumerService {
         });
     }
 
-    public async registerMessageConsumerForAggregate<
-        TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-    >(
+    public async registerMessageConsumerForAggregate<TAggregateRootClass extends EventSourcedAggregateRoot>(
         aggregateClass: TAggregateRootClass,
         consumerName: string,
         handleMessage?: HandleMessage,
         options?: HandleMessageOptions
-    ): Promise<void> {
+    ): Promise<AggregateMessageConsumer<TAggregateRootClass, any>> {
         const aggregateMessageConsumer = this.getAggregateMessageConsumer(aggregateClass);
 
         await aggregateMessageConsumer.registerMessageConsumerForAggregate(consumerName, handleMessage, options);
+
+        return aggregateMessageConsumer;
     }
 }
