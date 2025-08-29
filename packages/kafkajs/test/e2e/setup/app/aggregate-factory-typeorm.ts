@@ -1,9 +1,4 @@
-import {
-    AbstractEventSourcedAggregateRoot,
-    AggregateFactory,
-    type AggregateFactoryOptions,
-    type RemoveAbstract
-} from "@dugongjs/core";
+import { AggregateFactory, type AggregateFactoryOptions, type EventSourcedAggregateRoot } from "@dugongjs/core";
 import {
     DomainEventEntity,
     DomainEventRepositoryTypeOrm,
@@ -14,15 +9,13 @@ import {
 import { dataSource } from "../setup/data-source.js";
 import { Logger } from "./logger.js";
 
-export type AggregateFactoryTypeOrmOptions<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
-> = Omit<
+export type AggregateFactoryTypeOrmOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = Omit<
     AggregateFactoryOptions<TAggregateRootClass>,
     "transactionManager" | "domainEventRepository" | "snapshotRepository" | "logger"
 >;
 
 export class AggregateFactoryTypeOrm<
-    TAggregateRootClass extends RemoveAbstract<typeof AbstractEventSourcedAggregateRoot>
+    TAggregateRootClass extends EventSourcedAggregateRoot
 > extends AggregateFactory<TAggregateRootClass> {
     constructor(options: AggregateFactoryTypeOrmOptions<TAggregateRootClass>) {
         super({
