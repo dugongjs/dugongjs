@@ -39,10 +39,6 @@ export class AggregateDomainEventConsumerExplorerService implements OnModuleInit
 
             const handlers = this.collectHandlers(instance);
 
-            if (handlers.size === 0) {
-                continue;
-            }
-
             const consumer = this.aggregateMessageConsumerService.getAggregateMessageConsumer(aggregateClass);
 
             await consumer.registerMessageConsumerForAggregate(consumerName, async (context) => {
@@ -76,6 +72,7 @@ export class AggregateDomainEventConsumerExplorerService implements OnModuleInit
                 map.set(name, domainEventClasses);
             }
         }
+
         return map;
     }
 }
