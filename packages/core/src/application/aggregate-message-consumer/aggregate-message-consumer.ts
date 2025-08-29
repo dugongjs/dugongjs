@@ -29,7 +29,7 @@ export type HandleMessageOptions = {
 };
 
 export type HandleMessageContext<
-    TDomainEvent extends InstanceType<typeof AbstractDomainEvent> = InstanceType<typeof AbstractDomainEvent>,
+    TDomainEvent extends InstanceType<typeof AbstractDomainEvent> = any,
     TMessage = any
 > = {
     transactionContext: TransactionContext;
@@ -37,10 +37,7 @@ export type HandleMessageContext<
     message: TMessage;
 };
 
-export type HandleMessage = <
-    TDomainEvent extends InstanceType<typeof AbstractDomainEvent> = InstanceType<typeof AbstractDomainEvent>,
-    TMessage = any
->(
+export type HandleMessage = <TDomainEvent extends InstanceType<typeof AbstractDomainEvent> = any, TMessage = any>(
     context: HandleMessageContext<TDomainEvent, TMessage>
 ) => Promise<void>;
 
