@@ -5,6 +5,7 @@ import {
     aggregateMetadataRegistry,
     type AggregateMetadata
 } from "../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
+import { AbstractAggregateRoot, AbstractDomainEvent, IsInProcessContext } from "../../domain/index.js";
 import type { IOutboundMessageMapper } from "../../ports/index.js";
 import type { IMessageProducer } from "../../ports/outbound/message-broker/i-message-producer.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
@@ -17,7 +18,8 @@ import { AggregateManager } from "./aggregate-manager.js";
 import { MissingProducerOrMapperError } from "./errors/missing-producer-or-mapper.error.js";
 
 describe("AggregateManager", () => {
-    const mockAggregateClass = vi.fn();
+    class MockAggregate extends AbstractAggregateRoot {}
+
     const mockTransactionManager = mock<ITransactionManager>({
         transaction: (fn) => fn({})
     });
@@ -34,18 +36,24 @@ describe("AggregateManager", () => {
     };
 
     beforeEach(() => {
+        aggregateMetadataRegistry.getAggregateMetadata = vi.fn(() => mockAggregateMetadata);
+        aggregateSnapshotTransformer.takeSnapshot = vi.fn();
+        aggregateSnapshotTransformer.canBeRestoredFromSnapshot = vi.fn(() => ({
+            isEqual: true,
+            snapshot: {},
+            restored: {}
+        }));
+        aggregateDomainEventApplier.applyStagedDomainEventsToAggregate = vi.fn();
+    });
+
+    afterEach(() => {
         mockReset(mockTransactionManager);
         mockReset(mockDomainEventRepository);
         mockReset(mockSnapshotRepository);
         mockReset(mockMessageProducer);
         mockReset(mockOutboundMessageMapper);
         mockReset(mockLogger);
-
         vi.clearAllMocks();
-
-        aggregateMetadataRegistry.getAggregateMetadata = vi.fn(() => mockAggregateMetadata);
-        aggregateSnapshotTransformer.takeSnapshot = vi.fn();
-        aggregateDomainEventApplier.applyStagedDomainEventsToAggregate = vi.fn();
     });
 
     describe("constructor", () => {
@@ -54,7 +62,7 @@ describe("AggregateManager", () => {
 
             expect(() => {
                 new AggregateManager({
-                    aggregateClass: mockAggregateClass,
+                    aggregateClass: MockAggregate,
                     transactionManager: mockTransactionManager,
                     domainEventRepository: mockDomainEventRepository,
                     snapshotRepository: mockSnapshotRepository,
@@ -69,7 +77,7 @@ describe("AggregateManager", () => {
         it("should throw an error if messageProducer is set without outboundMessageMapper", () => {
             expect(() => {
                 new AggregateManager({
-                    aggregateClass: mockAggregateClass,
+                    aggregateClass: MockAggregate,
                     transactionManager: mockTransactionManager,
                     domainEventRepository: mockDomainEventRepository,
                     snapshotRepository: mockSnapshotRepository,
@@ -83,7 +91,7 @@ describe("AggregateManager", () => {
 
         it("should construct a valid instance", () => {
             const manager = new AggregateManager({
-                aggregateClass: mockAggregateClass,
+                aggregateClass: MockAggregate,
                 transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
@@ -99,10 +107,8 @@ describe("AggregateManager", () => {
 
     describe("applyStagedDomainEvents", () => {
         it("should apply staged domain events to the aggregate", () => {
-            const mockAggregate = { getStagedDomainEvents: vi.fn().mockReturnValue([]) } as any;
-
             const manager = new AggregateManager({
-                aggregateClass: mockAggregateClass,
+                aggregateClass: MockAggregate,
                 transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
@@ -111,6 +117,8 @@ describe("AggregateManager", () => {
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });
+
+            const mockAggregate = new MockAggregate();
 
             manager.applyStagedDomainEvents(mockAggregate);
 
@@ -120,14 +128,8 @@ describe("AggregateManager", () => {
 
     describe("commitStagedDomainEvents", () => {
         it("should not commit if there are no staged domain events", async () => {
-            const mockAggregate = {
-                getId: vi.fn(() => "aggregate-id"),
-                getStagedDomainEvents: vi.fn(() => []),
-                clearStagedDomainEvents: vi.fn()
-            } as any;
-
             const manager = new AggregateManager({
-                aggregateClass: mockAggregateClass,
+                aggregateClass: MockAggregate,
                 transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
@@ -137,26 +139,16 @@ describe("AggregateManager", () => {
                 logger: mockLogger
             });
 
+            const mockAggregate = new MockAggregate();
+
             await manager.commitStagedDomainEvents(mockAggregate);
 
             expect(mockDomainEventRepository.saveDomainEvents).not.toHaveBeenCalled();
         });
 
         it("should commit staged domain events and publish them if a message producer and outbound message mapper is provided", async () => {
-            const mockDomainEvent = {
-                serialize: vi.fn(() => "serialized-event"),
-                setCorrelationId: vi.fn(),
-                setTriggeredByUserId: vi.fn(),
-                setTriggeredByEventId: vi.fn()
-            };
-            const mockAggregate = {
-                getId: vi.fn(() => "aggregate-id"),
-                getStagedDomainEvents: vi.fn(() => [mockDomainEvent]),
-                clearStagedDomainEvents: vi.fn()
-            } as any;
-
             const manager = new AggregateManager({
-                aggregateClass: mockAggregateClass,
+                aggregateClass: MockAggregate,
                 transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
@@ -169,6 +161,15 @@ describe("AggregateManager", () => {
             const correlationId = faker.string.uuid();
             const triggeredByUserId = faker.string.uuid();
             const triggeredByEventId = faker.string.uuid();
+
+            const mockDomainEvent = mock<AbstractDomainEvent>({
+                serialize: () => "serialized-event" as any
+            });
+
+            const mockAggregate = new MockAggregate();
+            mockAggregate[IsInProcessContext] = true;
+            mockAggregate.stageDomainEvent(mockDomainEvent);
+            mockAggregate[IsInProcessContext] = false;
 
             await manager.commitStagedDomainEvents(mockAggregate, {
                 correlationId,
@@ -184,19 +185,14 @@ describe("AggregateManager", () => {
             ]);
             expect(mockOutboundMessageMapper.map).toHaveBeenCalled();
             expect(mockMessageProducer.publishMessages).toHaveBeenCalled();
-            expect(mockAggregate.clearStagedDomainEvents).toHaveBeenCalled();
+            expect(mockAggregate.getStagedDomainEvents().length).toBe(0);
         });
     });
 
     describe("createSnapshotIfNecessary", () => {
         it("should not create a snapshot if the aggregate is not snapshotable", async () => {
-            const mockAggregate = {
-                getId: vi.fn(() => "aggregate-id"),
-                getCurrentDomainEventSequenceNumber: vi.fn(() => 5)
-            } as any;
-
             const manager = new AggregateManager({
-                aggregateClass: mockAggregateClass,
+                aggregateClass: MockAggregate,
                 transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
@@ -205,6 +201,8 @@ describe("AggregateManager", () => {
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });
+
+            const mockAggregate = new MockAggregate();
 
             await manager["createSnapshotIfNecessary"](mockAggregate);
 
@@ -212,18 +210,13 @@ describe("AggregateManager", () => {
         });
 
         it("should not create a snapshot if the interval is not met", async () => {
-            const mockAggregate = {
-                getId: vi.fn(() => "aggregate-id"),
-                getCurrentDomainEventSequenceNumber: vi.fn(() => 10)
-            } as any;
-
             aggregateMetadataRegistry.getAggregateSnapshotMetadata = vi.fn(() => ({
                 isSnapshotable: true,
                 snapshotInterval: 20
             }));
 
             const manager = new AggregateManager({
-                aggregateClass: mockAggregateClass,
+                aggregateClass: MockAggregate,
                 transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
@@ -232,6 +225,10 @@ describe("AggregateManager", () => {
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });
+
+            const mockAggregate = new MockAggregate();
+
+            mockAggregate.setCurrentDomainEventSequenceNumber(5);
 
             await manager["createSnapshotIfNecessary"](mockAggregate);
 
@@ -240,18 +237,13 @@ describe("AggregateManager", () => {
         });
 
         it("should create a snapshot if the aggregate is snapshotable and the interval is met", async () => {
-            const mockAggregate = {
-                getId: vi.fn(() => "aggregate-id"),
-                getCurrentDomainEventSequenceNumber: vi.fn(() => 10)
-            } as any;
-
             aggregateMetadataRegistry.getAggregateSnapshotMetadata = vi.fn(() => ({
                 isSnapshotable: true,
                 snapshotInterval: 10
             }));
 
             const manager = new AggregateManager({
-                aggregateClass: mockAggregateClass,
+                aggregateClass: MockAggregate,
                 transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
@@ -260,6 +252,10 @@ describe("AggregateManager", () => {
                 currentOrigin: "CurrentOrigin",
                 logger: mockLogger
             });
+
+            const mockAggregate = new MockAggregate();
+
+            mockAggregate.setCurrentDomainEventSequenceNumber(10);
 
             await manager["createSnapshotIfNecessary"](mockAggregate);
 
@@ -273,18 +269,13 @@ describe("AggregateManager", () => {
         });
 
         it("should create a snapshot if the aggregate is snapshotable and the interval is met (with tenant ID if provided)", async () => {
-            const mockAggregate = {
-                getId: vi.fn(() => "aggregate-id"),
-                getCurrentDomainEventSequenceNumber: vi.fn(() => 10)
-            } as any;
-
             aggregateMetadataRegistry.getAggregateSnapshotMetadata = vi.fn(() => ({
                 isSnapshotable: true,
                 snapshotInterval: 10
             }));
 
             const manager = new AggregateManager({
-                aggregateClass: mockAggregateClass,
+                aggregateClass: MockAggregate,
                 transactionManager: mockTransactionManager,
                 domainEventRepository: mockDomainEventRepository,
                 snapshotRepository: mockSnapshotRepository,
@@ -295,6 +286,10 @@ describe("AggregateManager", () => {
                 logger: mockLogger
             });
 
+            const mockAggregate = new MockAggregate();
+
+            mockAggregate.setCurrentDomainEventSequenceNumber(10);
+
             await manager["createSnapshotIfNecessary"](mockAggregate);
 
             expect(aggregateSnapshotTransformer.takeSnapshot).toHaveBeenCalledWith(
@@ -304,6 +299,44 @@ describe("AggregateManager", () => {
                 "TestTenant"
             );
             expect(mockSnapshotRepository.saveSnapshot).toHaveBeenCalled();
+        });
+
+        it("should not create a snapshot if the aggregate cannot be fully restored from snapshot", async () => {
+            aggregateMetadataRegistry.getAggregateSnapshotMetadata = vi.fn(() => ({
+                isSnapshotable: true,
+                snapshotInterval: 10
+            }));
+
+            (aggregateSnapshotTransformer.canBeRestoredFromSnapshot as any) = vi.fn(() => ({
+                isEqual: false,
+                snapshot: {},
+                restored: {}
+            }));
+
+            const manager = new AggregateManager({
+                aggregateClass: MockAggregate,
+                transactionManager: mockTransactionManager,
+                domainEventRepository: mockDomainEventRepository,
+                snapshotRepository: mockSnapshotRepository,
+                messageProducer: mockMessageProducer,
+                outboundMessageMapper: mockOutboundMessageMapper,
+                currentOrigin: "CurrentOrigin",
+                logger: mockLogger
+            });
+
+            const mockAggregate = new MockAggregate();
+
+            mockAggregate.setCurrentDomainEventSequenceNumber(10);
+
+            await manager["createSnapshotIfNecessary"](mockAggregate);
+
+            expect(aggregateSnapshotTransformer.takeSnapshot).not.toHaveBeenCalledWith(
+                "TestOrigin",
+                "TestType",
+                mockAggregate,
+                undefined
+            );
+            expect(mockSnapshotRepository.saveSnapshot).not.toHaveBeenCalled();
         });
     });
 });
