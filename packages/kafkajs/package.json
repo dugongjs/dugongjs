@@ -1,6 +1,6 @@
 {
     "name": "@dugongjs/kafkajs",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "author": "Erik Lysne",
     "license": "MIT",
     "engines": {
