@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.10
+
+### Patch Changes
+
+- 1576b2a: Added snapshot validity checks before persisting snapshots
+
 ## 0.0.9
 
 ### Patch Changes
