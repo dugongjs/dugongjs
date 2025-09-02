@@ -184,6 +184,29 @@ export class AggregateManager<
             `Creating snapshot for ${this.aggregateType} aggregate ${aggregateId} at sequence number ${currentDomainEventSequenceNumber}`
         );
 
+        const snapshotTestResult = aggregateSnapshotTransformer.canBeRestoredFromSnapshot(
+            this.aggregateClass,
+            aggregate
+        );
+
+        if (!snapshotTestResult.isEqual) {
+            this.logger.warn(
+                logContext,
+                `Snapshotting of aggregate ${this.aggregateClass.name} was skipped because it cannot be fully restored from snapshot. Make sure the aggregate is properly decorated for snapshotting.`
+            );
+
+            // NOTE: This is logged directly to the console to make the differences, including class types, more visible.
+            console.log("============================================================");
+            console.log("Compare the original aggregate and the restored aggregate below to identify the differences:");
+            console.log("Before taking snapshot:");
+            console.dir(aggregate, { depth: null });
+            console.log("After restoring from snapshot:");
+            console.dir(snapshotTestResult.restored, { depth: null });
+            console.log("============================================================");
+
+            return;
+        }
+
         const snapshot = aggregateSnapshotTransformer.takeSnapshot(
             this.aggregateOrigin,
             this.aggregateType,

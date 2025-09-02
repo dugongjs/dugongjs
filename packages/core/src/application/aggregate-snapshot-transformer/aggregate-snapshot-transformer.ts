@@ -1,8 +1,8 @@
 import { instanceToPlain, plainToInstance } from "class-transformer";
+import equal from "fast-deep-equal";
 import type { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
 import type { EventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/event-sourced-aggregate-root.js";
 import type { SerializedSnapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
-
 class AggregateSnapshotTransformer {
     public takeSnapshot(
         origin: string,
@@ -35,6 +35,21 @@ class AggregateSnapshotTransformer {
         aggregate.setCurrentDomainEventSequenceNumber(domainEventSequenceNumber);
 
         return aggregate as InstanceType<TAggregateRootClass>;
+    }
+
+    public canBeRestoredFromSnapshot<TAggregateRootClass extends EventSourcedAggregateRoot>(
+        aggregateClass: TAggregateRootClass,
+        aggregate: InstanceType<TAggregateRootClass>
+    ): {
+        snapshot: any;
+        restored: any;
+        isEqual: boolean;
+    } {
+        const snapshot = JSON.parse(JSON.stringify(instanceToPlain(aggregate)));
+        const restored = plainToInstance(aggregateClass, snapshot);
+        const isEqual = equal(aggregate, restored);
+
+        return { snapshot, restored, isEqual };
     }
 }
 
