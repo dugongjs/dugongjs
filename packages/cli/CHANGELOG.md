@@ -1,5 +1,11 @@
 # @dugongjs/cli
 
+## 0.0.22
+
+### Patch Changes
+
+- 52e5b34: Rebuilt dugong studio with new TUI
+
 ## 0.0.21
 
 ### Patch Changes
