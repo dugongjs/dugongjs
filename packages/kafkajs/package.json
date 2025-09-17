@@ -35,6 +35,7 @@
         "change-case": "^5.4.4"
     },
     "devDependencies": {
+        "@dugongjs/core": "workspace:*",
         "@dugongjs/eslint-config": "workspace:*",
         "@dugongjs/scripts": "workspace:*",
         "@dugongjs/testing": "workspace:*",
@@ -49,6 +50,7 @@
         "@types/pg": "^8.11.14",
         "@vitest/ui": "^3.2.4",
         "dotenv": "^16.5.0",
+        "kafkajs": "^2.2.4",
         "pg": "^8.15.6",
         "pino": "^9.6.0",
         "reflect-metadata": "^0.2.2",
