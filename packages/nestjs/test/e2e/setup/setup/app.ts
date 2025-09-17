@@ -65,11 +65,11 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-    await dataSource.getRepository(DomainEventEntity).delete({});
-    await dataSource.getRepository(SnapshotEntity).delete({});
-    await dataSource.getRepository(ConsumedMessageEntity).delete({});
-    await dataSource.getRepository(OutboxEntity).delete({});
-    await dataSource.getRepository(UserQueryModelEntity).delete({});
+    await dataSource.getRepository(DomainEventEntity).clear();
+    await dataSource.getRepository(SnapshotEntity).clear();
+    await dataSource.getRepository(ConsumedMessageEntity).clear();
+    await dataSource.getRepository(OutboxEntity).clear();
+    await dataSource.getRepository(UserQueryModelEntity).clear();
 });
 
 export { app, dataSource };
