@@ -17,6 +17,6 @@
         "@dugongjs/eslint-config": "workspace:*",
         "@dugongjs/typescript-config": "workspace:*",
         "@types/fs-extra": "^11.0.4",
-        "@types/node": "^20.17.6"
+        "@types/node": "^24.5.1"
     }
 }
