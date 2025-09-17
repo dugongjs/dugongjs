@@ -1,16 +1,22 @@
 import { Box, Spacer, Text } from "ink";
 import { diff as jsonDiff } from "jsondiffpatch";
 import React from "react";
-import { Pane, type PaneProps } from "../components/pane.js";
 
-export type AggregateDiffPaneProps = PaneProps & {
+export type AggregateDiffPaneProps = {
+    isFocused: boolean;
+    isLoading: boolean;
+    error?: string | null;
     current: object | null;
     previous: object | null;
 };
 
-export const AggregateDiffPane: React.FC<AggregateDiffPaneProps> = (props) => {
-    const { current, previous } = props;
-
+export const AggregateDiffPane: React.FC<AggregateDiffPaneProps> = ({
+    isFocused,
+    isLoading,
+    error,
+    current,
+    previous
+}) => {
     const diff = React.useMemo(() => {
         if (!current || !previous) return null;
         try {
@@ -97,13 +103,33 @@ export const AggregateDiffPane: React.FC<AggregateDiffPaneProps> = (props) => {
     };
 
     return (
-        <Pane>
-            <Text bold>Diff</Text>
+        <Box
+            width="100%"
+            height="100%"
+            borderStyle="round"
+            borderColor={isFocused ? "cyan" : "gray"}
+            flexDirection="column"
+        >
+            <Box paddingX={1}>
+                <Text bold>Diff</Text>
+            </Box>
 
-            {!diff ? (
+            {isLoading ? (
+                <Box paddingX={1}>
+                    <Text color="gray">Loading aggregate…</Text>
+                </Box>
+            ) : error ? (
+                <Box paddingX={1}>
+                    <Text color="red">{error}</Text>
+                </Box>
+            ) : !current || !previous ? (
+                <Box paddingX={1}>
+                    <Text color="gray">No aggregate selected</Text>
+                </Box>
+            ) : !diff ? (
                 <Text color="gray">No changes detected.</Text>
             ) : (
-                <Box flexDirection="column" marginTop={1}>
+                <Box flexDirection="column" paddingX={1}>
                     {renderDiff(diff)}
                 </Box>
             )}
@@ -113,6 +139,6 @@ export const AggregateDiffPane: React.FC<AggregateDiffPaneProps> = (props) => {
             <Text color="gray" dimColor>
                 Compares the current and previous state of the aggregate
             </Text>
-        </Pane>
+        </Box>
     );
 };

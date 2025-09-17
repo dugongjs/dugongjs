@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Command } from "commander";
 import { withFullScreen } from "fullscreen-ink";
 import React from "react";
@@ -16,7 +17,20 @@ const studio = new Command("studio").description("Launch the interactive studio"
         process.exit(1);
     }
 
-    withFullScreen(<MainView />).start();
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                retry: 0,
+                refetchOnWindowFocus: false
+            }
+        }
+    });
+
+    withFullScreen(
+        <QueryClientProvider client={queryClient}>
+            <MainView />
+        </QueryClientProvider>
+    ).start();
 });
 
 export default studio;

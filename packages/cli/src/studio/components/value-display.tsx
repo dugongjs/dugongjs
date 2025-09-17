@@ -3,17 +3,18 @@ import React from "react";
 
 export type ValueDisplayProps = {
     label: string;
-    value?: string;
+    value?: string | null;
+    spacer?: boolean;
 };
 
-export const ValueDisplay: React.FC<ValueDisplayProps> = (props) => {
-    const { label, value } = props;
-
+export const ValueDisplay: React.FC<ValueDisplayProps> = ({ label, value, spacer }) => {
     return (
         <Box>
-            <Text color="gray">{label}:</Text>
-            <Spacer />
-            <Text color="cyan">{value ?? "none"}</Text>
+            <Text color="blueBright">{label}: </Text>
+            {spacer && <Spacer />}
+            <Text color="white" bold>
+                {value ?? "none"}
+            </Text>
         </Box>
     );
 };

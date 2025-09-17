@@ -1,33 +1,39 @@
 import { Box, measureElement, Spacer, Text, useInput, type DOMElement } from "ink";
 
 import React from "react";
-import { Pane, type PaneProps } from "../components/pane.js";
+import { HotkeyIndicator } from "../components/hotkey-indicator.js";
 import { useStdoutDimensions } from "../hooks/use-stdout-dimensions.js";
 
-export type DomainEventSelectPaneProps = PaneProps & {
+export type DomainEventSelectPaneProps = {
+    isFocused: boolean;
+    isLoading: boolean;
+    error?: string | null;
     domainEvents: any[];
     selectedDomainEventIndex: number | null;
     setSelectedDomainEventIndex: (value: number) => void;
 };
 
+export const VISIBLE_LINES_SUBTRACT = 6;
+
 export const DomainEventSelectPane: React.FC<DomainEventSelectPaneProps> = ({
     isFocused,
     isLoading,
+    error,
     domainEvents,
     selectedDomainEventIndex,
     setSelectedDomainEventIndex
 }) => {
     const selectedIndex = selectedDomainEventIndex ?? domainEvents.length - 1;
 
-    const paneRef = React.useRef<DOMElement>(null);
+    const containerRef = React.useRef<DOMElement>(null);
     const [visibleLines, setVisibleLines] = React.useState<number>(10);
     const [scrollOffset, setScrollOffset] = React.useState<number>(0);
     const [_, rows] = useStdoutDimensions();
 
     React.useEffect(() => {
-        if (paneRef.current) {
-            const { height } = measureElement(paneRef.current);
-            setVisibleLines(height - 8);
+        if (containerRef.current) {
+            const { height } = measureElement(containerRef.current);
+            setVisibleLines(height - VISIBLE_LINES_SUBTRACT);
         }
     }, [rows]);
 
@@ -56,10 +62,21 @@ export const DomainEventSelectPane: React.FC<DomainEventSelectPaneProps> = ({
     const visibleDomainEvents = domainEvents.slice(scrollOffset, scrollOffset + visibleLines);
 
     return (
-        <Pane ref={paneRef} isFocused={isFocused} isLoading={isLoading}>
-            <Text bold>Domain Events</Text>
+        <Box
+            ref={containerRef}
+            flexDirection="column"
+            flexGrow={1}
+            borderStyle="round"
+            borderColor={isFocused ? "cyan" : "gray"}
+            paddingX={1}
+        >
+            <Text bold>Domain Events ({domainEvents.length})</Text>
 
-            {domainEvents.length === 0 ? (
+            {isLoading ? (
+                <Text color="gray">Loading events…</Text>
+            ) : error ? (
+                <Text color="red">{error}</Text>
+            ) : domainEvents.length === 0 ? (
                 <Text color="gray">No domain events to display</Text>
             ) : (
                 <Box flexDirection="column" marginTop={1}>
@@ -78,10 +95,8 @@ export const DomainEventSelectPane: React.FC<DomainEventSelectPaneProps> = ({
             <Spacer />
 
             <Box marginTop={1}>
-                <Text color="gray" dimColor>
-                    ↑/↓ : select
-                </Text>
+                <HotkeyIndicator hotkey="↑/↓" label="navigate + select" />
             </Box>
-        </Pane>
+        </Box>
     );
 };
