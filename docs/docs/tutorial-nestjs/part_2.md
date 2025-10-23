@@ -68,9 +68,9 @@ import { AbstractDomainEvent, type DomainEventPayload } from "@dugongjs/core";
 export abstract class AbstractBankAccountDomainEvent<
     TPayload extends DomainEventPayload | null = null
 > extends AbstractDomainEvent<TPayload> {
-    public static readonly origin = "BankingContext-AccountService";
-    public static readonly aggregateType = "BankAccount";
-    public static readonly version = 1;
+    public readonly origin = "BankingContext-AccountService";
+    public readonly aggregateType = "BankAccount";
+    public readonly version = 1;
 }
 ```
 
@@ -82,7 +82,7 @@ import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-e
 
 @DomainEvent()
 export class AccountOpenedEvent extends AbstractBankAccountDomainEvent<{ owner: string; initialBalance: number }> {
-    public static readonly type = "AccountOpened";
+    public readonly type = "AccountOpened";
 }
 ```
 
@@ -92,7 +92,7 @@ import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-e
 
 @DomainEvent()
 export class AccountClosedEvent extends AbstractBankAccountDomainEvent {
-    public static readonly type = "AccountClosed";
+    public readonly type = "AccountClosed";
 }
 ```
 
@@ -102,7 +102,7 @@ import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-e
 
 @DomainEvent()
 export class MoneyDepositedEvent extends AbstractBankAccountDomainEvent<{ amount: number }> {
-    public static readonly type = "MoneyDeposited";
+    public readonly type = "MoneyDeposited";
 }
 ```
 
@@ -112,7 +112,7 @@ import { AbstractBankAccountDomainEvent } from "./abstract-bank-account-domain-e
 
 @DomainEvent()
 export class MoneyWithdrawnEvent extends AbstractBankAccountDomainEvent<{ amount: number }> {
-    public static readonly type = "MoneyWithdrawn";
+    public readonly type = "MoneyWithdrawn";
 }
 ```
 
