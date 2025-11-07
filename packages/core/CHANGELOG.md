@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.11
+
+### Patch Changes
+
+- fa4995f: Fixed an issue with SerializableObject preventing primitive arrays
+
 ## 0.0.10
 
 ### Patch Changes
