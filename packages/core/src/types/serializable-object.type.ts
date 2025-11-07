@@ -1,3 +1,5 @@
+type Primitive = string | number | boolean;
+
 export type SerializableObject = {
-    [key: string]: string | number | boolean | SerializableObject | SerializableObject[];
+    [key: string]: Primitive | Primitive[] | SerializableObject | SerializableObject[];
 };
