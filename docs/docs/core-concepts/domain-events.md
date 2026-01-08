@@ -183,6 +183,7 @@ The following table lists the available getters that you can call on a domain ev
 | `getPayload()`            | Returns the payload of the domain event.                                                                                             | `TPayload`                        |
 | `getSequenceNumber()`     | Returns the sequence number of the domain event. The first event for an aggregate instance starts at 1 and increments automatically. | `number`                          |
 | `getTimestamp()`          | Returns the timestamp indicating when the domain event was created.                                                                  | `Date`                            |
+| `getTenantId()`           | Returns the tenant ID associated with the domain event. This is an optional, user-defined field for multi-tenant applications.       | `string \| undefined`             |
 | `getCorrelationId()`      | Returns the correlation ID of the domain event. This is an optional, user-defined field for tracking cross-event flows.              | `string \| undefined`             |
 | `getTriggeredByEventId()` | Returns the ID of the domain event that triggered the creation of the current event. This is an optional, user-defined field.        | `string \| undefined`             |
 | `getTriggeredByUserId()`  | Returns the ID of the user who triggered the creation of the current event. This is an optional, user-defined field.                 | `string \| undefined`             |

@@ -102,7 +102,7 @@ Kafka will be accessible at localhost:9092. To view Kafka messages, navigate to 
 
 Install the Kafka packages for DugongJS and NestJS:
 
-```bash
+```bash npm2yarn
 npm install kafkajs @dugong/kafkajs @dugong/nestjs-kafkajs
 ```
 

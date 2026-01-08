@@ -20,7 +20,7 @@ It has adapters for the following ports:
 
 To get started, install the following packages:
 
-```bash
+```bash npm2yarn
 npm install typeorm @dugongjs/typeorm
 ```
 

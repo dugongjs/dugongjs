@@ -1,0 +1,121 @@
+---
+title: Multitenancy
+sidebar_position: 3
+---
+
+In a multitenant application, multiple tenants (e.g., customers, organizations) share the same application instance while keeping their data isolated. Multitenancy is a common requirement in SaaS applications and can be implemented in various ways, ranging from soft multitenancy (where data is logically separated) to hard multitenancy (where data is physically separated).
+
+DugongJS provides built-in support for soft multitenancy by allowing a tenant ID to be passed to all adapters during persistence and message broker operations. By default, the built-in adapters handle this at a logical level. However, while not currently provided as a feature, it is also possible to implement custom adapters that enforce hard multitenancy.
+
+import Admonition from "@theme/Admonition";
+
+<Admonition type="tip" icon="⭐" title="PRs welcome!">
+    PRs implementing hard multitenancy adapters are welcome!
+</Admonition>
+
+## Tenant ID Injection
+
+Using the [NestJS tutorial](../tutorial-nestjs/part_3.md) as an example, we could associate each bank account with a specific tenant ID. This tenant ID would then be used to tag all domain events, snapshots, consumed messages, outbox messages and could also be used to tag query models.
+
+Tenant ID injection is handled in the application layer. Let's examine the following code snippet from the `BankAccountCommandService`in the NestJS tutorial:
+
+```typescript title="src/bank-account/application/command/bank-account.command.service.ts" showLineNumbers
+import { EventSourcingService } from "@dugongjs/nestjs";
+import { Injectable } from "@nestjs/common";
+import { BankAccount } from "../../domain/bank-account.aggregate.js";
+import type { DepositMoneyCommand } from "../../domain/commands/deposit-money.command.js";
+import type { OpenAccountCommand } from "../../domain/commands/open-account.command.js";
+import type { WithdrawMoneyCommand } from "../../domain/commands/withdraw-money.command.js";
+
+@Injectable()
+export class BankAccountCommandService {
+    constructor(private readonly eventSourcingService: EventSourcingService) {}
+
+    public async openAccount(command: OpenAccountCommand): Promise<BankAccount> {
+        return this.eventSourcingService.transaction(async (transaction) => {
+            const accountContext = this.eventSourcingService.createAggregateContext(transaction, BankAccount);
+
+            const account = new BankAccount();
+
+            account.openAccount(command);
+
+            await accountContext.applyAndCommitStagedDomainEvents(account);
+
+            return account;
+        });
+    }
+
+    public async depositMoney(command: DepositMoneyCommand): Promise<void> {
+        return this.eventSourcingService.transaction(async (transaction) => {
+            const accountContext = this.eventSourcingService.createAggregateContext(transaction, BankAccount);
+
+            const account = await accountContext.getById(command.accountId);
+
+            account.depositMoney(command);
+
+            await accountContext.applyAndCommitStagedDomainEvents(account);
+        });
+    }
+
+    // Other commands methods...
+}
+```
+
+We can modify the `openAccount` and `depositMoney` methods to accept a `tenantId` parameter. DugongJS will then automatically associate this tenant ID with all domain events generated during the command execution:
+
+```typescript title="src/bank-account/application/command/bank-account.command.service.ts" showLineNumbers
+import { EventSourcingService } from "@dugongjs/nestjs";
+import { Injectable } from "@nestjs/common";
+import { BankAccount } from "../../domain/bank-account.aggregate.js";
+import type { DepositMoneyCommand } from "../../domain/commands/deposit-money.command.js";
+import type { OpenAccountCommand } from "../../domain/commands/open-account.command.js";
+import type { WithdrawMoneyCommand } from "../../domain/commands/withdraw-money.command.js";
+
+@Injectable()
+export class BankAccountCommandService {
+    constructor(private readonly eventSourcingService: EventSourcingService) {}
+
+    public async openAccount(tenantId: string, command: OpenAccountCommand): Promise<BankAccount> {
+        return this.eventSourcingService.transaction(async (transaction) => {
+            // highlight-start
+            const accountContext = this.eventSourcingService
+                .createAggregateContext(transaction, BankAccount)
+                .withTenantId(tenantId);
+            // highlight-end
+
+            const account = new BankAccount();
+
+            account.openAccount(command);
+
+            await accountContext.applyAndCommitStagedDomainEvents(account);
+
+            return account;
+        });
+    }
+
+    public async depositMoney(tenantId: string, command: DepositMoneyCommand): Promise<void> {
+        return this.eventSourcingService.transaction(async (transaction) => {
+            // highlight-start
+            const accountContext = this.eventSourcingService
+                .createAggregateContext(transaction, BankAccount)
+                .withTenantId(tenantId);
+            // highlight-end
+
+            const account = await accountContext.getById(command.accountId);
+
+            account.depositMoney(command);
+
+            await accountContext.applyAndCommitStagedDomainEvents(account);
+        });
+    }
+
+    // Other commands methods...
+}
+```
+
+These changes lead to two important outcomes:
+
+1. All domain events and snapshots generated during the execution of the `openAccount` and `depositMoney` commands will have the specified tenant ID associated with them.
+2. When retrieving aggregate instances using the `accountContext.getById` method, only events and snapshots associated with the specified tenant ID will be considered. If the aggregate instance does not exist for that tenant, an error will be thrown.
+
+Note that there is no built-in mechanism for extracting the tenant ID from incoming requests. It is up to the controller layer (or middlewares, guards, interceptors, etc.) to extract the tenant ID from the request context and pass it down to the application layer. This can be done using various strategies, such as extracting the tenant ID from request headers, JWT tokens, or session data.
