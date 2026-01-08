@@ -1,4 +1,5 @@
 import type * as Preset from "@docusaurus/preset-classic";
+import RemarkPlugin from "@docusaurus/remark-plugin-npm2yarn";
 import type { Config } from "@docusaurus/types";
 import { themes as prismThemes } from "prism-react-renderer";
 
@@ -36,7 +37,8 @@ const config: Config = {
             "classic",
             {
                 docs: {
-                    sidebarPath: "./sidebars.ts"
+                    sidebarPath: "./sidebars.ts",
+                    remarkPlugins: [[RemarkPlugin, { sync: true, converters: ["pnpm", "yarn"] }]]
                 },
                 blog: {
                     showReadingTime: true,

@@ -11,7 +11,7 @@ First, create a new NestJS project by following the [NestJS First Steps guide](h
 
 Then install the required DugongJS packages:
 
-```bash
+```bash npm2yarn
 npm install @dugongjs/core @dugongjs/nestjs
 ```
 
@@ -21,7 +21,7 @@ DugongJS is built for native ECMAScript Modules (ESM), but NestJS is configured 
 
 Install the required dev dependencies:
 
-```bash
+```bash npm2yarn
 npm install --save-dev vite vite-node vite-plugin-node dotenv-cli
 ```
 
@@ -99,7 +99,7 @@ We’ll use [TypeORM](https://typeorm.io/) for persistence and configure it with
 
 Install the following dependencies:
 
-```bash
+```bash npm2yarn
 npm install typeorm @nestjs/typeorm @dugongjs/typeorm @dugongjs/nestjs-typeorm
 ```
 

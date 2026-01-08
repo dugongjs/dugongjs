@@ -35,13 +35,13 @@ Luckily, DugongJS comes with a developer tool that lets you inspect and interact
 
 First, install the `dugong` cli:
 
-```bash
+```bash npm2yarn
 npm install --save-dev @dugongjs/cli
 ```
 
 Or alternatively, install it globally:
 
-```bash
+```bash npm2yarn
 npm install --global @dugongjs/cli
 ```
 
@@ -57,7 +57,7 @@ To use the CLI, we'll need to expose an API for the CLI from our service. We'll 
 
 First, install the following packages:
 
-```bash
+```bash npm2yarn
 npm install @nestjs/microservices @dugongjs/nestjs-microservice-query
 ```
 
@@ -165,15 +165,6 @@ dugong studio
 
 This will launch an interactive terminal UI, as shown in the screenshot below. Here, you can explore your aggregates, time-travel in the event log and view computed diffs on aggregates based on applied domain events.
 
-![DugongJS studio](/img/dugong_cli.png)
+![DugongJS studio](/img/dugong_studio.png)
 
-The terminal UI consists of 6 panes:
-
-1. **Aggregate Types pane**: Shows a list of all aggregate types. Use the arrow keys to navigate and press enter to select one.
-2. **Aggregate Instances pane**: Shows a list of all aggregate instances of the selected type. Use the arrow keys to navigate and press enter to select one.
-3. **Aggregate pane**: Shows the selected aggregate instance. When a domain event is selected, the aggregate is built up to the selected event. Cannot be interacted with.
-4. **Domain Events pane**: Shows the list of domain events for the selected aggregate instance. Use the arrow keys to select one.
-5. **Domain Event pane**: Shows the selected domain event. Cannot be interacted with.
-6. **Diff pane**: Shows the diff of the aggregate for the selected domain event against the previous. Cannot be interacted with.
-
-The `TAB` key and `SHIT+TAB` keys can be used to navigate between the different panes.
+Dugong Studio consists of multiple panes. Use the `TAB` key and `SHIFT+TAB` keys to navigate between the different panes. Use the arrow keys to navigate within a pane. Press `ENTER` to select an item and `BACKSPACE` to go back. Additional commands are shown at the bottom of the screen.

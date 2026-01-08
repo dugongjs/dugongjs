@@ -5,7 +5,7 @@ tags:
     - Core
 ---
 
-This diagram presents an overview of the core components in the DugongJS architecture and how they interact during the lifecycle of a domain operation. Although you do not need to understand the details of this diagram, you can use it as a reference while reading this documentation.
+This diagram shows an overview of the core components in the DugongJS architecture and how they interact. Although you do not need to understand the details of this diagram, you can use it as a reference while reading this documentation.
 
 ```mermaid
 

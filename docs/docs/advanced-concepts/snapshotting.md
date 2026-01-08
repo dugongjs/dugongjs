@@ -1,6 +1,6 @@
 ---
 title: Snapshotting
-sidebar_order: 1
+sidebar_position: 1
 tags:
     - Aggregate
     - Snapshotting
@@ -16,7 +16,7 @@ To support snapshots, an aggregate class must meet certain requirements. A snaps
 
 First, install the dependency:
 
-```bash
+```bash npm2yarn
 npm install class-transformer
 ```
 

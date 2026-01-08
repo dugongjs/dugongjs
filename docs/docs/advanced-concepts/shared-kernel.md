@@ -1,6 +1,6 @@
 ---
 title: Shared Kernel
-sidebar_order: 2
+sidebar_position: 2
 tags:
     - Aggregate
 ---
