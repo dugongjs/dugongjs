@@ -2,22 +2,19 @@ import type { AggregateRoot } from "../../domain/abstract-aggregate-root/aggrega
 import type { AbstractDomainEvent } from "../../domain/abstract-domain-event/abstract-domain-event.js";
 import type { SerializedDomainEvent } from "../../domain/abstract-domain-event/serialized-domain-event.js";
 import { aggregateDomainEventApplier } from "../../domain/aggregate-domain-event-applier/aggregate-domain-event-applier.js";
+import type { ISnapshotRepository } from "../../ports/index.js";
 import type { IMessageProducer } from "../../ports/outbound/message-broker/i-message-producer.js";
 import type { IOutboundMessageMapper } from "../../ports/outbound/message-broker/i-outbound-message-mapper.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
-import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
 import type { SerializableObject } from "../../types/serializable-object.type.js";
-import {
-    AbstractAggregateHandler,
-    type AbstractAggregateHandlerOptions
-} from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
-import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
+import { type AbstractAggregateHandlerOptions } from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
+import { AbstractAggregateSnapshotCoordinator } from "../abstract-aggregate-snapshot-coordinator/abstract-aggregate-snapshot-coordinator.js";
 import { MissingProducerOrMapperError } from "./errors/missing-producer-or-mapper.error.js";
 
 export type AggregateManagerOptions<TAggregateRootClass extends AggregateRoot> =
     AbstractAggregateHandlerOptions<TAggregateRootClass> & {
         domainEventRepository: IDomainEventRepository;
-        snapshotRepository: ISnapshotRepository;
+        snapshotRepository?: ISnapshotRepository;
         messageProducer?: IMessageProducer<any>;
         outboundMessageMapper?: IOutboundMessageMapper<any>;
     };
@@ -35,16 +32,14 @@ export type CommitOptions = {
  */
 export class AggregateManager<
     TAggregateRootClass extends AggregateRoot
-> extends AbstractAggregateHandler<TAggregateRootClass> {
+> extends AbstractAggregateSnapshotCoordinator<TAggregateRootClass> {
     private readonly domainEventRepository: IDomainEventRepository;
-    private readonly snapshotRepository: ISnapshotRepository;
     private readonly messageProducer?: IMessageProducer<any>;
     private readonly outboundMessageMapper?: IOutboundMessageMapper<any>;
 
     constructor(options: AggregateManagerOptions<TAggregateRootClass>) {
         super(options);
         this.domainEventRepository = options.domainEventRepository;
-        this.snapshotRepository = options.snapshotRepository;
         this.messageProducer = options.messageProducer;
         this.outboundMessageMapper = options.outboundMessageMapper;
 
@@ -98,7 +93,7 @@ export class AggregateManager<
 
         aggregate.clearStagedDomainEvents();
 
-        await this.createSnapshotIfNecessary(aggregate);
+        await this.snapshotIfNecessary(aggregate);
     }
 
     /**
@@ -159,66 +154,5 @@ export class AggregateManager<
                 `${domainEvents.length} staged domain events published to message broker on channel ${channelId}`
             );
         }
-    }
-
-    private async createSnapshotIfNecessary(aggregate: InstanceType<TAggregateRootClass>): Promise<void> {
-        const aggregateId = aggregate.getId();
-
-        const logContext = this.getLogContext(aggregateId);
-
-        if (!this.isSnapshotable) {
-            return;
-        }
-
-        const currentDomainEventSequenceNumber = aggregate.getCurrentDomainEventSequenceNumber();
-
-        const shouldCreateSnapshot =
-            currentDomainEventSequenceNumber > 0 && currentDomainEventSequenceNumber % this.snapshotInterval === 0;
-
-        if (!shouldCreateSnapshot) {
-            return;
-        }
-
-        this.logger.verbose(
-            logContext,
-            `Creating snapshot for ${this.aggregateType} aggregate ${aggregateId} at sequence number ${currentDomainEventSequenceNumber}`
-        );
-
-        const snapshotTestResult = aggregateSnapshotTransformer.canBeRestoredFromSnapshot(
-            this.aggregateClass,
-            aggregate
-        );
-
-        if (!snapshotTestResult.isEqual) {
-            this.logger.warn(
-                logContext,
-                `Snapshotting of aggregate ${this.aggregateClass.name} was skipped because it cannot be fully restored from snapshot. Make sure the aggregate is properly decorated for snapshotting.`
-            );
-
-            // NOTE: This is logged directly to the console to make the differences, including class types, more visible.
-            console.log("============================================================");
-            console.log("Compare the original aggregate and the restored aggregate below to identify the differences:");
-            console.log("Before taking snapshot:");
-            console.dir(aggregate, { depth: null });
-            console.log("After restoring from snapshot:");
-            console.dir(snapshotTestResult.restored, { depth: null });
-            console.log("============================================================");
-
-            return;
-        }
-
-        const snapshot = aggregateSnapshotTransformer.takeSnapshot(
-            this.aggregateOrigin,
-            this.aggregateType,
-            aggregate,
-            this.tenantId
-        );
-
-        await this.snapshotRepository.saveSnapshot(this.getTransactionContext(), snapshot);
-
-        this.logger.verbose(
-            logContext,
-            `Snapshot for ${this.aggregateType} aggregate ${aggregateId} created at sequence number ${currentDomainEventSequenceNumber}`
-        );
     }
 }

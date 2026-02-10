@@ -1,12 +1,12 @@
 import { mock } from "vitest-mock-extended";
 import { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
 import { AbstractEventSourcedAggregateRoot, Aggregate, ExternalAggregate } from "../../domain/index.js";
+import { ISnapshotRepository } from "../../ports/index.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
-import type { ISnapshotRepository } from "../../ports/outbound/repository/i-snapshot-repository.js";
 import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { AggregateFactory } from "../aggregate-factory/aggregate-factory.js";
 import { AggregateManager } from "../aggregate-manager/aggregate-manager.js";
-import { AggregateContext } from "./aggregate-context.js";
+import { AggregateContext, type AggregateContextOptions } from "./aggregate-context.js";
 import { AggregateManagerNotAvailableError } from "./errors/aggregate-manager-not-available-error.js";
 
 @Aggregate("TestAggregate")
@@ -26,15 +26,19 @@ describe("AggregateContext", () => {
         vi.clearAllMocks();
     });
 
+    function createAggregateContext(overrides: Partial<AggregateContextOptions<any>> = {}) {
+        return new AggregateContext({
+            aggregateClass: TestAggregate,
+            currentOrigin: "TestOrigin",
+            transactionManager: mockTransactionManager,
+            domainEventRepository: mockDomainEventRepository,
+            ...overrides
+        });
+    }
+
     describe("constructor", () => {
         it("should create an instance of AggregateContext", () => {
-            const aggregateContext = new AggregateContext({
-                aggregateClass: TestAggregate,
-                currentOrigin: "TestOrigin",
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository
-            });
+            const aggregateContext = createAggregateContext();
 
             expect(aggregateContext).toBeInstanceOf(AggregateContext);
         });
@@ -42,13 +46,7 @@ describe("AggregateContext", () => {
 
     describe("getFactory", () => {
         it("should return the factory for an AbstractAggregateRoot", () => {
-            const aggregateContext = new AggregateContext({
-                aggregateClass: TestAggregate,
-                currentOrigin: "TestOrigin",
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository
-            });
+            const aggregateContext = createAggregateContext();
 
             const factory = aggregateContext.getFactory();
 
@@ -56,12 +54,8 @@ describe("AggregateContext", () => {
         });
 
         it("should return the factory for an AbstractEventSourcedAggregateRoot", () => {
-            const aggregateContext = new AggregateContext({
-                aggregateClass: TestEventSourcedAggregate,
-                currentOrigin: "TestOrigin",
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository
+            const aggregateContext = createAggregateContext({
+                aggregateClass: TestEventSourcedAggregate
             });
 
             const factory = aggregateContext.getFactory();
@@ -72,13 +66,7 @@ describe("AggregateContext", () => {
 
     describe("getManager", () => {
         it("should return the manager for an AbstractAggregateRoot", () => {
-            const aggregateContext = new AggregateContext({
-                aggregateClass: TestAggregate,
-                currentOrigin: "TestOrigin",
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository
-            });
+            const aggregateContext = createAggregateContext();
 
             const manager = aggregateContext.getManager();
 
@@ -86,12 +74,8 @@ describe("AggregateContext", () => {
         });
 
         it("should throw an error if called for an AbstractEventSourcedAggregateRoot", () => {
-            const aggregateContext = new AggregateContext({
-                aggregateClass: TestEventSourcedAggregate,
-                currentOrigin: "TestOrigin",
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository
+            const aggregateContext = createAggregateContext({
+                aggregateClass: TestEventSourcedAggregate
             });
 
             expect(() => aggregateContext.getManager()).toThrow(AggregateManagerNotAvailableError);
@@ -100,13 +84,7 @@ describe("AggregateContext", () => {
 
     describe("withTenantId", () => {
         it("should return a new AggregateContext with the specified tenantId", () => {
-            const aggregateContext = new AggregateContext({
-                aggregateClass: TestAggregate,
-                currentOrigin: "TestOrigin",
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository
-            });
+            const aggregateContext = createAggregateContext();
 
             const tenantId = "TestTenant";
             const newContext = aggregateContext.withTenantId(tenantId);
@@ -123,8 +101,7 @@ describe("AggregateContext", () => {
                 aggregateClass: TestAggregate,
                 currentOrigin: "TestOrigin",
                 transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository
+                domainEventRepository: mockDomainEventRepository
             });
 
             const factory = aggregateContext.getFactory();
