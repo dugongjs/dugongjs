@@ -1,13 +1,13 @@
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import equal from "fast-deep-equal";
-import type { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
 import type { EventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/event-sourced-aggregate-root.js";
 import type { SerializedSnapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
+
 class AggregateSnapshotTransformer {
     public takeSnapshot(
         origin: string,
         aggregateType: string,
-        aggregate: InstanceType<typeof AbstractAggregateRoot>,
+        aggregate: InstanceType<EventSourcedAggregateRoot>,
         tenantId?: string | null
     ): SerializedSnapshot {
         const aggregateSnapshot = instanceToPlain(aggregate);

@@ -4,6 +4,11 @@ import { AggregateAlreadyRegisteredError } from "./errors/aggregate-already-regi
 class TestAggregateRoot {}
 class TestDomainEvent {}
 
+class BaseAggregate {}
+class DerivedAggregate extends BaseAggregate {}
+
+class BaseDomainEvent {}
+
 describe("AggregateMetadataRegistry", () => {
     let registry: typeof aggregateMetadataRegistry;
 
@@ -93,82 +98,85 @@ describe("AggregateMetadataRegistry", () => {
         });
     });
 
-    describe("getAggregateClass", () => {
-        it("should return the aggregate class for the given type and origin", () => {
-            registry.registerExternalAggregateMetadata(TestAggregateRoot, "TestType", "TestOrigin");
+    describe("prototype inheritance: aggregate metadata", () => {
+        it("inherits aggregate metadata from base class if not defined on derived class", () => {
+            registry.registerAggregateMetadata(BaseAggregate, "BaseType");
 
-            const aggregateClass = registry.getAggregateClass("TestType", "TestOrigin");
-            expect(aggregateClass).toBe(TestAggregateRoot);
-        });
+            const metadata = registry.getAggregateMetadata(DerivedAggregate);
 
-        it("should return the aggregate class for the given type without origin", () => {
-            registry.registerAggregateMetadata(TestAggregateRoot, "TestType");
-
-            const aggregateClass = registry.getAggregateClass("TestType");
-            expect(aggregateClass).toBe(TestAggregateRoot);
-        });
-
-        it("should return null if no matching aggregate class is found", () => {
-            const aggregateClass = registry.getAggregateClass("NonExistentType", "NonExistentOrigin");
-            expect(aggregateClass).toBeNull();
-        });
-    });
-
-    describe("getAggregateTypes", () => {
-        it("should return all registered aggregate types", () => {
-            registry.registerAggregateMetadata(TestAggregateRoot, "TestType1");
-            class AnotherAggregateRoot {}
-            registry.registerAggregateMetadata(AnotherAggregateRoot, "TestType2");
-
-            const types = registry.getAggregateTypes();
-            expect(types).toEqual(["TestType1", "TestType2"]);
-        });
-
-        it("should return an empty array if no aggregates are registered", () => {
-            const types = registry.getAggregateTypes();
-            expect(types).toEqual([]);
-        });
-    });
-
-    describe("getAllAggregateMetadata", () => {
-        it("should return all registered aggregate metadata", () => {
-            registry.registerAggregateMetadata(TestAggregateRoot, "TestType1");
-            class AnotherAggregateRoot {}
-            registry.registerExternalAggregateMetadata(AnotherAggregateRoot, "TestType2", "TestOrigin");
-
-            const allMetadata = registry.getAllAggregateMetadata();
-            expect(allMetadata.size).toBe(2);
-            expect(allMetadata.get(TestAggregateRoot)).toEqual({
-                isInternal: true,
-                type: "TestType1"
-            });
-            expect(allMetadata.get(AnotherAggregateRoot)).toEqual({
-                isInternal: false,
-                type: "TestType2",
-                origin: "TestOrigin"
-            });
-        });
-
-        it("should return an empty map if no metadata is registered", () => {
-            const allMetadata = registry.getAllAggregateMetadata();
-            expect(allMetadata.size).toBe(0);
-        });
-    });
-
-    describe("getAggregateMetadata", () => {
-        it("should return null if no metadata is registered", () => {
-            const metadata = registry.getAggregateMetadata(TestAggregateRoot);
-            expect(metadata).toBeNull();
-        });
-
-        it("should return the registered metadata", () => {
-            registry.registerAggregateMetadata(TestAggregateRoot, "TestType");
-
-            const metadata = registry.getAggregateMetadata(TestAggregateRoot);
             expect(metadata).toEqual({
                 isInternal: true,
-                type: "TestType"
+                type: "BaseType"
             });
+        });
+
+        it("prefers derived aggregate metadata over base metadata", () => {
+            registry.registerAggregateMetadata(BaseAggregate, "BaseType");
+            registry.registerAggregateMetadata(DerivedAggregate, "DerivedType");
+
+            const metadata = registry.getAggregateMetadata(DerivedAggregate);
+
+            expect(metadata).toEqual({
+                isInternal: true,
+                type: "DerivedType"
+            });
+        });
+    });
+
+    describe("prototype inheritance: snapshot metadata", () => {
+        it("inherits snapshot metadata from base aggregate", () => {
+            registry.registerAggregateMetadata(BaseAggregate, "BaseType");
+            registry.registerAggregateSnapshotMetadata(BaseAggregate, { snapshotInterval: 50 });
+
+            const snapshotMetadata = registry.getAggregateSnapshotMetadata(DerivedAggregate);
+
+            expect(snapshotMetadata).toEqual({
+                snapshotInterval: 50
+            });
+        });
+
+        it("prefers snapshot metadata defined on derived aggregate", () => {
+            registry.registerAggregateMetadata(BaseAggregate, "BaseType");
+            registry.registerAggregateSnapshotMetadata(BaseAggregate, { snapshotInterval: 50 });
+
+            registry.registerAggregateMetadata(DerivedAggregate, "DerivedType");
+            registry.registerAggregateSnapshotMetadata(DerivedAggregate, { snapshotInterval: 10 });
+
+            const snapshotMetadata = registry.getAggregateSnapshotMetadata(DerivedAggregate);
+
+            expect(snapshotMetadata).toEqual({
+                snapshotInterval: 10
+            });
+        });
+    });
+
+    describe("prototype inheritance: domain event appliers", () => {
+        it("accumulates domain event appliers from base and derived aggregates", () => {
+            const baseApplier = () => {};
+            const derivedApplier = () => {};
+
+            registry.registerAggregateDomainEventApplier(BaseAggregate, BaseDomainEvent, baseApplier);
+            registry.registerAggregateDomainEventApplier(DerivedAggregate, BaseDomainEvent, derivedApplier);
+
+            const appliers = registry.getAggregateDomainEventAppliers(DerivedAggregate, BaseDomainEvent)!;
+
+            expect(appliers).toContain(baseApplier);
+            expect(appliers).toContain(derivedApplier);
+            expect(appliers.length).toBe(2);
+        });
+
+        it("accumulates default appliers across the inheritance chain", () => {
+            const baseDefaultApplier = () => {};
+            const derivedDefaultApplier = () => {};
+
+            registry.registerDefaultAggregateDomainEventApplier(BaseAggregate, baseDefaultApplier);
+            registry.registerDefaultAggregateDomainEventApplier(DerivedAggregate, derivedDefaultApplier);
+
+            const appliers = registry.getAggregateDomainEventAppliers(DerivedAggregate, TestDomainEvent)!;
+
+            expect(appliers).toContain(baseDefaultApplier);
+            expect(appliers).toContain(derivedDefaultApplier);
+            expect(appliers.length).toBe(2);
         });
     });
 

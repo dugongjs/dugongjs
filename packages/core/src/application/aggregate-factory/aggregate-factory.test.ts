@@ -16,7 +16,7 @@ import type { Constructor } from "../../types/constructor.type.js";
 import type { AggregateQueryService } from "../aggregate-query-service/aggregate-query-service.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import type { ILogger } from "../logger/i-logger.js";
-import { AggregateFactory } from "./aggregate-factory.js";
+import { AggregateFactory, type AggregateFactoryOptions } from "./aggregate-factory.js";
 import { AggregateMetadataNotFoundError } from "./errors/aggregate-metadata-not-found.error.js";
 
 describe("AggregateFactory", () => {
@@ -49,31 +49,29 @@ describe("AggregateFactory", () => {
         aggregateDomainEventApplier.applyDomainEventToAggregate = vi.fn();
     });
 
+    function createFactory(overrides: Partial<AggregateFactoryOptions<any>> = {}) {
+        return new AggregateFactory({
+            aggregateClass: mockAggregateClass,
+            transactionManager: mockTransactionManager,
+            domainEventRepository: mockDomainEventRepository,
+            snapshotRepository: mockSnapshotRepository,
+            currentOrigin: "CurrentOrigin",
+            logger: mockLogger,
+            ...overrides
+        });
+    }
+
     describe("constructor", () => {
         it("should throw AggregateMetadataNotFoundError if metadata is not found", () => {
             aggregateMetadataRegistry.getAggregateMetadata = vi.fn(() => null);
 
             expect(() => {
-                new AggregateFactory({
-                    aggregateClass: mockAggregateClass,
-                    transactionManager: mockTransactionManager,
-                    domainEventRepository: mockDomainEventRepository,
-                    snapshotRepository: mockSnapshotRepository,
-                    currentOrigin: "CurrentOrigin",
-                    logger: mockLogger
-                });
+                createFactory();
             }).toThrow(AggregateMetadataNotFoundError);
         });
 
         it("should construct a valid instance", () => {
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "CurrentOrigin",
-                logger: mockLogger
-            });
+            const factory = createFactory();
 
             expect(factory).toBeDefined();
         });
@@ -81,14 +79,7 @@ describe("AggregateFactory", () => {
 
     describe("buildFromEventLog", () => {
         it("should build the aggregate from the event log", async () => {
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "CurrentOrigin",
-                logger: mockLogger
-            });
+            const factory = createFactory();
 
             const mockSerializedEvents = [
                 { id: faker.string.uuid(), sequenceNumber: 1 },
@@ -132,14 +123,8 @@ describe("AggregateFactory", () => {
         });
 
         it("should build the aggregate from the event log (with tenant ID if provided)", async () => {
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "CurrentOrigin",
-                tenantId: "TestTenant",
-                logger: mockLogger
+            const factory = createFactory({
+                tenantId: "TestTenant"
             });
 
             const mockSerializedEvents = [
@@ -184,14 +169,7 @@ describe("AggregateFactory", () => {
         });
 
         it("should return null if no events are found in event log", async () => {
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "CurrentOrigin",
-                logger: mockLogger
-            });
+            const factory = createFactory();
 
             mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([]);
 
@@ -210,13 +188,8 @@ describe("AggregateFactory", () => {
                     }) as const
             );
 
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "ExternalOrigin",
-                logger: mockLogger
+            const factory = createFactory({
+                currentOrigin: "ExternalOrigin"
             });
 
             mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([]);
@@ -236,13 +209,8 @@ describe("AggregateFactory", () => {
                     }) as const
             );
 
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "ExternalOrigin",
-                logger: mockLogger
+            const factory = createFactory({
+                currentOrigin: "ExternalOrigin"
             });
 
             mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([
@@ -272,14 +240,8 @@ describe("AggregateFactory", () => {
             mockExternalOriginMap.has.mockReturnValueOnce(true);
             mockExternalOriginMap.get.mockReturnValueOnce(mockAggregateQueryService);
 
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "ExternalOrigin",
-                externalOriginMap: mockExternalOriginMap,
-                logger: mockLogger
+            const factory = createFactory({
+                externalOriginMap: mockExternalOriginMap
             });
 
             mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([]);
@@ -314,15 +276,10 @@ describe("AggregateFactory", () => {
             mockExternalOriginMap.has.mockReturnValueOnce(true);
             mockExternalOriginMap.get.mockReturnValueOnce(mockAggregateQueryService);
 
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "ExternalOrigin",
-                tenantId: "TestTenant",
+            const factory = createFactory({
                 externalOriginMap: mockExternalOriginMap,
-                logger: mockLogger
+                currentOrigin: "ExternalOrigin",
+                tenantId: "TestTenant"
             });
 
             mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([]);
@@ -357,14 +314,9 @@ describe("AggregateFactory", () => {
             mockExternalOriginMap.has.mockReturnValueOnce(true);
             mockExternalOriginMap.get.mockReturnValueOnce(mockAggregateQueryService);
 
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "ExternalOrigin",
+            const factory = createFactory({
                 externalOriginMap: mockExternalOriginMap,
-                logger: mockLogger
+                currentOrigin: "ExternalOrigin"
             });
 
             mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([
@@ -404,15 +356,10 @@ describe("AggregateFactory", () => {
             mockExternalOriginMap.has.mockReturnValueOnce(true);
             mockExternalOriginMap.get.mockReturnValueOnce(mockAggregateQueryService);
 
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "ExternalOrigin",
-                tenantId: "TestTenant",
+            const factory = createFactory({
                 externalOriginMap: mockExternalOriginMap,
-                logger: mockLogger
+                currentOrigin: "ExternalOrigin",
+                tenantId: "TestTenant"
             });
 
             mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([
@@ -450,14 +397,8 @@ describe("AggregateFactory", () => {
             const mockAggregateQueryService = mock<AggregateQueryService>();
             mockExternalOriginMap.has.mockReturnValueOnce(true);
 
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "ExternalOrigin",
-                externalOriginMap: mockExternalOriginMap,
-                logger: mockLogger
+            const factory = createFactory({
+                currentOrigin: "ExternalOrigin"
             });
 
             const aggregateId = faker.string.uuid();
@@ -489,13 +430,8 @@ describe("AggregateFactory", () => {
 
     describe("buildFromLatestSnapshot", () => {
         it("should build the aggregate from the latest snapshot", async () => {
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "CurrentOrigin",
-                logger: mockLogger
+            const factory = createFactory({
+                currentOrigin: "CurrentOrigin"
             });
 
             const aggregateId = faker.string.uuid();
@@ -554,14 +490,8 @@ describe("AggregateFactory", () => {
         });
 
         it("should build the aggregate from the latest snapshot (with tenant ID if provided)", async () => {
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "CurrentOrigin",
-                tenantId: "TestTenant",
-                logger: mockLogger
+            const factory = createFactory({
+                tenantId: "TestTenant"
             });
 
             const aggregateId = faker.string.uuid();
@@ -620,14 +550,7 @@ describe("AggregateFactory", () => {
         });
 
         it("should return null if no snapshot is found", async () => {
-            const factory = new AggregateFactory({
-                aggregateClass: mockAggregateClass,
-                transactionManager: mockTransactionManager,
-                domainEventRepository: mockDomainEventRepository,
-                snapshotRepository: mockSnapshotRepository,
-                currentOrigin: "CurrentOrigin",
-                logger: mockLogger
-            });
+            const factory = createFactory();
 
             mockSnapshotRepository.getLatestSnapshot.mockResolvedValueOnce(null);
 

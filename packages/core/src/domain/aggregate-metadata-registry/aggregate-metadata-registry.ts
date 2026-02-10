@@ -104,11 +104,13 @@ class AggregateMetadataRegistry {
     }
 
     public getAggregateMetadata(aggregateClass: Constructor): AggregateMetadata | null {
-        return this.aggregateMetadataMap.get(aggregateClass) ?? null;
+        return this.traversePrototypeChain(aggregateClass, (cls) => this.aggregateMetadataMap.get(cls))[0] ?? null;
     }
 
     public getAggregateSnapshotMetadata(aggregateClass: Constructor): AggregateSnapshotMetadata | null {
-        return this.aggregateSnapshotMetadataMap.get(aggregateClass) ?? null;
+        return (
+            this.traversePrototypeChain(aggregateClass, (cls) => this.aggregateSnapshotMetadataMap.get(cls))[0] ?? null
+        );
     }
 
     public getAggregateDomainEventAppliers(
@@ -117,11 +119,8 @@ class AggregateMetadataRegistry {
     ): AggregateDomainEventApplier[] | null {
         const appliers: AggregateDomainEventApplier[] = [];
 
-        let currentClass: Constructor | null = aggregateClass;
-
-        while (currentClass) {
-            const domainEventApplierMap = this.aggregateDomainEventAppliers.get(currentClass);
-
+        this.traversePrototypeChain(aggregateClass, (cls) => {
+            const domainEventApplierMap = this.aggregateDomainEventAppliers.get(cls);
             if (domainEventApplierMap) {
                 const handlers = domainEventApplierMap.get(domainEventClass);
                 if (handlers) {
@@ -129,14 +128,11 @@ class AggregateMetadataRegistry {
                 }
             }
 
-            const defaultAppliers = this.aggregateDefaultDomainEventAppliers.get(currentClass);
-
+            const defaultAppliers = this.aggregateDefaultDomainEventAppliers.get(cls);
             if (defaultAppliers) {
                 appliers.push(...defaultAppliers);
             }
-
-            currentClass = Object.getPrototypeOf(currentClass);
-        }
+        });
 
         return appliers.length ? appliers : null;
     }
@@ -175,6 +171,21 @@ class AggregateMetadataRegistry {
         if (this.aggregateSnapshotMetadataMap.has(aggregateClass)) {
             throw new AggregateAlreadyRegisteredError(aggregateClass.constructor.name);
         }
+    }
+
+    private traversePrototypeChain<T>(aggregateClass: Constructor, visitor: (cls: Constructor) => T | void): T[] {
+        const results: T[] = [];
+        let currentClass: Constructor | null = aggregateClass;
+
+        while (currentClass) {
+            const result = visitor(currentClass);
+            if (result !== undefined) {
+                results.push(result);
+            }
+            currentClass = Object.getPrototypeOf(currentClass);
+        }
+
+        return results;
     }
 }
 

@@ -48,7 +48,6 @@ describe("InMemoryMessageBus", () => {
             aggregateClass: UserAggregate,
             transactionManager,
             domainEventRepository,
-            snapshotRepository,
             messageProducer,
             outboundMessageMapper,
             currentOrigin,

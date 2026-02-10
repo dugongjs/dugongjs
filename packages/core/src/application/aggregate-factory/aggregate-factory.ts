@@ -5,10 +5,8 @@ import { domainEventDeserializer } from "../../domain/domain-event-deserializer/
 import type { IExternalOriginMap } from "../../ports/outbound/ipc/i-external-origin-map.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository, SerializedSnapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
-import {
-    AbstractAggregateHandler,
-    type AbstractAggregateHandlerOptions
-} from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
+import { type AbstractAggregateHandlerOptions } from "../abstract-aggregate-handler/abstract-aggregate-handler.js";
+import { AbstractAggregateSnapshotCoordinator } from "../abstract-aggregate-snapshot-coordinator/abstract-aggregate-snapshot-coordinator.js";
 import type { AggregateQueryService } from "../aggregate-query-service/aggregate-query-service.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import { MissingAggregateIdError } from "./errors/missing-aggregate-id.error.js";
@@ -35,15 +33,13 @@ export type BuildFromEventLogOptions = {
  */
 export class AggregateFactory<
     TAggregateRootClass extends EventSourcedAggregateRoot
-> extends AbstractAggregateHandler<TAggregateRootClass> {
+> extends AbstractAggregateSnapshotCoordinator<TAggregateRootClass> {
     private readonly domainEventRepository: IDomainEventRepository;
-    private readonly snapshotRepository?: ISnapshotRepository;
     private readonly externalOriginMap: IExternalOriginMap;
 
     constructor(options: AggregateFactoryOptions<TAggregateRootClass>) {
         super(options);
         this.domainEventRepository = options.domainEventRepository;
-        this.snapshotRepository = options.snapshotRepository;
         this.externalOriginMap = options.externalOriginMap ?? new Map<string, AggregateQueryService>();
     }
 
@@ -131,9 +127,13 @@ export class AggregateFactory<
             domainEventsToApply = domainEvents.filter((event) => event.sequenceNumber <= options.toSequenceNumber!);
         }
 
-        const aggregate = new this.aggregateClass().setId(aggregateId) as InstanceType<TAggregateRootClass>;
+        const aggregateBase = new this.aggregateClass().setId(aggregateId) as InstanceType<TAggregateRootClass>;
 
-        return this.applySerializedDomainEvents(aggregate, domainEventsToApply);
+        const aggregate = this.applySerializedDomainEvents(aggregateBase, domainEventsToApply);
+
+        await this.snapshotIfNecessary(aggregate);
+
+        return aggregate;
     }
 
     /**
