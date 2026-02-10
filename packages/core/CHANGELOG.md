@@ -1,5 +1,12 @@
 # @dugongjs/core
 
+## 0.0.12
+
+### Patch Changes
+
+- 6a00551: Changed snapshotting to be threshold based (instead of modulo based) and added snapshotting to `AggregateFactory.buildFromEventLog`
+- d8d23c2: Update `AggregateMetadataRegistry` to support prototype chain traversal during metadata lookup
+
 ## 0.0.11
 
 ### Patch Changes
