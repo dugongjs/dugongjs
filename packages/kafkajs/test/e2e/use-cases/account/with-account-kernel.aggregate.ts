@@ -1,8 +1,8 @@
 import { Apply, type AbstractConstructor } from "@dugongjs/core";
 import { AccountClosedEvent } from "./domain-events/account-closed.event.js";
 import { AccountOpenedEvent } from "./domain-events/account-opened.event.js";
-import { MoneyDepositedEvent } from "./domain-events/monet-deposited.event.js";
-import { MoneyWithdrawnEvent } from "./domain-events/monet-withdrawn.event.js";
+import { MoneyDepositedEvent } from "./domain-events/money-deposited.event.js";
+import { MoneyWithdrawnEvent } from "./domain-events/money-withdrawn.event.js";
 
 export function WithAccountKernel<TBase extends AbstractConstructor<{ delete: () => void }>>(Base: TBase) {
     abstract class AccountKernel extends Base {

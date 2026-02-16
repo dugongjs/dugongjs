@@ -23,7 +23,6 @@
         "test:typecheck": "tsc --noEmit",
         "test:unit:run": "vitest --config vitest.config.unit.ts run",
         "test:unit:watch": "vitest --config vitest.config.unit.ts watch",
-        "test": "pnpm test:typecheck && pnpm test:run",
         "lint": "eslint .",
         "build": "vite-node ./scripts/build.ts",
         "prepublishOnly": "pnpm build"
@@ -43,10 +42,10 @@
         "@types/node": "^24.5.1",
         "@types/uuid": "^9.0.8",
         "reflect-metadata": "^0.2.2",
-        "typescript": "^5.6.3",
+        "typescript": "catalog:",
         "unplugin-swc": "^1.5.2",
         "vite-node": "^3.1.2",
-        "vitest": "^3.2.4",
+        "vitest": "catalog:",
         "vitest-mock-extended": "^2.0.2"
     }
 }
