@@ -10,7 +10,7 @@ export async function setup() {
     console.log(
         `Starting PostgreSQL test container with username: ${username}, password: ${password}, database: ${database}`
     );
-    postgresContainer = await new PostgreSqlContainer()
+    postgresContainer = await new PostgreSqlContainer("postgres:18")
         .withUsername(username)
         .withPassword(password)
         .withDatabase(database)

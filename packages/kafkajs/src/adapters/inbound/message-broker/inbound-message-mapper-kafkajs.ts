@@ -1,7 +1,15 @@
 import type { IInboundMessageMapper, SerializedDomainEvent } from "@dugongjs/core";
 import type { EachMessagePayload } from "kafkajs";
 
+/**
+ * InboundMessageMapperKafkaJS is an implementation of the IInboundMessageMapper interface that maps KafkaJS EachMessagePayload to a SerializedDomainEvent.
+ */
 export class InboundMessageMapperKafkaJS implements IInboundMessageMapper<EachMessagePayload> {
+    /**
+     * Maps a KafkaJS EachMessagePayload to a SerializedDomainEvent by extracting the necessary fields from the message headers and value.
+     * @param messagePayload The EachMessagePayload received from KafkaJS, containing the message and its metadata.
+     * @returns A SerializedDomainEvent object constructed from the message payload.
+     */
     public map(messagePayload: EachMessagePayload): SerializedDomainEvent {
         const message = messagePayload.message;
         const headers = message.headers;

@@ -48,13 +48,13 @@
         "@swc/core": "^1.11.21",
         "@swc/helpers": "^0.5.17",
         "@types/node": "^24.5.1",
-        "@vitest/ui": "^3.2.4",
+        "@vitest/ui": "catalog:",
         "reflect-metadata": "^0.2.2",
         "typeorm": "^0.3.22",
-        "typescript": "^5.6.3",
+        "typescript": "catalog:",
         "unplugin-swc": "^1.5.2",
         "vite-node": "^3.1.2",
-        "vitest": "^3.2.4",
+        "vitest": "catalog:",
         "vitest-mock-extended": "^2.0.2"
     }
 }

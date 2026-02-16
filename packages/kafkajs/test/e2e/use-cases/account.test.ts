@@ -9,8 +9,8 @@ import { WaitForMessageConsumerKafkaJS } from "../setup/app/wait-for-message-con
 import { Account } from "./account/account.aggregate.js";
 import { AccountClosedEvent } from "./account/domain-events/account-closed.event.js";
 import { AccountOpenedEvent } from "./account/domain-events/account-opened.event.js";
-import { MoneyDepositedEvent } from "./account/domain-events/monet-deposited.event.js";
-import { MoneyWithdrawnEvent } from "./account/domain-events/monet-withdrawn.event.js";
+import { MoneyDepositedEvent } from "./account/domain-events/money-deposited.event.js";
+import { MoneyWithdrawnEvent } from "./account/domain-events/money-withdrawn.event.js";
 
 describe("Account", () => {
     let transactionManager: ITransactionManager;
