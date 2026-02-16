@@ -1,5 +1,11 @@
 # @dugongjs/kafkajs
 
+## 0.0.16
+
+### Patch Changes
+
+- 13d59ac: Added retry logic to `MessageConsumerKafkaJS.registerDomainEventMessageConsumer` to allow topic autocreation when running Kafka with KRaft
+
 ## 0.0.15
 
 ### Patch Changes
