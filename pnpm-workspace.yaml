@@ -1,5 +1,10 @@
 packages:
-    - "apps/*"
-    - "packages/*"
-    - "docs"
-    - "tutorials/*"
+  - "apps/*"
+  - "packages/*"
+  - "docs"
+  - "tutorials/*"
+
+catalog:
+  typescript: 5.8.3
+  vitest: 4.0.18
+  "@vitest/ui": 4.0.18

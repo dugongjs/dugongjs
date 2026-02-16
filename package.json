@@ -23,10 +23,10 @@
         "husky": "^9.1.7",
         "prettier": "^3.5.3",
         "turbo": "^2.5.0",
-        "typescript": "5.8.2",
-        "vitest": "^3.2.4"
+        "typescript": "catalog:",
+        "vitest": "catalog:"
     },
-    "packageManager": "pnpm@9.0.0",
+    "packageManager": "pnpm@10.29.3",
     "engines": {
         "node": ">=18"
     },
