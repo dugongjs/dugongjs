@@ -71,7 +71,7 @@ export class MessageConsumerKafkaJS
 
     /**
      * Subscribes to a Kafka topic with retry logic to handle the case where the topic might not exist yet.
-     * This is required when running Kafka in Kraft mode, as topic creation is asynchronous.
+     * This is required when running Kafka in KRaft mode, as topic creation is asynchronous.
      * @param consumer The Kafka consumer instance.
      * @param topic The topic to subscribe to.
      * @param retries The number of retry attempts before giving up.
