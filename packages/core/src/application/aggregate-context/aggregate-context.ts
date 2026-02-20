@@ -65,7 +65,18 @@ export class AggregateContext<TAggregateRootClass extends EventSourcedAggregateR
      * @returns A new instance of `AggregateContext` with the updated tenant ID.
      */
     public withTenantId(tenantId: string): AggregateContext<TAggregateRootClass> {
-        return new AggregateContext<TAggregateRootClass>({ ...this.options, tenantId });
+        const newContext = new AggregateContext<TAggregateRootClass>({ ...this.options, tenantId });
+
+        // Preserve transaction context from current factory/manager
+        const currentTxContext = this.factory?.getTransactionContext();
+        if (currentTxContext) {
+            newContext.getFactory().setTransactionContext(currentTxContext);
+            try {
+                newContext.getManager().setTransactionContext(currentTxContext);
+            } catch {}
+        }
+
+        return newContext;
     }
 
     /**
