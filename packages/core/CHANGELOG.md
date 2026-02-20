@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.13
+
+### Patch Changes
+
+- 67acd5e: `AggregateContext.withTenantId()` now preserves transaction context from factory/manager when creating a new context
+
 ## 0.0.12
 
 ### Patch Changes
