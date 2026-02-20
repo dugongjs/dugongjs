@@ -93,6 +93,36 @@ describe("AggregateContext", () => {
             expect(newContext.getFactory()["tenantId"]).toBe(tenantId);
             expect(newContext.getManager()["tenantId"]).toBe(tenantId);
         });
+
+        it("should preserve the transaction context set on the factory when creating a new context", () => {
+            const aggregateContext = createAggregateContext();
+
+            const mockTransactionContext = { id: "test-transaction" };
+            aggregateContext.getFactory().setTransactionContext(mockTransactionContext);
+
+            expect(aggregateContext.getFactory().getTransactionContext()).toBe(mockTransactionContext);
+
+            const tenantId = "TestTenant";
+            const newContext = aggregateContext.withTenantId(tenantId);
+
+            expect(newContext.getFactory().getTransactionContext()).toBe(mockTransactionContext);
+        });
+
+        it("should preserve the transaction context set on the manager when creating a new context", () => {
+            const aggregateContext = createAggregateContext();
+
+            const mockTransactionContext = { id: "test-transaction" };
+            aggregateContext.getFactory().setTransactionContext(mockTransactionContext);
+            aggregateContext.getManager().setTransactionContext(mockTransactionContext);
+
+            expect(aggregateContext.getFactory().getTransactionContext()).toBe(mockTransactionContext);
+            expect(aggregateContext.getManager().getTransactionContext()).toBe(mockTransactionContext);
+
+            const newContext = aggregateContext.withTenantId("TestTenant");
+
+            expect(newContext.getFactory().getTransactionContext()).toBe(mockTransactionContext);
+            expect(newContext.getManager().getTransactionContext()).toBe(mockTransactionContext);
+        });
     });
 
     describe("type-safety", () => {
