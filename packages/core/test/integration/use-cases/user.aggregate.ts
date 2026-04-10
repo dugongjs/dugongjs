@@ -83,6 +83,14 @@ export class UserAggregate extends AbstractAggregateRoot {
         this.stageDomainEvent(event);
     }
 
+    @Process({ isCreation: true })
+    public async createUserAsync(username: string): Promise<void> {
+        await Promise.resolve();
+
+        const event = this.createDomainEvent(UserCreatedEvent, { username });
+        this.stageDomainEvent(event);
+    }
+
     @Process()
     public updateUser(username: string): void {
         const event = this.createDomainEvent(UserUpdatedEvent, { username });

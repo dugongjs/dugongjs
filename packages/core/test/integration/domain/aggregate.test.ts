@@ -134,4 +134,19 @@ describe("Aggregate and Domain Event Integration", () => {
             userAggregate.createUser(faker.string.alpha(21));
         }).toThrowErrorMatchingInlineSnapshot(`[Error: Username must be at most 20 characters long.]`);
     });
+
+    it("should support async commands", async () => {
+        const userAggregate = new UserAggregate();
+        const username = "test_user";
+
+        await userAggregate.createUserAsync(username);
+
+        const stagedDomainEvents = userAggregate.getStagedDomainEvents();
+
+        const userCreatedEvent = stagedDomainEvents[0];
+
+        aggregateDomainEventApplier.applyDomainEventToAggregate(userAggregate, userCreatedEvent);
+
+        expect(userAggregate.getUsername()).toBe(username);
+    });
 });

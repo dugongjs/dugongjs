@@ -15,20 +15,31 @@ export function Process(options: ProcessOptions = {}): MethodDecorator {
 
         descriptor.value = function (...args: any[]) {
             const self = this as any;
+
             self[IsInProcessContext] = true;
+            self[IsInCreationContext] = isCreation;
 
-            if (isCreation) {
-                self[IsInCreationContext] = true;
-            } else {
-                self[IsInCreationContext] = false;
-            }
-
-            try {
-                return originalMethod.apply(this, args);
-            } finally {
+            const resetProcessContext = () => {
                 self[IsInProcessContext] = false;
                 self[IsInCreationContext] = false;
+            };
+
+            let result: any;
+
+            try {
+                result = originalMethod.apply(this, args);
+            } catch (error) {
+                resetProcessContext();
+                throw error;
             }
+
+            if (result instanceof Promise) {
+                return result.finally(resetProcessContext);
+            }
+
+            resetProcessContext();
+
+            return result;
         };
 
         return descriptor;
