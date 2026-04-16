@@ -1,8 +1,14 @@
 import type { RemoveAbstract } from "../../types/remove-abstract.type.js";
 import type { SerializableObject } from "../../types/serializable-object.type.js";
+import type { StandardSchemaV1 } from "../../types/standard-schema/v1/standard-schema-v1.js";
+import type { AbstractDomainEventConstructor } from "./abstract-domain-event-constructor.js";
+import { SchemaValidationError } from "./errors/schema-validation.error.js";
+import type { SchemaPayload } from "./schema-payload.js";
 import type { SerializedDomainEvent } from "./serialized-domain-event.js";
 
 export type DomainEventPayload = SerializableObject | null;
+
+const IsSchemaBasedDomainEvent = Symbol("IsSchemaBasedDomainEvent");
 
 /**
  * Abstract class representing a domain event.
@@ -25,6 +31,9 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
     protected triggeredByEventId?: string;
     protected triggeredByUserId?: string;
     protected metadata?: SerializableObject;
+
+    public readonly schema?: StandardSchemaV1;
+    public readonly [IsSchemaBasedDomainEvent]: boolean = false;
 
     constructor(aggregateId: string, ...payload: TPayload extends null ? [] : [payload: TPayload]) {
         this.aggregateId = aggregateId;
@@ -204,5 +213,46 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
         instance.metadata = serializedDomainEvent.metadata;
 
         return instance as unknown as InstanceType<TDomainEventClass>;
+    }
+
+    public isSchemaBased(): this is InstanceType<AbstractDomainEventConstructor<any, any>> {
+        return this[IsSchemaBasedDomainEvent];
+    }
+
+    public static fromSchema<TSchema extends StandardSchemaV1 | null = null>(
+        schema: TSchema
+    ): AbstractDomainEventConstructor<SchemaPayload<TSchema, "INPUT">, SchemaPayload<TSchema, "OUTPUT">> {
+        abstract class AbstractDomainEventFromSchema extends AbstractDomainEvent<SchemaPayload<TSchema, "OUTPUT">> {
+            public readonly [IsSchemaBasedDomainEvent]: boolean = true;
+            public abstract origin: string;
+            public abstract aggregateType: string;
+            public abstract type: string;
+            public abstract version: number;
+
+            constructor(
+                aggregateId: string,
+                ...payload: SchemaPayload<TSchema, "INPUT"> extends null
+                    ? []
+                    : [payload: SchemaPayload<TSchema, "INPUT">]
+            ) {
+                super(aggregateId, ...(payload as any));
+            }
+
+            /**
+             * Validates and transforms the payload using the schema.
+             * This method is called automatically by the aggregate when creating the event.
+             */
+            public async validatePayload(): Promise<void> {
+                const validationResult = await schema?.["~standard"].validate(this.payload);
+
+                if (validationResult?.issues) {
+                    throw new SchemaValidationError(validationResult.issues);
+                }
+
+                this.payload = validationResult?.value as SchemaPayload<TSchema, "OUTPUT">;
+            }
+        }
+
+        return AbstractDomainEventFromSchema;
     }
 }
