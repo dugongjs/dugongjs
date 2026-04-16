@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.16
+
+### Patch Changes
+
+- 58f4863: Added missing type exports
+
 ## 0.0.15
 
 ### Patch Changes
