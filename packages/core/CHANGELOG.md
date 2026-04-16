@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.15
+
+### Patch Changes
+
+- 549ac9b: Added support for Standard Schema validation of domain event payloads
+
 ## 0.0.14
 
 ### Patch Changes
