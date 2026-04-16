@@ -5,6 +5,8 @@ tags:
     - Core
     - Aggregate
     - Domain event
+    - Standard Schema
+    - Validation
 ---
 
 ## Introduction
@@ -255,3 +257,90 @@ You could perform the same validation in the `onApply()` lifecycle hook to detec
 :::
 
 While payload validation is useful for enforcing structure and assumptions, it is not the place to enforce invariants or business rules. Those concerns belong in the aggregate. Likewise, this validation should not replace user input validation, which is best handled in the application layer.
+
+### Standard Schema validation (New)
+
+DugongJS now supports [Standard Schema](https://standardschema.dev/)! By using Standard Schema, any Standard Schema-compliant library can be used, with payload validation and transformation automatically handled by DugongJS. To create a domain event using a schema, use the static `fromSchema` method on `AbstractDomainEvent`:
+
+```typescript
+import { z } from "zod";
+
+const AccountOpenedPayloadSchema = z.object({
+    owner: z.string().min(1).max(100),
+    initialAmount: z.string().positive().finite()
+});
+
+@DomainEvent()
+export class AccountOpenedEvent extends AbstractBankAccountDomainEvent.fromSchema(AccountOpenedPayloadSchema) {
+    public readonly type = "AccountOpened";
+}
+```
+
+This has two main advantages:
+
+1. It eliminates the need to manually set up type inference from the schema and implement `onCreate()`, reducing the amount of boilerplate.
+2. Since Standard Schema also supports data transformation, you can encode complex data types and their serialization directly into the schema.
+
+To illustrate the second point, consider adding something like a `Date` object to the payload. Since the payload must be a serializable object, we cannot pass a Date object directly. The best we can do is represent it using something like an ISO string or epoch time, as shown below:
+
+```typescript
+const AccountOpenedPayloadSchema = z.object({
+    owner: z.string().min(1).max(100),
+    initialAmount: z.string().positive().finite(),
+    openedAt: z.iso.datetime(),
+    validUntil: z.iso.datetime().optional()
+});
+
+@DomainEvent()
+export class AccountOpenedEvent extends AbstractBankAccountDomainEvent.fromSchema(AccountOpenedPayloadSchema) {
+    public readonly type = "AccountOpened";
+}
+```
+
+However, it introduces a mismatch between the type used by the [Aggregate](aggregates.md), which likely operates on `Date` objects, and the format required by the payload. With Standard Schema, we can define both an input and output format and allow the validation layer to handle the transformation:
+
+```typescript
+const dateToIsoDatetime = z.codec(z.date(), z.iso.datetime(), {
+    encode: (isoString) => new Date(isoString),
+    decode: (date) => date.toISOString()
+});
+
+const AccountOpenedPayloadSchema = z.object({
+    owner: z.string().min(1).max(100),
+    initialAmount: z.string().positive().finite(),
+    openedAt: dateToIsoDatetime,
+    validUntil: dateToIsoDatetime.optional()
+});
+
+@DomainEvent()
+export class AccountOpenedEvent extends AbstractBankAccountDomainEvent.fromSchema(AccountOpenedPayloadSchema) {
+    public readonly type = "AccountOpened";
+}
+```
+
+Now, when creating an `AccountOpenedEvent`, we can use `Date` objects directly in the payload, and the schema will handle the transformation to and from ISO strings during serialization and deserialization:
+
+```typescript
+@Aggregate("BankAccount")
+export class BankAccount extends AbstractAggregateRoot {
+    // Rest of the class...
+
+    @CreationProcess()
+    public async openAccount(command: OpenAccountCommand): Promise<void> {
+        const event = await this.createDomainEventAsync(AccountOpenedEvent, {
+            owner: command.owner,
+            initialBalance: command.initialBalance,
+            openedAt: new Date(),
+            validUntil: command.validUntil ? new Date(command.validUntil) : undefined
+        });
+
+        this.stageDomainEvent(event);
+    }
+}
+```
+
+:::note
+**Creating schema-based domain events**
+
+Note that when creating domain events based on a schema, you must use the `createDomainEventAsync` method instead of `createDomainEvent`. This is because the Standard Schema interface is asynchronous, and the schema validation and transformation process may involve asynchronous operations. Whether this actually requires async execution depends on the specific schema library used to implement the Standard Schema interface.
+:::

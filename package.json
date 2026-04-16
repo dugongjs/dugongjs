@@ -34,5 +34,10 @@
         "commitizen": {
             "path": "cz-emoji"
         }
+    },
+    "pnpm": {
+        "overrides": {
+            "webpackbar": "^7.0.0"
+        }
     }
 }
