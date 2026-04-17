@@ -263,16 +263,20 @@ While payload validation is useful for enforcing structure and assumptions, it i
 DugongJS now supports [Standard Schema](https://standardschema.dev/)! By using Standard Schema, any Standard Schema-compliant library can be used, with payload validation and transformation automatically handled by DugongJS. To create a domain event using a schema, use the static `fromSchema` method on `AbstractDomainEvent`:
 
 ```typescript
+import { DomainEvent, AbstractDomainEvent } from "@dugongjs/core";
 import { z } from "zod";
 
-const AccountOpenedPayloadSchema = z.object({
+const schema = z.object({
     owner: z.string().min(1).max(100),
     initialAmount: z.string().positive().finite()
 });
 
 @DomainEvent()
-export class AccountOpenedEvent extends AbstractBankAccountDomainEvent.fromSchema(AccountOpenedPayloadSchema) {
+export class AccountOpenedEvent extends AbstractDomainEvent.fromSchema(schema) {
+    public readonly origin = "BankingContext-AccountService";
+    public readonly aggregateType = "BankAccount";
     public readonly type = "AccountOpened";
+    public readonly version = 1;
 }
 ```
 
@@ -284,7 +288,7 @@ This has two main advantages:
 To illustrate the second point, consider adding something like a `Date` object to the payload. Since the payload must be a serializable object, we cannot pass a Date object directly. The best we can do is represent it using something like an ISO string or epoch time, as shown below:
 
 ```typescript
-const AccountOpenedPayloadSchema = z.object({
+const schema = z.object({
     owner: z.string().min(1).max(100),
     initialAmount: z.string().positive().finite(),
     openedAt: z.iso.datetime(),
@@ -292,8 +296,11 @@ const AccountOpenedPayloadSchema = z.object({
 });
 
 @DomainEvent()
-export class AccountOpenedEvent extends AbstractBankAccountDomainEvent.fromSchema(AccountOpenedPayloadSchema) {
+export class AccountOpenedEvent extends AbstractDomainEvent.fromSchema(schema) {
+    public readonly origin = "BankingContext-AccountService";
+    public readonly aggregateType = "BankAccount";
     public readonly type = "AccountOpened";
+    public readonly version = 1;
 }
 ```
 
@@ -305,7 +312,7 @@ const dateToIsoDatetime = z.codec(z.date(), z.iso.datetime(), {
     decode: (date) => date.toISOString()
 });
 
-const AccountOpenedPayloadSchema = z.object({
+const schema = z.object({
     owner: z.string().min(1).max(100),
     initialAmount: z.string().positive().finite(),
     openedAt: dateToIsoDatetime,
@@ -313,8 +320,11 @@ const AccountOpenedPayloadSchema = z.object({
 });
 
 @DomainEvent()
-export class AccountOpenedEvent extends AbstractBankAccountDomainEvent.fromSchema(AccountOpenedPayloadSchema) {
+export class AccountOpenedEvent extends AbstractDomainEvent.fromSchema(schema) {
+    public readonly origin = "BankingContext-AccountService";
+    public readonly aggregateType = "BankAccount";
     public readonly type = "AccountOpened";
+    public readonly version = 1;
 }
 ```
 
