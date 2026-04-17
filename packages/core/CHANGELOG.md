@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.17
+
+### Patch Changes
+
+- 906b45e: Fixed an issue with `DomainEventClass` not recognizing events created using `fromSchema`
+
 ## 0.0.16
 
 ### Patch Changes
