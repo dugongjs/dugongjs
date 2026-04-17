@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import { z } from "zod";
 import type { AbstractDomainEventStatics } from "./abstract-domain-event-statics.js";
 import { AbstractDomainEvent } from "./abstract-domain-event.js";
+import type { DomainEventClass } from "./domain-event-class.js";
 import { SchemaValidationError } from "./errors/schema-validation.error.js";
 import type { SerializedDomainEvent } from "./serialized-domain-event.js";
 
@@ -617,6 +618,17 @@ describe("AbstractDomainEvent", () => {
 
             // getPayload returns string (output type)
             expectTypeOf(event.getPayload()).toEqualTypeOf<{ value: string }>();
+        });
+
+        it("should accept schema based domain events as domain event classes", () => {
+            class SchemaBasedEvent extends AbstractDomainEvent.fromSchema(z.object({ data: z.string() })) {
+                public origin = "TestOrigin";
+                public aggregateType = "TestAggregate";
+                public type = "SchemaBasedEvent";
+                public version = 1;
+            }
+
+            expectTypeOf<typeof SchemaBasedEvent>().toExtend<DomainEventClass>();
         });
     });
 });
