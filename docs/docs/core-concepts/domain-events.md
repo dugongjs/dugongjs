@@ -116,7 +116,7 @@ We can now define the concrete domain events for the `BankAccount` aggregate by 
 
 ```typescript
 @DomainEvent()
-export class AccountOpenedEvent extends AbstractBankAccountDomainEvent<{ owner: string; initialAmount: number }> {
+export class AccountOpenedEvent extends AbstractBankAccountDomainEvent<{ owner: string; initialBalance: number }> {
     public readonly type = "AccountOpened";
 }
 
@@ -162,7 +162,7 @@ const accountId = "<account-id>";
 
 const accountOpenedEvent = new AccountOpenedEvent(accountId, {
     owner: "Bob",
-    initialAmount: 100
+    initialBalance: 100
 });
 
 const accountClosedEvent = new AccountClosedEvent(accountId);
@@ -233,7 +233,7 @@ We can then define a payload schema for the `AccountOpenedEvent` like this:
 ```typescript
 const AccountOpenedPayloadSchema = z.object({
     owner: z.string().min(1).max(100),
-    initialAmount: z.string().positive().finite()
+    initialBalance: z.number().positive().finite()
 });
 
 type AccountOpenedPayload = z.infer<typeof AccountOpenedPayloadSchema>;
@@ -268,7 +268,7 @@ import { z } from "zod";
 
 const schema = z.object({
     owner: z.string().min(1).max(100),
-    initialAmount: z.string().positive().finite()
+    initialBalance: z.number().positive().finite()
 });
 
 @DomainEvent()
@@ -290,7 +290,7 @@ To illustrate the second point, consider adding something like a `Date` object t
 ```typescript
 const schema = z.object({
     owner: z.string().min(1).max(100),
-    initialAmount: z.string().positive().finite(),
+    initialBalance: z.number().positive().finite(),
     openedAt: z.iso.datetime(),
     validUntil: z.iso.datetime().optional()
 });
@@ -308,13 +308,13 @@ However, it introduces a mismatch between the type used by the [Aggregate](aggre
 
 ```typescript
 const dateToIsoDatetime = z.codec(z.date(), z.iso.datetime(), {
-    encode: (isoString) => new Date(isoString),
-    decode: (date) => date.toISOString()
+    decode: (isoString) => new Date(isoString),
+    encode: (date) => date.toISOString()
 });
 
 const schema = z.object({
     owner: z.string().min(1).max(100),
-    initialAmount: z.string().positive().finite(),
+    initialBalance: z.number().positive().finite(),
     openedAt: dateToIsoDatetime,
     validUntil: dateToIsoDatetime.optional()
 });

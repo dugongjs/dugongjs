@@ -135,7 +135,7 @@ export type DepositMoneyCommand = {
 };
 ```
 
-```typescript title="src/bank-account/domain/commands/deposit-money.command.ts" showLineNumbers
+```typescript title="src/bank-account/domain/commands/withdraw-money.command.ts" showLineNumbers
 export type WithdrawMoneyCommand = {
     amount: number;
 };

@@ -60,7 +60,7 @@ flowchart LR
 However, this approach introduces duplication: the `User` aggregate must now exist in both services. While this duplication is in itself not a concern, and can be a valid design choice, it can lead to issues if the user service introduces new events or new rules for event appliers that have not been implemented in the account service. An alternative approach is to extract the common logic into a shared kernel — a library shared between services that encapsulates read-only aggregate logic.
 
 :::note
-Be aware that a shared kernel introduces coupling between microservices. If a microservice only requires limited information about an aggregate owned by another microservice, such as wether or not it exists, a shared kernel can introduce unnecessary coupling. In that case, simply duplicating parts of the aggregate may be preferred.
+Be aware that a shared kernel introduces coupling between microservices. If a microservice only requires limited information about an aggregate owned by another microservice, such as whether or not it exists, a shared kernel can introduce unnecessary coupling. In that case, simply duplicating parts of the aggregate may be preferred.
 :::
 
 There is one critical distinction between the user service and the accounting service: only the user service owns the `User` aggregate and is allowed to emit domain events for it. The accounting service must only replicate and apply those events. To enforce this boundary, we create a version of the aggregate in the shared kernel that defines only event appliers (a _read-only_ version) — while the owning service adds command handling on top.
@@ -194,7 +194,7 @@ Because this aggregate extends `AbstractEventSourcedAggregateRoot` instead of `A
 :::info
 **Why `AccountOwner` instead of `User`?**
 
-As stated earlier, in the accounting contexts ubiquitous language, the role of the related entity is that of an “owner”, not a general “user”. We reflect this distinction in the class name by calling it `AccountOwner`. However, note that the `aggregateType` in the `@ExternalAggregate()` decorator must still match the original `"User"` type from the publishing service. This is because domain events consumed by a service must adhere to the publishing services published language when defining the aggregate metadata, but is free to use its own ubiquitous language in the class.
+As stated earlier, in the accounting context's ubiquitous language, the role of the related entity is that of an “owner”, not a general “user”. We reflect this distinction in the class name by calling it `AccountOwner`. However, note that the `aggregateType` in the `@ExternalAggregate()` decorator must still match the original `"User"` type from the publishing service. This is because domain events consumed by a service must adhere to the publishing service's published language when defining the aggregate metadata, but are free to use their own ubiquitous language in the class.
 
 With this setup, the application layer in the accounting service might validate user existence like so:
 
@@ -207,7 +207,7 @@ class AccountCommandService {
         const accountOwner = this.accountOwnerFactory.build(command.ownerId);
 
         if (!accountOwner) {
-            // If the account `AccountOwner` not exist, the command should fail.
+            // If the `AccountOwner` account does not exist, the command should fail.
             throw new Error(`Owner with ID ${command.ownerId} not found.`);
         }
 
