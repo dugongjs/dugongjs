@@ -325,7 +325,7 @@ There are two ways to construct an aggregate:
 ```typescript
 const bankAccount = new BankAccount();
 
-bankAccount.openAccount({ owner: "Bob", initialAmount: 100 });
+bankAccount.openAccount({ owner: "Bob", initialBalance: 100 });
 ```
 
 2. Subsequently, use the `AggregateFactory` to build the aggregate from the event log.

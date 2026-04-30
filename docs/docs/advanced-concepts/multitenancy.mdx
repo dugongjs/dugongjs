@@ -17,7 +17,7 @@ import Admonition from "@theme/Admonition";
 
 Using the [NestJS tutorial](../tutorial-nestjs/part_3.md) as an example, we could associate each bank account with a specific tenant ID. This tenant ID would then be used to tag all domain events, snapshots, consumed messages, outbox messages and could also be used to tag query models.
 
-Tenant ID injection is handled in the application layer. Let's examine the following code snippet from the `BankAccountCommandService`in the NestJS tutorial:
+Tenant ID injection is handled in the application layer. Let's examine the following code snippet from the `BankAccountCommandService` in the NestJS tutorial:
 
 ```typescript title="src/bank-account/application/command/bank-account.command.service.ts" showLineNumbers
 import { EventSourcingService } from "@dugongjs/nestjs";
@@ -49,7 +49,7 @@ export class BankAccountCommandService {
         return this.eventSourcingService.transaction(async (transaction) => {
             const accountContext = this.eventSourcingService.createAggregateContext(transaction, BankAccount);
 
-            const account = await accountContext.getById(command.accountId);
+            const account = await accountContext.build(command.accountId);
 
             account.depositMoney(command);
 
@@ -101,7 +101,7 @@ export class BankAccountCommandService {
                 .withTenantId(tenantId);
             // highlight-end
 
-            const account = await accountContext.getById(command.accountId);
+            const account = await accountContext.build(command.accountId);
 
             account.depositMoney(command);
 

@@ -9,7 +9,7 @@ It has adapters for the following ports:
 
 | Port                                                                                | Adapter                            |
 | ----------------------------------------------------------------------------------- | ---------------------------------- |
-| [`IDomainRepository`](../ports/repositories.md#idomaineventrepository)              | `DomainRepositoryTypeOrm`          |
+| [`IDomainEventRepository`](../ports/repositories.md#idomaineventrepository)         | `DomainEventRepositoryTypeOrm`     |
 | [`ISnapshotRepository`](../ports/repositories.md#isnapshotrepository)               | `SnapshotRepositoryTypeOrm`        |
 | [`IConsumedMessageRepository`](../ports/repositories.md#iconsumedmessagerepository) | `ConsumedMessageRepositoryTypeOrm` |
 | [`ITransactionManager`](../ports/transaction-manager.md#itransactionmanager)        | `TransactionManagerTypeOrm`        |

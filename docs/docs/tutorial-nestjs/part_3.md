@@ -274,7 +274,7 @@ import { EventIssuerModule } from "@dugongjs/nestjs";
 import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { BankAccountCommandModule } from "./bank-account/application/command/bank-account.command.module.ts";
+import { BankAccountCommandModule } from "./bank-account/application/command/bank-account.command.module.js";
 import { dataSourceOptions } from "./db/data-source-options.js";
 
 @Module({
