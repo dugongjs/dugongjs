@@ -55,6 +55,10 @@ export class MessageProducerKafkaJS extends MessageChannelParticipantKafkaJS imp
     ): Promise<void> {
         this.ensureConnected();
 
+        if (messages.length === 0) {
+            return;
+        }
+
         await this.producer.send({
             topic: messageChannelId,
             messages

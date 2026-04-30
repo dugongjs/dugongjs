@@ -2,8 +2,8 @@ import { faker } from "@faker-js/faker";
 import supertest from "supertest";
 import { app } from "../../setup/setup/app.js";
 
-describe("User command", () => {
-    it("should be possible to create a user", async () => {
+describe("command api behavior", () => {
+    it("creates a resource", async () => {
         const email = faker.internet.email();
         const username = faker.internet.userName();
 
@@ -20,7 +20,7 @@ describe("User command", () => {
         });
     });
 
-    it("should be possible to update the username of a user", async () => {
+    it("updates a resource attribute", async () => {
         const email = faker.internet.email();
         const username = faker.internet.userName();
 
@@ -52,7 +52,7 @@ describe("User command", () => {
         });
     });
 
-    it("should be possible to update the email of a user", async () => {
+    it("updates a second resource attribute", async () => {
         const email = faker.internet.email();
         const username = faker.internet.userName();
 
@@ -84,7 +84,7 @@ describe("User command", () => {
         });
     });
 
-    it("should be possible to delete a user", async () => {
+    it("deletes a resource", async () => {
         const email = faker.internet.email();
         const username = faker.internet.userName();
 
@@ -111,7 +111,7 @@ describe("User command", () => {
         expect(getResponse.status).toBe(404);
     });
 
-    it("should return 404 when user not found", async () => {
+    it("returns 404 when resource is not found", async () => {
         const userId = faker.string.uuid();
 
         const response = await supertest(app.getHttpServer()).get(`/users/${userId}`);

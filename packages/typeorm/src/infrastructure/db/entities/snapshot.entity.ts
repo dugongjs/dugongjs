@@ -1,5 +1,6 @@
 import type { SerializedSnapshot } from "@dugongjs/core";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { NO_TENANT_ID } from "../no-tenant-id.js";
 
 @Entity("snapshots")
 export class SnapshotEntity implements SerializedSnapshot {
@@ -15,8 +16,8 @@ export class SnapshotEntity implements SerializedSnapshot {
     @Column({ type: "uuid" })
     aggregateId: string;
 
-    @Column({ type: "varchar", length: 255, nullable: true })
-    tenantId?: string | null;
+    @Column({ type: "varchar", length: 255, default: NO_TENANT_ID })
+    tenantId: string;
 
     @Column({ type: "int" })
     domainEventSequenceNumber: number;

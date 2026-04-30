@@ -1,0 +1,36 @@
+{
+    "name": "@dugongjs/testing-contracts",
+    "version": "0.0.1",
+    "private": true,
+    "author": "Erik Lysne",
+    "license": "MIT",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "keywords": [
+        "dugong",
+        "dugongjs"
+    ],
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "lint": "eslint .",
+        "test:typecheck": "tsc --noEmit"
+    },
+    "peerDependencies": {
+        "@dugongjs/core": "workspace:*",
+        "vitest": "catalog:"
+    },
+    "devDependencies": {
+        "@dugongjs/core": "workspace:*",
+        "@dugongjs/eslint-config": "workspace:*",
+        "@dugongjs/typescript-config": "workspace:*",
+        "@types/node": "^24.5.1",
+        "@types/uuid": "^9.0.8",
+        "typescript": "catalog:",
+        "uuid": "^9.0.1",
+        "vitest": "catalog:"
+    }
+}

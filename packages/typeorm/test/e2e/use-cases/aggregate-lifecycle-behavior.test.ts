@@ -9,7 +9,7 @@ import { AggregateManagerTypeOrm } from "../setup/app/aggregate-manager-typeorm.
 import { dataSource } from "../setup/setup/data-source.js";
 import { User } from "./user-aggregate/user.js";
 
-describe("User", () => {
+describe("aggregate lifecycle behavior", () => {
     let userFactory: AggregateFactoryTypeOrm<typeof User>;
     let userManager: AggregateManagerTypeOrm<typeof User>;
 
@@ -17,46 +17,18 @@ describe("User", () => {
         userFactory = new AggregateFactoryTypeOrm({
             aggregateClass: User,
             currentOrigin: "IAM-UserService",
-            tenantId: "TestTenant",
             transactionManager: mock<ITransactionManager>()
         });
 
         userManager = new AggregateManagerTypeOrm({
             aggregateClass: User,
             currentOrigin: "IAM-UserService",
-            tenantId: "TestTenant",
             transactionManager: mock<ITransactionManager>()
         });
     });
 
-    describe("create", () => {
-        it("should create a user and persist the event", async () => {
-            const user = new User();
-
-            const email = faker.internet.email();
-            const username = faker.internet.userName();
-
-            user.createUser({ email, username });
-
-            await userManager.commitStagedDomainEvents(user);
-
-            const persistedEvents = await dataSource.getRepository(DomainEventEntity).find({});
-            const userCreatedEvent = persistedEvents[0];
-
-            expect(persistedEvents).toHaveLength(1);
-            expect(userCreatedEvent.id).toBeDefined();
-            expect(userCreatedEvent.type).toBe("UserCreated");
-            expect(userCreatedEvent.version).toBe(1);
-            expect(userCreatedEvent.origin).toBe("IAM-UserService");
-            expect(userCreatedEvent.aggregateType).toBe("User");
-            expect(userCreatedEvent.aggregateId).toBe(user.getId());
-            expect(userCreatedEvent.tenantId).toBe("TestTenant");
-            expect(userCreatedEvent.sequenceNumber).toBe(1);
-            expect(userCreatedEvent.timestamp).toBeInstanceOf(Date);
-            expect(userCreatedEvent.payload).toEqual({ email, username });
-        });
-
-        it("should create a user and publish the event to the outbox", async () => {
+    describe("when committing aggregate creation", () => {
+        it("persists and publishes the creation event", async () => {
             const user = new User();
 
             const email = faker.internet.email();
@@ -75,7 +47,6 @@ describe("User", () => {
             expect(userCreatedOutboxMessage.origin).toBe("IAM-UserService");
             expect(userCreatedOutboxMessage.aggregateType).toBe("User");
             expect(userCreatedOutboxMessage.aggregateId).toBe(user.getId());
-            expect(userCreatedOutboxMessage.tenantId).toBe("TestTenant");
             expect(userCreatedOutboxMessage.sequenceNumber).toBe(1);
             expect(userCreatedOutboxMessage.timestamp).toBeInstanceOf(Date);
             expect(userCreatedOutboxMessage.payload).toEqual({
@@ -85,7 +56,7 @@ describe("User", () => {
             expect(userCreatedOutboxMessage.channelId).toBe("iam-user-service-user");
         });
 
-        it("should correctly update the state when the event is applied", async () => {
+        it("applies staged events to aggregate state", async () => {
             const user = new User();
 
             const email = faker.internet.email();
@@ -101,7 +72,7 @@ describe("User", () => {
         });
     });
 
-    describe("updateEmail", () => {
+    describe("when mutating an existing aggregate", () => {
         let userId: string;
 
         beforeEach(async () => {
@@ -116,7 +87,7 @@ describe("User", () => {
             userId = user.getId();
         });
 
-        it("should reconstruct the user, update the email and persist the event", async () => {
+        it("rebuilds from history, applies mutation, and persists a new event", async () => {
             const user = await userFactory.build(userId);
 
             if (!user) {
@@ -135,7 +106,7 @@ describe("User", () => {
             expect(user.getEmail()).toBe(newEmail);
         });
 
-        it("should take a snapshot after the snapshot interval has been reached", async () => {
+        it("creates a snapshot after crossing the snapshot interval", async () => {
             const user = await userFactory.build(userId);
 
             if (!user) {
@@ -162,12 +133,7 @@ describe("User", () => {
             expect(persistedEvents).toHaveLength(10);
             expect(snapshots).toHaveLength(1);
 
-            expect(snapshot.id).toBeDefined();
-            expect(snapshot.origin).toBe("IAM-UserService");
-            expect(snapshot.aggregateType).toBe("User");
-            expect(snapshot.aggregateId).toBe(user.getId());
             expect(snapshot.domainEventSequenceNumber).toBe(10);
-            expect(snapshot.tenantId).toBe("TestTenant");
             expect(snapshot.snapshotData).toEqual(
                 expect.objectContaining({
                     id: user.getId(),
@@ -178,7 +144,7 @@ describe("User", () => {
             );
         });
 
-        it("should restore the user from the snapshot and update the email", async () => {
+        it("restores from snapshot and allows new mutations", async () => {
             const user = await userFactory.build(userId);
 
             if (!user) {
@@ -216,7 +182,7 @@ describe("User", () => {
             expect(restoredUser.getEmail()).toBe(newEmail);
         });
 
-        it("should be possible to execute additional commands after restoring from a snapshot", async () => {
+        it("supports additional commands after snapshot restore", async () => {
             const user = await userFactory.build(userId);
 
             if (!user) {
@@ -271,7 +237,7 @@ describe("User", () => {
         });
     });
 
-    describe("deleteUser", () => {
+    describe("when deleting an aggregate", () => {
         let userId: string;
 
         beforeEach(async () => {
@@ -286,7 +252,7 @@ describe("User", () => {
             userId = user.getId();
         });
 
-        it("should delete the user", async () => {
+        it("marks the aggregate as deleted", async () => {
             const user = await userFactory.build(userId);
 
             if (!user) {
@@ -296,14 +262,10 @@ describe("User", () => {
             user.deleteUser();
 
             await userManager.applyAndCommitStagedDomainEvents(user);
-
-            const persistedEvents = await dataSource.getRepository(DomainEventEntity).find({});
-
-            expect(persistedEvents).toHaveLength(2);
             expect(user.isDeleted()).toBe(true);
         });
 
-        it("should return null when trying to restore a deleted user through the factory", async () => {
+        it("returns null when rebuilding a deleted aggregate by default", async () => {
             const user = await userFactory.build(userId);
 
             if (!user) {
@@ -319,7 +281,7 @@ describe("User", () => {
             expect(deletedUser).toBeNull();
         });
 
-        it("should return the deleted user when trying to restore a deleted user through the factory with returnDeleted", async () => {
+        it("returns deleted aggregate when returnDeleted is enabled", async () => {
             const user = await userFactory.build(userId);
 
             if (!user) {

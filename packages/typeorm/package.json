@@ -38,6 +38,7 @@
         "@dugongjs/core": "workspace:*",
         "@dugongjs/eslint-config": "workspace:*",
         "@dugongjs/scripts": "workspace:*",
+        "@dugongjs/testing-contracts": "workspace:*",
         "@dugongjs/typescript-config": "workspace:*",
         "@faker-js/faker": "^8.4.1",
         "@swc/core": "^1.11.21",
