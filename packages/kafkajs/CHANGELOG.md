@@ -1,5 +1,11 @@
 # @dugongjs/kafkajs
 
+## 0.0.22
+
+### Patch Changes
+
+- d5c2b16: Fixed an issue where publishing an empty message list should be a no-op, and added contract coverage for message producer and consumer behavior
+
 ## 0.0.21
 
 ### Patch Changes
