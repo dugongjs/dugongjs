@@ -1,4 +1,4 @@
-import { AggregateFactory, ITransactionManager, WaitForMessageConsumer } from "@dugongjs/core";
+import { AggregateFactory, WaitForMessageConsumer } from "@dugongjs/core";
 import { MessageBuilder } from "@dugongjs/testing";
 import { faker } from "@faker-js/faker";
 import { OutboundMessageMapperKafkaJS } from "../../../src/adapters/outbound/message-broker/outbound-message-mapper-kafkajs.js";
@@ -12,8 +12,7 @@ import { AccountOpenedEvent } from "./account/domain-events/account-opened.event
 import { MoneyDepositedEvent } from "./account/domain-events/money-deposited.event.js";
 import { MoneyWithdrawnEvent } from "./account/domain-events/money-withdrawn.event.js";
 
-describe("Account", () => {
-    let transactionManager: ITransactionManager;
+describe("message consumption behavior", () => {
     let accountMessageConsumer: AggregateMessageConsumerKafkaJS<typeof Account>;
     let accountMessageProducer: AggregateMessageProducerKafkaJS<typeof Account>;
     let accountFactory: AggregateFactory<typeof Account>;
@@ -52,8 +51,8 @@ describe("Account", () => {
         vi.resetAllMocks();
     });
 
-    describe("OnAccountOpened", () => {
-        it("should open account", async () => {
+    describe("when consuming creation events", () => {
+        it("rebuilds an aggregate from the consumed event", async () => {
             const accountId = faker.string.uuid();
             const initialAmount = faker.number.int({ min: 0, max: 1000 });
             const owner = faker.person.fullName();
@@ -81,8 +80,8 @@ describe("Account", () => {
         });
     });
 
-    describe("OnAccountClosed", () => {
-        it("should close account", async () => {
+    describe("when consuming deletion events", () => {
+        it("treats the aggregate as deleted after consumption", async () => {
             const accountId = faker.string.uuid();
             const initialAmount = faker.number.int({ min: 0, max: 1000 });
             const owner = faker.person.fullName();
@@ -108,8 +107,8 @@ describe("Account", () => {
         });
     });
 
-    describe("OnMoneyDeposited", () => {
-        it("should deposit money", async () => {
+    describe("when consuming increment events", () => {
+        it("applies the increment to aggregate state", async () => {
             const accountId = faker.string.uuid();
             const initialAmount = faker.number.int({ min: 0, max: 1000 });
             const depositAmount = faker.number.int({ min: 1, max: 100 });
@@ -141,8 +140,8 @@ describe("Account", () => {
         });
     });
 
-    describe("OnMoneyWithdrawn", () => {
-        it("should withdraw money", async () => {
+    describe("when consuming decrement events", () => {
+        it("applies the decrement to aggregate state", async () => {
             const accountId = faker.string.uuid();
             const initialAmount = faker.number.int({ min: 0, max: 1000 });
             const withdrawAmount = faker.number.int({ min: 1, max: 100 });
