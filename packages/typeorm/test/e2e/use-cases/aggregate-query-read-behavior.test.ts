@@ -5,7 +5,7 @@ import { AggregateManagerTypeOrm } from "../setup/app/aggregate-manager-typeorm.
 import { AggregateQueryServiceTypeOrm } from "../setup/app/aggregate-query-service-typeorm.js";
 import { User } from "./user-aggregate/user.js";
 
-describe("AggregateQueryService", () => {
+describe("aggregate query read behavior", () => {
     let userManager: AggregateManagerTypeOrm<typeof User>;
     let service: AggregateQueryServiceTypeOrm;
 
@@ -21,16 +21,16 @@ describe("AggregateQueryService", () => {
         });
     });
 
-    describe("getAggregateTypes", () => {
-        it("should return aggregate types", async () => {
+    describe("when listing aggregate types", () => {
+        it("returns registered aggregate types", async () => {
             const aggregateTypes = await service.getAggregateTypes();
 
             expect(aggregateTypes).toEqual(["User"]);
         });
     });
 
-    describe("getAggregateIds", () => {
-        it("should return aggregate ids", async () => {
+    describe("when listing aggregate ids", () => {
+        it("returns aggregate ids for persisted aggregates", async () => {
             for await (const i of Array.from({ length: 10 })) {
                 const user = new User();
 
@@ -46,7 +46,7 @@ describe("AggregateQueryService", () => {
             expect(aggregateIds).toHaveLength(10);
         });
 
-        it("should include ids for deleted aggregates", async () => {
+        it("includes ids for deleted aggregates", async () => {
             for await (const i of Array.from({ length: 10 })) {
                 const user = new User();
 
@@ -64,8 +64,8 @@ describe("AggregateQueryService", () => {
         });
     });
 
-    describe("getAggregate", () => {
-        it("should return the aggregate", async () => {
+    describe("when rebuilding an aggregate", () => {
+        it("returns the latest aggregate state", async () => {
             const finalUsername = faker.internet.userName();
             const finalEmail = faker.internet.email();
 
@@ -83,7 +83,7 @@ describe("AggregateQueryService", () => {
             expect(aggregate.email).toEqual(finalEmail);
         });
 
-        it("should be possible to build the aggregate up to a specific sequence number", async () => {
+        it("supports rebuilding up to a specific sequence number", async () => {
             const initialUsername = faker.internet.userName();
             const initialEmail = faker.internet.email();
 
@@ -101,15 +101,15 @@ describe("AggregateQueryService", () => {
             expect(aggregate.email).toEqual(initialEmail);
         });
 
-        it("should return null if aggregate not found", async () => {
+        it("returns null when aggregate is not found", async () => {
             const aggregate = await service.getAggregate("IAM-UserService", "User", faker.string.uuid());
 
             expect(aggregate).toBeNull();
         });
     });
 
-    describe("getDomainEventsForAggregate", () => {
-        it("should return domain events for aggregate", async () => {
+    describe("when reading domain events for an aggregate", () => {
+        it("returns all events for the aggregate", async () => {
             const user = new User();
 
             user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
@@ -123,7 +123,7 @@ describe("AggregateQueryService", () => {
             expect(events).toHaveLength(3);
         });
 
-        it("should return empty array if no events found", async () => {
+        it("returns an empty array when no events are found", async () => {
             const events = await service.getDomainEventsForAggregate("IAM-UserService", "User", faker.string.uuid());
 
             expect(events).toHaveLength(0);

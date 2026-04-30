@@ -1,6 +1,7 @@
 import type { IConsumedMessageRepository } from "@dugongjs/core";
 import type { EntityManager, Repository } from "typeorm";
 import { ConsumedMessageEntity } from "../../../infrastructure/db/entities/consumed-message.js";
+import { normalizeTenantId } from "../../../infrastructure/db/no-tenant-id.js";
 
 export class ConsumedMessageRepositoryTypeOrm implements IConsumedMessageRepository {
     constructor(private readonly consumedMessageRepository: Repository<ConsumedMessageEntity>) {}
@@ -18,7 +19,7 @@ export class ConsumedMessageRepositoryTypeOrm implements IConsumedMessageReposit
             where: {
                 domainEventId,
                 consumerId,
-                tenantId
+                tenantId: normalizeTenantId(tenantId)
             }
         });
 
@@ -34,10 +35,10 @@ export class ConsumedMessageRepositoryTypeOrm implements IConsumedMessageReposit
         const consumedMessageRepository =
             transactionContext?.getRepository(ConsumedMessageEntity) ?? this.consumedMessageRepository;
 
-        await consumedMessageRepository.save({
+        await consumedMessageRepository.insert({
             domainEventId,
             consumerId,
-            tenantId
+            tenantId: normalizeTenantId(tenantId)
         });
     }
 }

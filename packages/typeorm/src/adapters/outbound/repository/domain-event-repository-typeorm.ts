@@ -1,6 +1,7 @@
 import type { IDomainEventRepository, SerializedDomainEvent } from "@dugongjs/core";
-import { MoreThanOrEqual, type EntityManager, type Repository } from "typeorm";
+import { MoreThanOrEqual, type EntityManager, type FindOptionsWhere, type Repository } from "typeorm";
 import { DomainEventEntity } from "../../../infrastructure/db/entities/domain-event.entity.js";
+import { denormalizeTenantId, normalizeTenantId } from "../../../infrastructure/db/no-tenant-id.js";
 
 export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
     constructor(private readonly domainEventRepository: Repository<DomainEventEntity>) {}
@@ -16,20 +17,28 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
         const domainEventRepository =
             transactionContext?.getRepository(DomainEventEntity) ?? this.domainEventRepository;
 
+        const where: FindOptionsWhere<DomainEventEntity> = {
+            origin,
+            aggregateType,
+            aggregateId,
+            sequenceNumber: fromSequenceNumber ? MoreThanOrEqual(fromSequenceNumber) : undefined
+        };
+
+        if (tenantId !== undefined) {
+            where.tenantId = normalizeTenantId(tenantId);
+        }
+
         const serializedDomainEvents = await domainEventRepository.find({
-            where: {
-                origin,
-                aggregateType,
-                aggregateId,
-                tenantId,
-                sequenceNumber: fromSequenceNumber ? MoreThanOrEqual(fromSequenceNumber) : undefined
-            },
+            where,
             order: {
                 sequenceNumber: "ASC"
             }
         });
 
-        return serializedDomainEvents;
+        return serializedDomainEvents.map((domainEvent) => ({
+            ...domainEvent,
+            tenantId: denormalizeTenantId(domainEvent.tenantId)
+        }));
     }
 
     public async getAggregateIds(
@@ -46,8 +55,10 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
             .select("DISTINCT domainEvent.aggregateId", "aggregateId")
             .where("domainEvent.origin = :origin", { origin })
             .andWhere("domainEvent.aggregateType = :aggregateType", { aggregateType })
-            .andWhere(tenantId ? "domainEvent.tenantId = :tenantId" : "TRUE", { tenantId })
             .orderBy("domainEvent.aggregateId", "ASC")
+            .andWhere(tenantId !== undefined ? "domainEvent.tenantId = :tenantId" : "TRUE", {
+                tenantId: normalizeTenantId(tenantId)
+            })
             .getRawMany();
 
         return aggregateIds.map((row) => row.aggregateId);
@@ -60,6 +71,17 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
         const domainEventRepository =
             transactionContext?.getRepository(DomainEventEntity) ?? this.domainEventRepository;
 
-        await domainEventRepository.save(events);
+        if (events.length === 0) {
+            return;
+        }
+
+        const domainEventEntities = domainEventRepository.create(
+            events.map((event) => ({
+                ...event,
+                tenantId: normalizeTenantId(event.tenantId)
+            }))
+        );
+
+        await domainEventRepository.insert(domainEventEntities);
     }
 }
