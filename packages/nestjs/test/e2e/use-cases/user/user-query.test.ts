@@ -2,8 +2,8 @@ import { faker } from "@faker-js/faker";
 import supertest from "supertest";
 import { app } from "../../setup/setup/app.js";
 
-describe("User query", () => {
-    it("should generate a query model when a user is created", async () => {
+describe("query api behavior", () => {
+    it("returns a query model when a resource is created", async () => {
         const email = faker.internet.email();
         const username = faker.internet.userName();
 
