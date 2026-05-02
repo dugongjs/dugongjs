@@ -1,3 +1,4 @@
+export { kafkaJSMessageConsumerAdapter } from "./adapters/kafkajs-message-consumer.adapter.js";
 export { KafkaModule } from "./modules/kafka/kafka.module.js";
 export { KafkaService } from "./modules/kafka/kafka.service.js";
 export { MessageBrokerKafkaJSModule } from "./modules/message-broker-kafkajs/message-broker-kafkajs.module.js";

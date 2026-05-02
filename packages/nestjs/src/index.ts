@@ -7,7 +7,7 @@ export {
     AGGREGATE_DOMAIN_EVENT_CONSUMER_TOKEN,
     AggregateDomainEventConsumer
 } from "./decorators/aggregate-domain-event-consumer.decorator.js";
-export { InjectConsumedMessageRepository } from "./decorators/inject-comsumed-message-repository.decorator.js";
+export { InjectConsumedMessageRepository } from "./decorators/inject-consumed-message-repository.decorator.js";
 export { InjectCurrentOrigin } from "./decorators/inject-current-origin.decorator.js";
 export { InjectDomainEventRepository } from "./decorators/inject-domain-event-repository.decorator.js";
 export { InjectMessageConsumer } from "./decorators/inject-message-consumer.decorator.js";
@@ -15,6 +15,8 @@ export { InjectMessageProducer } from "./decorators/inject-message-producer.deco
 export { InjectSnapshotRepository } from "./decorators/inject-snapshot-repository.decorator.js";
 export { InjectTransactionManager } from "./decorators/inject-transaction-manager.decorator.js";
 export { ON_DOMAIN_EVENT_TOKEN, OnDomainEvent } from "./decorators/on-domain-event.decorator.js";
+export { DugongAdapterBuilder, type DugongAdapterFactory, type DugongAdapters } from "./dugong/dugong-adapter.js";
+export { DugongModule, type DugongModuleOptions } from "./dugong/dugong.module.js";
 export { EventIssuerModule, type EventIssuerModuleOptions } from "./event-issuer/event-issuer.module.js";
 export { EventSourcingModule, type EventSourcingModuleOptions } from "./event-sourcing/event-sourcing.module.js";
 export { EventSourcingService } from "./event-sourcing/event-sourcing.service.js";

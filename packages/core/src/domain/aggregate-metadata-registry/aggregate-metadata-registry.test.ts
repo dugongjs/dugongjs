@@ -99,7 +99,7 @@ describe("AggregateMetadataRegistry", () => {
     });
 
     describe("prototype inheritance: aggregate metadata", () => {
-        it("inherits aggregate metadata from base class if not defined on derived class", () => {
+        it("should inherit aggregate metadata from base class if not defined on derived class", () => {
             registry.registerAggregateMetadata(BaseAggregate, "BaseType");
 
             const metadata = registry.getAggregateMetadata(DerivedAggregate);
@@ -110,7 +110,7 @@ describe("AggregateMetadataRegistry", () => {
             });
         });
 
-        it("prefers derived aggregate metadata over base metadata", () => {
+        it("should prefer derived aggregate metadata over base metadata", () => {
             registry.registerAggregateMetadata(BaseAggregate, "BaseType");
             registry.registerAggregateMetadata(DerivedAggregate, "DerivedType");
 
@@ -124,7 +124,7 @@ describe("AggregateMetadataRegistry", () => {
     });
 
     describe("prototype inheritance: snapshot metadata", () => {
-        it("inherits snapshot metadata from base aggregate", () => {
+        it("should inherit snapshot metadata from base aggregate", () => {
             registry.registerAggregateMetadata(BaseAggregate, "BaseType");
             registry.registerAggregateSnapshotMetadata(BaseAggregate, { snapshotInterval: 50 });
 
@@ -135,7 +135,7 @@ describe("AggregateMetadataRegistry", () => {
             });
         });
 
-        it("prefers snapshot metadata defined on derived aggregate", () => {
+        it("should prefer snapshot metadata defined on derived aggregate", () => {
             registry.registerAggregateMetadata(BaseAggregate, "BaseType");
             registry.registerAggregateSnapshotMetadata(BaseAggregate, { snapshotInterval: 50 });
 
@@ -151,7 +151,7 @@ describe("AggregateMetadataRegistry", () => {
     });
 
     describe("prototype inheritance: domain event appliers", () => {
-        it("accumulates domain event appliers from base and derived aggregates", () => {
+        it("should accumulate domain event appliers from base and derived aggregates", () => {
             const baseApplier = () => {};
             const derivedApplier = () => {};
 
@@ -165,7 +165,7 @@ describe("AggregateMetadataRegistry", () => {
             expect(appliers.length).toBe(2);
         });
 
-        it("accumulates default appliers across the inheritance chain", () => {
+        it("should accumulate default appliers across the inheritance chain", () => {
             const baseDefaultApplier = () => {};
             const derivedDefaultApplier = () => {};
 

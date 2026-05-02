@@ -1,6 +1,8 @@
 {
     "extends": "../typescript-config/nodejs.json",
-    "compilerOptions": {},
-    "include": ["src"],
+    "compilerOptions": {
+        "types": ["vitest/globals"]
+    },
+    "include": ["src", "test", "vitest.config.ts"],
     "exclude": ["node_modules"]
 }

@@ -6,7 +6,7 @@ import {
     type EventSourcedAggregateRoot
 } from "@dugongjs/core";
 import { Injectable, Logger } from "@nestjs/common";
-import { InjectConsumedMessageRepository } from "../decorators/inject-comsumed-message-repository.decorator.js";
+import { InjectConsumedMessageRepository } from "../decorators/inject-consumed-message-repository.decorator.js";
 import { InjectCurrentOrigin } from "../decorators/inject-current-origin.decorator.js";
 import { InjectDomainEventRepository } from "../decorators/inject-domain-event-repository.decorator.js";
 import { InjectMessageConsumer } from "../decorators/inject-message-consumer.decorator.js";

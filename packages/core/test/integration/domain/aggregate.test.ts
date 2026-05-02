@@ -3,14 +3,14 @@ import { aggregateDomainEventApplier } from "../../../src/domain/aggregate-domai
 import { AggregateIdMismatchError } from "../../../src/domain/aggregate-domain-event-applier/errors/aggregate-id-mismatch.error.js";
 import { DomainEventSequenceNumberMismatchError } from "../../../src/domain/aggregate-domain-event-applier/errors/domain-event-sequence-number-mismatch.error.js";
 import { aggregateMetadataRegistry } from "../../../src/domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
-import { UserAggregate, UserCreatedEvent } from "../use-cases/user.aggregate.js";
+import { UserAggregate, UserCreatedEvent } from "../fixtures/user.aggregate.js";
 
-describe("Aggregate and Domain Event Integration", () => {
+describe("aggregate and domain event behavior", () => {
     afterAll(() => {
         aggregateMetadataRegistry.clear();
     });
 
-    it("should handle domain events and apply them to the aggregate", () => {
+    it("should apply created events and update aggregate state", () => {
         const userAggregate = new UserAggregate();
         const username = "test_user";
 
@@ -26,7 +26,7 @@ describe("Aggregate and Domain Event Integration", () => {
         expect(userAggregate.getStagedDomainEvents()).toContain(userCreatedEvent);
     });
 
-    it("should handle multiple domain events and apply them to the aggregate", () => {
+    it("should apply multiple staged events in sequence", () => {
         const userAggregate = new UserAggregate();
         const username1 = "test_user1";
         const username2 = "test_user2";
@@ -46,7 +46,7 @@ describe("Aggregate and Domain Event Integration", () => {
         expect(userAggregate.getStagedDomainEvents().length).toBe(2);
     });
 
-    it("should apply default domain event appliers to the aggregate", () => {
+    it("should run default appliers to update aggregate version", () => {
         const userAggregate = new UserAggregate();
         const username = "test_user";
 
@@ -75,7 +75,7 @@ describe("Aggregate and Domain Event Integration", () => {
         expect(userAggregate.getVersion()).toBe(2);
     });
 
-    it("should throw an error when sequence numbers do not match", () => {
+    it("should throw when an incoming event sequence does not match aggregate state", () => {
         const userAggregate = new UserAggregate();
         const username = "test_user";
 
@@ -93,7 +93,7 @@ describe("Aggregate and Domain Event Integration", () => {
         }).toThrowError(DomainEventSequenceNumberMismatchError);
     });
 
-    it("should set the ID of the aggregate when rehydrating from a domain event", () => {
+    it("should hydrate aggregate id from the first applied event", () => {
         const userId = faker.string.uuid();
         const userAggregate = new UserAggregate();
 
@@ -107,7 +107,7 @@ describe("Aggregate and Domain Event Integration", () => {
         expect(userAggregate.getId()).toBe(userId);
     });
 
-    it("should throw an error when the aggregate ID does not match the domain event ID", () => {
+    it("should throw when aggregate id and event aggregate id differ", () => {
         const userId = faker.string.uuid();
         const userAggregate = new UserAggregate();
         const username = "test_user";
@@ -123,7 +123,7 @@ describe("Aggregate and Domain Event Integration", () => {
         }).toThrowError(AggregateIdMismatchError);
     });
 
-    it("should call the onCreate lifecycle method of the domain event to allow payload validation", () => {
+    it("should run domain event create hooks for payload validation", () => {
         const userAggregate = new UserAggregate();
 
         expect(() => {
@@ -135,7 +135,7 @@ describe("Aggregate and Domain Event Integration", () => {
         }).toThrowErrorMatchingInlineSnapshot(`[Error: Username must be at most 20 characters long.]`);
     });
 
-    it("should support async commands", async () => {
+    it("should support async command handlers that stage domain events", async () => {
         const userAggregate = new UserAggregate();
         const username = "test_user";
 

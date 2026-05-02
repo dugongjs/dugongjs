@@ -1,10 +1,9 @@
-import { EventIssuerModule } from "@dugongjs/nestjs";
-import { KafkaModule, MessageConsumerKafkaJSModule } from "@dugongjs/nestjs-kafkajs";
-import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
+import { DugongAdapterBuilder, DugongModule } from "@dugongjs/nestjs";
+import { kafkaJSMessageConsumerAdapter, KafkaModule } from "@dugongjs/nestjs-kafkajs";
 import {
-    OutboxMessageProducerTypeOrmModule,
-    RepositoryTypeOrmModule,
-    TransactionManagerTypeOrmModule
+    typeOrmOutboxMessageProducerAdapter,
+    typeOrmRepositoryAdapter,
+    typeOrmTransactionManagerAdapter
 } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -20,12 +19,15 @@ import { dataSourceOptions } from "./db/data-source-options.js";
     imports: [
         TypeOrmModule.forRoot(dataSourceOptions),
         KafkaModule.forRoot({ brokers: process.env.KAFKA_BROKERS!.split(",") }),
-        RepositoryTypeOrmModule.forRoot(),
-        TransactionManagerTypeOrmModule.forRoot(),
-        EventIssuerModule.forRoot({ currentOrigin: "BankingContext-AccountService" }),
-        AggregateQueryMicroserviceModule,
-        MessageConsumerKafkaJSModule.forRoot(),
-        OutboxMessageProducerTypeOrmModule.forRoot(),
+        DugongModule.forRoot({
+            currentOrigin: "BankingContext-AccountService",
+            adapters: DugongAdapterBuilder.create()
+                .register(typeOrmRepositoryAdapter)
+                .register(typeOrmTransactionManagerAdapter)
+                .register(typeOrmOutboxMessageProducerAdapter)
+                .register(kafkaJSMessageConsumerAdapter)
+                .build()
+        }),
         BankAccountCommandModule,
         BankAccountQueryModelProjectionConsumerModule.register({
             repository: BankAccountQueryModelWriteRepositoryTypeOrmService
