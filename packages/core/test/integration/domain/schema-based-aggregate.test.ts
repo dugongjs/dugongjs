@@ -7,15 +7,15 @@ import {
     OrderCompletedEvent,
     OrderCreatedEvent,
     OrderItemAddedEvent
-} from "../use-cases/order.aggregate.js";
+} from "../fixtures/order.aggregate.js";
 
-describe("Schema-based Aggregate Integration", () => {
+describe("schema-based aggregate behavior", () => {
     afterAll(() => {
         aggregateMetadataRegistry.clear();
     });
 
-    describe("OrderCreatedEvent", () => {
-        it("should create an order with valid data and transform Date to ISO string", async () => {
+    describe("order created event behavior", () => {
+        it("should stage an order-created event with date encoded as ISO string", async () => {
             const order = new OrderAggregate();
             const customerId = faker.string.uuid();
             const customerName = faker.person.fullName();
@@ -35,7 +35,7 @@ describe("Schema-based Aggregate Integration", () => {
             expect(payload.customerName).toBe(customerName);
         });
 
-        it("should apply OrderCreatedEvent to aggregate", async () => {
+        it("should apply order-created events to aggregate state", async () => {
             const order = new OrderAggregate();
             const customerId = faker.string.uuid();
             const customerName = faker.person.fullName();
@@ -51,25 +51,23 @@ describe("Schema-based Aggregate Integration", () => {
             expect(order.getCreatedAt()).toBe(createdAt.toISOString());
         });
 
-        it("should throw SchemaValidationError for invalid customerId", async () => {
+        it("should reject invalid customer id values", async () => {
             const order = new OrderAggregate();
 
-            await expect(
-                order.createOrder("not-a-uuid", faker.person.fullName(), new Date())
-            ).rejects.toThrow(SchemaValidationError);
+            await expect(order.createOrder("not-a-uuid", faker.person.fullName(), new Date())).rejects.toThrow(
+                SchemaValidationError
+            );
         });
 
-        it("should throw SchemaValidationError for empty customerName", async () => {
+        it("should reject empty customer names", async () => {
             const order = new OrderAggregate();
 
-            await expect(
-                order.createOrder(faker.string.uuid(), "", new Date())
-            ).rejects.toThrow(SchemaValidationError);
+            await expect(order.createOrder(faker.string.uuid(), "", new Date())).rejects.toThrow(SchemaValidationError);
         });
     });
 
-    describe("OrderItemAddedEvent", () => {
-        it("should add line item with valid data", async () => {
+    describe("order item added event behavior", () => {
+        it("should stage line-item events for valid item input", async () => {
             const order = new OrderAggregate();
             await order.createOrder(faker.string.uuid(), faker.person.fullName(), new Date());
 
@@ -92,7 +90,7 @@ describe("Schema-based Aggregate Integration", () => {
             expect(payload.unitPrice).toBe(unitPrice);
         });
 
-        it("should calculate line total in onPostValidation", async () => {
+        it("should calculate line totals during event lifecycle hooks", async () => {
             const order = new OrderAggregate();
             await order.createOrder(faker.string.uuid(), faker.person.fullName(), new Date());
 
@@ -105,7 +103,7 @@ describe("Schema-based Aggregate Integration", () => {
             expect(itemEvent.getLineTotal()).toBe(50.0);
         });
 
-        it("should apply line items to aggregate", async () => {
+        it("should apply line-item events to the aggregate list", async () => {
             const order = new OrderAggregate();
             await order.createOrder(faker.string.uuid(), faker.person.fullName(), new Date());
 
@@ -127,7 +125,7 @@ describe("Schema-based Aggregate Integration", () => {
             expect(lineItems[1].productName).toBe("Widget B");
         });
 
-        it("should throw SchemaValidationError for invalid quantity", async () => {
+        it("should reject non-positive line-item quantities", async () => {
             const order = new OrderAggregate();
             await order.createOrder(faker.string.uuid(), faker.person.fullName(), new Date());
 
@@ -135,26 +133,26 @@ describe("Schema-based Aggregate Integration", () => {
             aggregateDomainEventApplier.applyDomainEventToAggregate(order, createEvent);
 
             // quantity must be >= 1
-            await expect(
-                order.addLineItem(faker.string.uuid(), "Widget", 0, 10.0)
-            ).rejects.toThrow(SchemaValidationError);
+            await expect(order.addLineItem(faker.string.uuid(), "Widget", 0, 10.0)).rejects.toThrow(
+                SchemaValidationError
+            );
         });
 
-        it("should throw SchemaValidationError for negative unit price", async () => {
+        it("should reject negative line-item prices", async () => {
             const order = new OrderAggregate();
             await order.createOrder(faker.string.uuid(), faker.person.fullName(), new Date());
 
             const createEvent = order.getStagedDomainEvents()[0];
             aggregateDomainEventApplier.applyDomainEventToAggregate(order, createEvent);
 
-            await expect(
-                order.addLineItem(faker.string.uuid(), "Widget", 1, -5.0)
-            ).rejects.toThrow(SchemaValidationError);
+            await expect(order.addLineItem(faker.string.uuid(), "Widget", 1, -5.0)).rejects.toThrow(
+                SchemaValidationError
+            );
         });
     });
 
-    describe("OrderCompletedEvent", () => {
-        it("should complete order with total amount calculation", async () => {
+    describe("order completed event behavior", () => {
+        it("should stage completion events with computed total amount", async () => {
             const order = new OrderAggregate();
             await order.createOrder(faker.string.uuid(), faker.person.fullName(), new Date());
 
@@ -179,7 +177,7 @@ describe("Schema-based Aggregate Integration", () => {
             expect(payload.totalAmount).toBe(65.0); // (2 * 10) + (3 * 15)
         });
 
-        it("should apply completion to aggregate", async () => {
+        it("should apply completion events to mark aggregate as completed", async () => {
             const order = new OrderAggregate();
             await order.createOrder(faker.string.uuid(), faker.person.fullName(), new Date());
 
@@ -202,8 +200,8 @@ describe("Schema-based Aggregate Integration", () => {
         });
     });
 
-    describe("Mixed schema and non-schema events", () => {
-        it("should handle both schema-based and regular events in same aggregate", async () => {
+    describe("mixed event behavior", () => {
+        it("should support schema and non-schema events in one aggregate stream", async () => {
             const order = new OrderAggregate();
             await order.createOrder(faker.string.uuid(), faker.person.fullName(), new Date());
 
@@ -220,8 +218,8 @@ describe("Schema-based Aggregate Integration", () => {
         });
     });
 
-    describe("Event serialization with schema-based events", () => {
-        it("should serialize and deserialize OrderCreatedEvent correctly", async () => {
+    describe("schema event serialization behavior", () => {
+        it("should round-trip order-created events through serialization", async () => {
             const order = new OrderAggregate();
             const customerId = faker.string.uuid();
             const customerName = faker.person.fullName();
@@ -243,7 +241,7 @@ describe("Schema-based Aggregate Integration", () => {
             expect(deserialized.getAggregateId()).toBe(originalEvent.getAggregateId());
         });
 
-        it("should preserve transformed payload after serialization roundtrip", async () => {
+        it("should preserve transformed payload values after round-trip serialization", async () => {
             const order = new OrderAggregate();
             const createdAt = new Date("2024-06-20T08:00:00.000Z");
 
@@ -262,8 +260,8 @@ describe("Schema-based Aggregate Integration", () => {
         });
     });
 
-    describe("Static properties on schema-based events", () => {
-        it("should provide correct static properties", () => {
+    describe("schema event metadata behavior", () => {
+        it("should expose expected static event metadata", () => {
             expect(OrderCreatedEvent.origin).toBe("Sales.OrderService");
             expect(OrderCreatedEvent.aggregateType).toBe("Order");
             expect(OrderCreatedEvent.type).toBe("OrderCreated");
@@ -271,8 +269,8 @@ describe("Schema-based Aggregate Integration", () => {
         });
     });
 
-    describe("Full order lifecycle", () => {
-        it("should handle complete order lifecycle with schema validation", async () => {
+    describe("full order lifecycle behavior", () => {
+        it("should process create, line items, and completion with schema validation", async () => {
             const order = new OrderAggregate();
             const customerId = faker.string.uuid();
             const customerName = faker.person.fullName();
@@ -280,10 +278,7 @@ describe("Schema-based Aggregate Integration", () => {
 
             // Create order
             await order.createOrder(customerId, customerName, orderDate);
-            aggregateDomainEventApplier.applyDomainEventToAggregate(
-                order,
-                order.getStagedDomainEvents()[0]
-            );
+            aggregateDomainEventApplier.applyDomainEventToAggregate(order, order.getStagedDomainEvents()[0]);
 
             expect(order.getCustomerId()).toBe(customerId);
             expect(order.getStatus()).toBe("pending");
@@ -293,18 +288,9 @@ describe("Schema-based Aggregate Integration", () => {
             await order.addLineItem(faker.string.uuid(), "Mouse", 2, 29.99);
             await order.addLineItem(faker.string.uuid(), "Keyboard", 1, 79.99);
 
-            aggregateDomainEventApplier.applyDomainEventToAggregate(
-                order,
-                order.getStagedDomainEvents()[1]
-            );
-            aggregateDomainEventApplier.applyDomainEventToAggregate(
-                order,
-                order.getStagedDomainEvents()[2]
-            );
-            aggregateDomainEventApplier.applyDomainEventToAggregate(
-                order,
-                order.getStagedDomainEvents()[3]
-            );
+            aggregateDomainEventApplier.applyDomainEventToAggregate(order, order.getStagedDomainEvents()[1]);
+            aggregateDomainEventApplier.applyDomainEventToAggregate(order, order.getStagedDomainEvents()[2]);
+            aggregateDomainEventApplier.applyDomainEventToAggregate(order, order.getStagedDomainEvents()[3]);
 
             expect(order.getLineItems()).toHaveLength(3);
 
@@ -312,10 +298,7 @@ describe("Schema-based Aggregate Integration", () => {
             const completionDate = new Date("2024-01-15T14:30:00.000Z");
             await order.completeOrder(completionDate);
 
-            aggregateDomainEventApplier.applyDomainEventToAggregate(
-                order,
-                order.getStagedDomainEvents()[4]
-            );
+            aggregateDomainEventApplier.applyDomainEventToAggregate(order, order.getStagedDomainEvents()[4]);
 
             expect(order.getStatus()).toBe("completed");
             expect(order.getCompletedAt()).toBe("2024-01-15T14:30:00.000Z");

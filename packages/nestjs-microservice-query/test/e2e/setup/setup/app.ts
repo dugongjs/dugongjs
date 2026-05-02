@@ -9,8 +9,8 @@ import { Logger, LoggerModule } from "nestjs-pino";
 import { DataSource } from "typeorm";
 import { AggregateQueryClientProxyService } from "../../../../src/client/aggregate-query-client-proxy.service.js";
 import { AggregateQueryMicroserviceModule } from "../../../../src/server/aggregate-query-microservice.module.js";
-import { UserCommandModule } from "../../use-cases/user-aggregate/application/command/user.command.module.js";
-import { UserQueryModule } from "../../use-cases/user-aggregate/application/query/user.query.module.js";
+import { UserCommandModule } from "../../fixtures/user/application/command/user.command.module.js";
+import { UserQueryModule } from "../../fixtures/user/application/query/user.query.module.js";
 
 let app: INestApplication;
 let dataSource: DataSource;

@@ -9,20 +9,21 @@ import type { ILogger } from "../../../src/application/logger/i-logger.js";
 import type { SerializedDomainEvent } from "../../../src/domain/abstract-domain-event/serialized-domain-event.js";
 import { InMemoryMessageBus } from "../../../src/infrastructure/in-memory-message-bus/in-memory-message-bus.js";
 import type { IInboundMessageMapper } from "../../../src/ports/inbound/message-broker/i-inbound-message-mapper.js";
+import type { IOutboundMessageMapper } from "../../../src/ports/outbound/message-broker/i-outbound-message-mapper.js";
 import type { IConsumedMessageRepository } from "../../../src/ports/outbound/repository/i-consumed-message-repository.js";
 import type { IDomainEventRepository } from "../../../src/ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository } from "../../../src/ports/outbound/repository/i-snapshot-repository.js";
 import type { ITransactionManager } from "../../../src/ports/outbound/transaction-manager/i-transaction-manager.js";
-import { UserAggregate } from "../use-cases/user.aggregate.js";
+import { UserAggregate } from "../fixtures/user.aggregate.js";
 
-describe("InMemoryMessageBus", () => {
+describe("in-memory message bus integration behavior", () => {
     let aggregateManager: AggregateManager<typeof UserAggregate>;
     let aggregateMessageConsumer: AggregateMessageConsumer<typeof UserAggregate, SerializedDomainEvent>;
     let messageBus: InMemoryMessageBus<SerializedDomainEvent>;
     let messageProducer: MessageProducerInMemory;
     let messageConsumer: MessageConsumerInMemory;
     let inboundMessageMapper: IInboundMessageMapper<SerializedDomainEvent>;
-    let outboundMessageMapper: IInboundMessageMapper<SerializedDomainEvent>;
+    let outboundMessageMapper: IOutboundMessageMapper<SerializedDomainEvent>;
 
     const transactionManager = mock<ITransactionManager>({
         transaction: (fn) => fn({})
@@ -66,7 +67,7 @@ describe("InMemoryMessageBus", () => {
         });
     });
 
-    it("should publish and consume domain events as messages", async () => {
+    it("should deliver committed domain events to registered message consumers", async () => {
         const handler = vi.fn();
 
         aggregateMessageConsumer.registerMessageConsumerForAggregate("test-consumer", handler);

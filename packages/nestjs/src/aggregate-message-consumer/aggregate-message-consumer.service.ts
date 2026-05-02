@@ -10,7 +10,7 @@ import {
     type HandleMessageOptions
 } from "@dugongjs/core";
 import { Injectable, Logger } from "@nestjs/common";
-import { InjectConsumedMessageRepository } from "../decorators/inject-comsumed-message-repository.decorator.js";
+import { InjectConsumedMessageRepository } from "../decorators/inject-consumed-message-repository.decorator.js";
 import { InjectCurrentOrigin } from "../decorators/inject-current-origin.decorator.js";
 import { InjectDomainEventRepository } from "../decorators/inject-domain-event-repository.decorator.js";
 import { InjectInboundMessageMapper } from "../decorators/inject-inbound-message-mapper.decorator.js";

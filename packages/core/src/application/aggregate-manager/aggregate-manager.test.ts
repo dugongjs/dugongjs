@@ -85,7 +85,7 @@ describe("AggregateManager", () => {
     });
 
     describe("applyStagedDomainEvents", () => {
-        it("applies staged domain events to the aggregate", () => {
+        it("should apply staged domain events to the aggregate", () => {
             const manager = createManager();
             const aggregate = new MockAggregate();
 
@@ -96,7 +96,7 @@ describe("AggregateManager", () => {
     });
 
     describe("commitStagedDomainEvents", () => {
-        it("does nothing if there are no staged domain events", async () => {
+        it("should do nothing if there are no staged domain events", async () => {
             const manager = createManager();
             const aggregate = new MockAggregate();
 
@@ -107,7 +107,7 @@ describe("AggregateManager", () => {
             expect(mockSnapshotRepository.saveSnapshot).not.toHaveBeenCalled();
         });
 
-        it("commits staged domain events and publishes messages", async () => {
+        it("should commit staged domain events and publish messages", async () => {
             const manager = createManager({
                 messageProducer: mockMessageProducer,
                 outboundMessageMapper: mockOutboundMessageMapper

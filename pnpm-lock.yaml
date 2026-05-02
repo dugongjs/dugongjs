@@ -766,15 +766,24 @@ importers:
       '@dugongjs/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@swc/core':
+        specifier: ^1.11.21
+        version: 1.15.11(@swc/helpers@0.5.18)
       '@types/node':
         specifier: ^24.5.1
         version: 24.10.13
       '@types/uuid':
         specifier: ^9.0.8
         version: 9.0.8
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
+      unplugin-swc:
+        specifier: ^1.5.2
+        version: 1.5.9(@swc/core@1.15.11(@swc/helpers@0.5.18))(rollup@4.57.1)
       uuid:
         specifier: ^9.0.1
         version: 9.0.1

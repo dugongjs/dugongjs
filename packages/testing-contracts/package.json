@@ -17,6 +17,7 @@
     },
     "scripts": {
         "lint": "eslint .",
+        "test:run": "vitest run",
         "test:typecheck": "tsc --noEmit"
     },
     "peerDependencies": {
@@ -26,6 +27,9 @@
     "devDependencies": {
         "@dugongjs/core": "workspace:*",
         "@dugongjs/eslint-config": "workspace:*",
+        "@swc/core": "^1.11.21",
+        "unplugin-swc": "^1.5.2",
+        "reflect-metadata": "^0.2.2",
         "@dugongjs/typescript-config": "workspace:*",
         "@types/node": "^24.5.1",
         "@types/uuid": "^9.0.8",

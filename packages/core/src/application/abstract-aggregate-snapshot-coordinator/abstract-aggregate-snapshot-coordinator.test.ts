@@ -78,7 +78,7 @@ describe("AbstractAggregateSnapshotCoordinator", () => {
     }
 
     describe("snapshotIfNecessary", () => {
-        it("does nothing if aggregate is not snapshotable", async () => {
+        it("should do nothing if aggregate is not snapshotable", async () => {
             const coordinator = createCoordinatorWithSnapshotMetadata(null);
             const aggregate = new MockAggregate();
 
@@ -90,7 +90,7 @@ describe("AbstractAggregateSnapshotCoordinator", () => {
             expect(mockSnapshotRepository.saveSnapshot).not.toHaveBeenCalled();
         });
 
-        it("does nothing if snapshot interval is not reached", async () => {
+        it("should do nothing if snapshot interval is not reached", async () => {
             const coordinator = createCoordinator();
             const aggregate = new MockAggregate();
 
@@ -102,7 +102,7 @@ describe("AbstractAggregateSnapshotCoordinator", () => {
             expect(mockSnapshotRepository.saveSnapshot).not.toHaveBeenCalled();
         });
 
-        it("creates a snapshot when interval is reached and no snapshot exists", async () => {
+        it("should create a snapshot when interval is reached and no snapshot exists", async () => {
             const coordinator = createCoordinator();
             const aggregate = new MockAggregate();
 
@@ -122,7 +122,7 @@ describe("AbstractAggregateSnapshotCoordinator", () => {
             expect(mockSnapshotRepository.saveSnapshot).toHaveBeenCalled();
         });
 
-        it("creates a snapshot when enough events occurred since last snapshot", async () => {
+        it("should create a snapshot when enough events occurred since last snapshot", async () => {
             const coordinator = createCoordinator();
             const aggregate = new MockAggregate();
 
@@ -138,7 +138,7 @@ describe("AbstractAggregateSnapshotCoordinator", () => {
             expect(mockSnapshotRepository.saveSnapshot).toHaveBeenCalled();
         });
 
-        it("does not create a snapshot if latest snapshot is ahead or equal", async () => {
+        it("should not create a snapshot if latest snapshot is ahead or equal", async () => {
             const coordinator = createCoordinator();
             const aggregate = new MockAggregate();
 
@@ -154,7 +154,7 @@ describe("AbstractAggregateSnapshotCoordinator", () => {
             expect(mockSnapshotRepository.saveSnapshot).not.toHaveBeenCalled();
         });
 
-        it("does not create a snapshot if aggregate cannot be restored from snapshot", async () => {
+        it("should not create a snapshot if aggregate cannot be restored from snapshot", async () => {
             (aggregateSnapshotTransformer.canBeRestoredFromSnapshot as any) = vi.fn(() => ({
                 isEqual: false,
                 snapshot: {},
@@ -172,7 +172,7 @@ describe("AbstractAggregateSnapshotCoordinator", () => {
             expect(mockSnapshotRepository.saveSnapshot).not.toHaveBeenCalled();
         });
 
-        it("passes tenantId to snapshot transformer when provided", async () => {
+        it("should pass tenantId to snapshot transformer when provided", async () => {
             const tenantId = faker.string.uuid();
 
             const coordinator = createCoordinator({ tenantId });

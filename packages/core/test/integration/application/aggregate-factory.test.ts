@@ -10,9 +10,9 @@ import type {
     SerializedSnapshot
 } from "../../../src/ports/outbound/repository/i-snapshot-repository.js";
 import type { ITransactionManager } from "../../../src/ports/outbound/transaction-manager/i-transaction-manager.js";
-import { UserAggregate, UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent } from "../use-cases/user.aggregate.js";
+import { UserAggregate, UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent } from "../fixtures/user.aggregate.js";
 
-describe("AggregateFactory", () => {
+describe("aggregate factory integration behavior", () => {
     let factory: AggregateFactory<typeof UserAggregate>;
 
     const transactionManager = mock<ITransactionManager>();
@@ -35,8 +35,8 @@ describe("AggregateFactory", () => {
         });
     });
 
-    describe("constructor", () => {
-        it("should throw an error if aggregate metadata is not found", () => {
+    describe("constructor behavior", () => {
+        it("should throw aggregate metadata error for undecorated aggregate classes", () => {
             class AggregateWithoutMetadata extends AbstractEventSourcedAggregateRoot {}
 
             expect(
@@ -53,8 +53,8 @@ describe("AggregateFactory", () => {
         });
     });
 
-    describe("build", () => {
-        it("should build an aggregate from the latest snapshot if snapshotable and skipSnapshot is not set", async () => {
+    describe("build behavior", () => {
+        it("should build from the latest snapshot when snapshot loading is enabled", async () => {
             const userId = faker.string.uuid();
 
             const snapshot: SerializedSnapshot = {
@@ -75,7 +75,7 @@ describe("AggregateFactory", () => {
             expect(user).toBeInstanceOf(UserAggregate);
         });
 
-        it("should build an aggregate from the event log if skipSnapshot is set", async () => {
+        it("should build from event history when snapshot loading is skipped", async () => {
             const userId = faker.string.uuid();
 
             domainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce([
@@ -93,7 +93,7 @@ describe("AggregateFactory", () => {
             expect(user).toBeInstanceOf(UserAggregate);
         });
 
-        it("should return null if the aggregate is deleted and returnDeleted is not set", async () => {
+        it("should return null for deleted aggregates unless returnDeleted is enabled", async () => {
             const userId = faker.string.uuid();
 
             const snapshot: SerializedSnapshot = {
@@ -122,7 +122,7 @@ describe("AggregateFactory", () => {
             expect(user).toBeNull();
         });
 
-        it("should return the deleted aggregate if returnDeleted is set", async () => {
+        it("should return deleted aggregates when returnDeleted is enabled", async () => {
             const userId = faker.string.uuid();
 
             const snapshot: SerializedSnapshot = {
@@ -152,7 +152,7 @@ describe("AggregateFactory", () => {
             expect(user?.isDeleted()).toBe(true);
         });
 
-        it("should return null if no snapshot or events are found", async () => {
+        it("should return null when no snapshot or events exist", async () => {
             const userId = faker.string.uuid();
 
             snapshotRepository.getLatestSnapshot.mockResolvedValueOnce(null);
@@ -164,8 +164,8 @@ describe("AggregateFactory", () => {
         });
     });
 
-    describe("buildFromEventLog", () => {
-        it("should create an instance of the aggregate class", async () => {
+    describe("buildFromEventLog behavior", () => {
+        it("should rehydrate an aggregate from a single event", async () => {
             const userId = faker.string.uuid();
 
             domainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce([
@@ -183,31 +183,33 @@ describe("AggregateFactory", () => {
             expect(user).toBeInstanceOf(UserAggregate);
         });
 
-        it("should create an instance of the aggregate class from several events", async () => {
+        it("should rehydrate aggregate state from a multi-event history", async () => {
             const userId = faker.string.uuid();
+            const createdUsername = faker.internet.userName();
+            const updatedUsernameA = faker.internet.userName();
+            const updatedUsernameB = faker.internet.userName();
+            const updatedUsernameC = faker.internet.userName();
 
             const userCreatedEvent = new UserCreatedEvent(userId, {
-                username: faker.internet.userName()
+                username: createdUsername
             });
 
-            const userUpdatedEvent1 = new UserCreatedEvent(userId, {
-                username: faker.internet.userName()
+            const userUpdatedEvent1 = new UserUpdatedEvent(userId, {
+                username: updatedUsernameA
             });
 
-            const userUpdatedEvent2 = new UserCreatedEvent(userId, {
-                username: faker.internet.userName()
+            const userUpdatedEvent2 = new UserUpdatedEvent(userId, {
+                username: updatedUsernameB
             });
 
-            const userUpdatedEvent3 = new UserCreatedEvent(userId, {
-                username: faker.internet.userName()
+            const userUpdatedEvent3 = new UserUpdatedEvent(userId, {
+                username: updatedUsernameC
             });
 
-            const UserDeletedEvent = new UserCreatedEvent(userId, {
-                username: faker.internet.userName()
-            });
+            const userDeletedEvent = new UserDeletedEvent(userId);
 
             domainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce(
-                [userCreatedEvent, userUpdatedEvent1, userUpdatedEvent2, userUpdatedEvent3, UserDeletedEvent].map(
+                [userCreatedEvent, userUpdatedEvent1, userUpdatedEvent2, userUpdatedEvent3, userDeletedEvent].map(
                     (event, index) =>
                         event
                             .setAggregateId(userId)
@@ -216,9 +218,15 @@ describe("AggregateFactory", () => {
                             .serialize()
                 )
             );
+
+            const user = await factory.buildFromEventLog(userId);
+
+            expect(user).toBeInstanceOf(UserAggregate);
+            expect(user?.getUsername()).toBe(updatedUsernameC);
+            expect(user?.isDeleted()).toBe(true);
         });
 
-        it("should return null if no events are found", async () => {
+        it("should return null when event history is empty", async () => {
             const userId = faker.string.uuid();
 
             domainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce([]);
@@ -229,8 +237,8 @@ describe("AggregateFactory", () => {
         });
     });
 
-    describe("buildFromLatestSnapshot", () => {
-        it("should create an instance of the aggregate class from the latest snapshot", async () => {
+    describe("buildFromLatestSnapshot behavior", () => {
+        it("should rehydrate from the latest snapshot when available", async () => {
             const userId = faker.string.uuid();
 
             const snapshot: SerializedSnapshot = {
@@ -251,7 +259,7 @@ describe("AggregateFactory", () => {
             expect(user).toBeInstanceOf(UserAggregate);
         });
 
-        it("should create an instance of the aggregate class from the latest snapshot and apply events", async () => {
+        it("should apply newer events after rehydrating from the latest snapshot", async () => {
             const userId = faker.string.uuid();
 
             const snapshot: SerializedSnapshot = {
@@ -289,7 +297,7 @@ describe("AggregateFactory", () => {
             expect(user?.isDeleted()).toBe(true);
         });
 
-        it("should return null if no snapshot is found", async () => {
+        it("should return null when no snapshot exists", async () => {
             const userId = faker.string.uuid();
 
             snapshotRepository.getLatestSnapshot.mockResolvedValueOnce(null);

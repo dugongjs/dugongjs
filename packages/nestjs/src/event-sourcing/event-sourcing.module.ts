@@ -34,8 +34,8 @@ export type EventSourcingModuleOptions = {
 })
 export class EventSourcingModule {
     public static register(options?: EventSourcingModuleOptions): DynamicModule {
-        const imports = options?.module?.imports ?? [];
-        const providers = options?.module?.providers ?? [];
+        const imports = [...(options?.module?.imports ?? [])];
+        const providers = [...(options?.module?.providers ?? [])];
 
         if (options?.transactionManager?.transactionManager) {
             providers.push({
