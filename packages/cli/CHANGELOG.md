@@ -1,5 +1,13 @@
 # @dugongjs/cli
 
+## 0.0.30
+
+### Patch Changes
+
+- Updated dependencies [dbce7ba]
+    - @dugongjs/nestjs@0.0.27
+    - @dugongjs/nestjs-microservice-query@0.0.28
+
 ## 0.0.29
 
 ### Patch Changes

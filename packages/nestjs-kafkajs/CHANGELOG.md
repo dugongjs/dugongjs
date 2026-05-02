@@ -1,5 +1,13 @@
 # @dugongjs/nestjs-kafkajs
 
+## 0.0.24
+
+### Patch Changes
+
+- dbce7ba: Add the Dugong module adapter builder for NestJS and export the NestJS KafkaJS and TypeORM adapters needed to use it
+- Updated dependencies [dbce7ba]
+    - @dugongjs/nestjs@0.0.27
+
 ## 0.0.23
 
 ### Patch Changes
