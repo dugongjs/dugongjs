@@ -10,10 +10,12 @@ import {
     type Constructor
 } from "@dugongjs/core";
 import type { ModuleMetadata } from "@nestjs/common";
+import type { ILoggerFactory } from "../logger/i-logger-factory.js";
 
 export type DugongAdapters = {
     imports?: ModuleMetadata["imports"];
     providers?: ModuleMetadata["providers"];
+    loggerFactory?: Constructor<ILoggerFactory>;
     transactionManager?: Constructor<ITransactionManager>;
     domainEventRepository?: Constructor<IDomainEventRepository>;
     snapshotRepository?: Constructor<ISnapshotRepository>;
@@ -29,10 +31,6 @@ export type DugongAdapterFactory = () => DugongAdapters;
 export class DugongAdapterBuilder {
     private adapters: DugongAdapters[] = [];
 
-    public static create(): DugongAdapterBuilder {
-        return new DugongAdapterBuilder();
-    }
-
     public register(adapter: DugongAdapters | DugongAdapterFactory): this {
         this.adapters.push(typeof adapter === "function" ? adapter() : adapter);
         return this;
@@ -47,6 +45,9 @@ export class DugongAdapterBuilder {
         const imports = this.adapters.flatMap((adapter) => adapter.imports ?? []);
         const providers = this.adapters.flatMap((adapter) => adapter.providers ?? []);
         const mergedAdapters = this.adapters.reduce<DugongAdapters>((acc, adapter) => {
+            if (adapter.loggerFactory !== undefined) {
+                acc.loggerFactory = adapter.loggerFactory;
+            }
             if (adapter.transactionManager !== undefined) {
                 acc.transactionManager = adapter.transactionManager;
             }

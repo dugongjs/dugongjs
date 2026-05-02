@@ -12,6 +12,7 @@ import { Module, type DynamicModule, type Provider, type Type } from "@nestjs/co
 import { AggregateDomainEventConsumerModule } from "../aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 import { EventIssuerModule } from "../event-issuer/event-issuer.module.js";
 import { ExternalOriginModule, type ExternalOriginModuleOptions } from "../external-origin/external-origin.module.js";
+import { ILoggerFactory } from "../logger/i-logger-factory.js";
 import type { DugongAdapters } from "./dugong-adapter.js";
 
 export type DugongModuleOptions = {
@@ -29,6 +30,7 @@ export class DugongModule {
             options.aggregateDomainEventConsumers ?? this.canRegisterAggregateDomainEventConsumers(adapters);
 
         const providers = new ProviderBuilder()
+            .withClassProvider(ILoggerFactory, adapters.loggerFactory)
             .withClassProvider(IDomainEventRepository, adapters.domainEventRepository)
             .withClassProvider(ISnapshotRepository, adapters.snapshotRepository)
             .withClassProvider(IConsumedMessageRepository, adapters.consumedMessageRepository)
@@ -75,7 +77,7 @@ export class DugongModule {
 class ProviderBuilder {
     private providers: Provider[] = [];
 
-    public withClassProvider(token: string, provider: Type | undefined): this {
+    public withClassProvider(token: string | Type, provider: Type | undefined): this {
         if (provider) {
             this.providers.push({
                 provide: token,

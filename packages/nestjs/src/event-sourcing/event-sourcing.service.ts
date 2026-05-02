@@ -6,24 +6,27 @@ import {
     type AggregateRoot,
     type EventSourcedAggregateRoot,
     type IDomainEventRepository,
+    type ILogger,
     type IMessageProducer,
     type ISnapshotRepository,
     type ITransactionManager,
     type RunInTransaction,
     type TransactionContext
 } from "@dugongjs/core";
-import { Injectable, Logger, Optional } from "@nestjs/common";
+import { Injectable, Optional } from "@nestjs/common";
 import { InjectCurrentOrigin } from "../decorators/inject-current-origin.decorator.js";
 import { InjectDomainEventRepository } from "../decorators/inject-domain-event-repository.decorator.js";
 import { InjectExternalOriginMap } from "../decorators/inject-external-origin-map.decorator.js";
+import { InjectLoggerFactory } from "../decorators/inject-logger-factory.decorator.js";
 import { InjectMessageProducer } from "../decorators/inject-message-producer.decorator.js";
 import { InjectOutboundMessageMapper } from "../decorators/inject-outbound-message-mapper.decorator.js";
 import { InjectSnapshotRepository } from "../decorators/inject-snapshot-repository.decorator.js";
 import { InjectTransactionManager } from "../decorators/inject-transaction-manager.decorator.js";
+import type { ILoggerFactory } from "../logger/i-logger-factory.js";
 
 @Injectable()
 export class EventSourcingService {
-    private readonly logger = new Logger(AggregateContext.name);
+    private readonly logger?: ILogger;
 
     constructor(
         @InjectCurrentOrigin() private readonly currentOrigin: string,
@@ -32,8 +35,11 @@ export class EventSourcingService {
         @InjectSnapshotRepository() private readonly snapshotRepository: ISnapshotRepository,
         @Optional() @InjectExternalOriginMap() private readonly externalOriginMap?: IExternalOriginMap,
         @Optional() @InjectMessageProducer() private readonly messageProducer?: IMessageProducer<any>,
-        @Optional() @InjectOutboundMessageMapper() private readonly outboundMessageMapper?: IOutboundMessageMapper<any>
-    ) {}
+        @Optional() @InjectOutboundMessageMapper() private readonly outboundMessageMapper?: IOutboundMessageMapper<any>,
+        @Optional() @InjectLoggerFactory() loggerFactory?: ILoggerFactory
+    ) {
+        this.logger = loggerFactory?.createLogger(AggregateContext.name);
+    }
 
     public createAggregateContext<TAggregateRootClass extends EventSourcedAggregateRoot>(
         transactionContext: TransactionContext | null,
