@@ -11,13 +11,13 @@ import {
     TransactionManagerTypeOrm
 } from "@dugongjs/typeorm";
 import type { EachMessagePayload } from "kafkajs";
-import { InboundMessageMapperKafkaJS } from "../../../../src/adapters/inbound/message-broker/inbound-message-mapper-kafkajs.js";
-import { MessageConsumerKafkaJS } from "../../../../src/adapters/inbound/message-broker/message-consumer-kafkajs.js";
+import { InboundMessageMapperKafkaJs } from "../../../../src/adapters/inbound/message-broker/inbound-message-mapper-kafkajs.js";
+import { MessageConsumerKafkaJs } from "../../../../src/adapters/inbound/message-broker/message-consumer-kafkajs.js";
 import { dataSource } from "../setup/data-source.js";
 import { kafka } from "../setup/kafkajs.js";
 import { Logger } from "./logger.js";
 
-export type AggregateMessageConsumerKafkaJSOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = Omit<
+export type AggregateMessageConsumerKafkaJsOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = Omit<
     AggregateMessageConsumerOptions<TAggregateRootClass, EachMessagePayload>,
     | "messageConsumer"
     | "inboundMessageMapper"
@@ -27,14 +27,14 @@ export type AggregateMessageConsumerKafkaJSOptions<TAggregateRootClass extends E
     | "logger"
 >;
 
-export class AggregateMessageConsumerKafkaJS<
+export class AggregateMessageConsumerKafkaJs<
     TAggregateRootClass extends EventSourcedAggregateRoot
 > extends AggregateMessageConsumer<TAggregateRootClass, EachMessagePayload> {
-    constructor(options: AggregateMessageConsumerKafkaJSOptions<TAggregateRootClass>) {
+    constructor(options: AggregateMessageConsumerKafkaJsOptions<TAggregateRootClass>) {
         super({
             ...options,
-            messageConsumer: new MessageConsumerKafkaJS(kafka),
-            inboundMessageMapper: new InboundMessageMapperKafkaJS(),
+            messageConsumer: new MessageConsumerKafkaJs(kafka),
+            inboundMessageMapper: new InboundMessageMapperKafkaJs(),
             consumedMessageRepository: new ConsumedMessageRepositoryTypeOrm(
                 dataSource.getRepository(ConsumedMessageEntity)
             ),
@@ -45,6 +45,6 @@ export class AggregateMessageConsumerKafkaJS<
     }
 
     public async disconnect(): Promise<void> {
-        await (this["messageConsumer"] as MessageConsumerKafkaJS).disconnect();
+        await (this["messageConsumer"] as MessageConsumerKafkaJs).disconnect();
     }
 }

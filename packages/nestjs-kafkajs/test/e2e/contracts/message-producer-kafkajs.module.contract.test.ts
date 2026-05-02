@@ -5,7 +5,7 @@ import type { Kafka, Message } from "kafkajs";
 import { vi } from "vitest";
 import { KafkaModule } from "../../../src/modules/kafka/kafka.module.js";
 import { KafkaService } from "../../../src/modules/kafka/kafka.service.js";
-import { MessageProducerKafkaJSModule } from "../../../src/modules/message-producer-kafkajs/message-producer-kafkajs.module.js";
+import { MessageProducerKafkaJsModule } from "../../../src/modules/message-producer-kafkajs/message-producer-kafkajs.module.js";
 import {
     collectMessages,
     createKafkaMessage,
@@ -25,7 +25,7 @@ async function getApp(): Promise<TestingModule> {
                 KafkaModule.forRoot({
                     brokers: [process.env.KAFKA_BOOTSTRAP_SERVER!]
                 }),
-                MessageProducerKafkaJSModule.forRoot()
+                MessageProducerKafkaJsModule.forRoot()
             ]
         }).compile();
 

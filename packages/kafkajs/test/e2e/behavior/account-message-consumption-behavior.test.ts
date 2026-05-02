@@ -1,31 +1,31 @@
 import { AggregateFactory, WaitForMessageConsumer } from "@dugongjs/core";
 import { MessageBuilder } from "@dugongjs/testing";
 import { faker } from "@faker-js/faker";
-import { OutboundMessageMapperKafkaJS } from "../../../src/adapters/outbound/message-broker/outbound-message-mapper-kafkajs.js";
+import { OutboundMessageMapperKafkaJs } from "../../../src/adapters/outbound/message-broker/outbound-message-mapper-kafkajs.js";
 import { Account } from "../fixtures/account/account.aggregate.js";
 import { AccountClosedEvent } from "../fixtures/account/domain-events/account-closed.event.js";
 import { AccountOpenedEvent } from "../fixtures/account/domain-events/account-opened.event.js";
 import { MoneyDepositedEvent } from "../fixtures/account/domain-events/money-deposited.event.js";
 import { MoneyWithdrawnEvent } from "../fixtures/account/domain-events/money-withdrawn.event.js";
 import { AggregateFactoryTypeOrm } from "../setup/app/aggregate-factory-typeorm.js";
-import { AggregateMessageConsumerKafkaJS } from "../setup/app/aggregate-message-consumer-kafkajs.js";
-import { AggregateMessageProducerKafkaJS } from "../setup/app/aggregate-message-producer-kafkajs.js";
-import { WaitForMessageConsumerKafkaJS } from "../setup/app/wait-for-message-consumer-kafkajs.js";
+import { AggregateMessageConsumerKafkaJs } from "../setup/app/aggregate-message-consumer-kafkajs.js";
+import { AggregateMessageProducerKafkaJs } from "../setup/app/aggregate-message-producer-kafkajs.js";
+import { WaitForMessageConsumerKafkaJs } from "../setup/app/wait-for-message-consumer-kafkajs.js";
 
 describe("message consumption behavior", () => {
-    let accountMessageConsumer: AggregateMessageConsumerKafkaJS<typeof Account>;
-    let accountMessageProducer: AggregateMessageProducerKafkaJS<typeof Account>;
+    let accountMessageConsumer: AggregateMessageConsumerKafkaJs<typeof Account>;
+    let accountMessageProducer: AggregateMessageProducerKafkaJs<typeof Account>;
     let accountFactory: AggregateFactory<typeof Account>;
     let waitForMessageConsumer: WaitForMessageConsumer;
 
     const mockHandleMessage = vi.fn();
 
     beforeAll(async () => {
-        accountMessageConsumer = new AggregateMessageConsumerKafkaJS({
+        accountMessageConsumer = new AggregateMessageConsumerKafkaJs({
             aggregateClass: Account,
             currentOrigin: "TestOrigin"
         });
-        accountMessageProducer = new AggregateMessageProducerKafkaJS({
+        accountMessageProducer = new AggregateMessageProducerKafkaJs({
             aggregateClass: Account,
             currentOrigin: "TestOrigin"
         });
@@ -33,7 +33,7 @@ describe("message consumption behavior", () => {
             aggregateClass: Account,
             currentOrigin: "TestOrigin"
         });
-        waitForMessageConsumer = new WaitForMessageConsumerKafkaJS({
+        waitForMessageConsumer = new WaitForMessageConsumerKafkaJs({
             aggregateClass: Account,
             currentOrigin: "TestOrigin"
         });
@@ -58,7 +58,7 @@ describe("message consumption behavior", () => {
             const owner = faker.person.fullName();
 
             const { domainEvents, domainEventIds } = new MessageBuilder({
-                outboundMessageMapper: new OutboundMessageMapperKafkaJS()
+                outboundMessageMapper: new OutboundMessageMapperKafkaJs()
             })
                 .addDomainEvent(
                     new AccountOpenedEvent(accountId, {
@@ -87,7 +87,7 @@ describe("message consumption behavior", () => {
             const owner = faker.person.fullName();
 
             const { domainEvents, domainEventIds } = new MessageBuilder({
-                outboundMessageMapper: new OutboundMessageMapperKafkaJS()
+                outboundMessageMapper: new OutboundMessageMapperKafkaJs()
             })
                 .addDomainEvent(
                     new AccountOpenedEvent(accountId, {
@@ -115,7 +115,7 @@ describe("message consumption behavior", () => {
             const owner = faker.person.fullName();
 
             const { domainEvents, domainEventIds } = new MessageBuilder({
-                outboundMessageMapper: new OutboundMessageMapperKafkaJS()
+                outboundMessageMapper: new OutboundMessageMapperKafkaJs()
             })
                 .addDomainEvent(
                     new AccountOpenedEvent(accountId, {
@@ -148,7 +148,7 @@ describe("message consumption behavior", () => {
             const owner = faker.person.fullName();
 
             const { domainEvents, domainEventIds } = new MessageBuilder({
-                outboundMessageMapper: new OutboundMessageMapperKafkaJS()
+                outboundMessageMapper: new OutboundMessageMapperKafkaJs()
             })
                 .addDomainEvent(
                     new AccountOpenedEvent(accountId, {

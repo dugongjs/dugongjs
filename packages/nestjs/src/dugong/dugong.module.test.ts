@@ -13,6 +13,7 @@ import "reflect-metadata";
 import { AggregateDomainEventConsumerModule } from "../aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 import { EventIssuerModule } from "../event-issuer/event-issuer.module.js";
 import { ExternalOriginModule } from "../external-origin/external-origin.module.js";
+import { ILoggerFactory } from "../logger/i-logger-factory.js";
 import { DugongModule } from "./dugong.module.js";
 
 class TestTransactionManager {}
@@ -23,6 +24,16 @@ class TestMessageConsumer {}
 class TestInboundMessageMapper {}
 class TestMessageProducer {}
 class TestOutboundMessageMapper {}
+class TestLoggerFactory {
+    public createLogger() {
+        return {
+            log() {},
+            error() {},
+            warn() {},
+            verbose() {}
+        };
+    }
+}
 
 describe("DugongModule", () => {
     it("should register adapter providers for mapped tokens", () => {
@@ -51,6 +62,30 @@ describe("DugongModule", () => {
                 { provide: IMessageProducer, useClass: TestMessageProducer },
                 { provide: IOutboundMessageMapper, useClass: TestOutboundMessageMapper }
             ])
+        );
+    });
+
+    it("should not register a logger factory by default", () => {
+        const module = DugongModule.register({
+            currentOrigin: "TestOrigin",
+            adapters: {}
+        });
+
+        expect(module.providers).not.toEqual(
+            expect.arrayContaining([{ provide: ILoggerFactory, useClass: expect.anything() }])
+        );
+    });
+
+    it("should register custom logger factory when provided", () => {
+        const module = DugongModule.register({
+            currentOrigin: "TestOrigin",
+            adapters: {
+                loggerFactory: TestLoggerFactory as any
+            }
+        });
+
+        expect(module.providers).toEqual(
+            expect.arrayContaining([{ provide: ILoggerFactory, useClass: TestLoggerFactory }])
         );
     });
 

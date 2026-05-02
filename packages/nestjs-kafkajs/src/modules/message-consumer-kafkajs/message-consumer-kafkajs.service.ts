@@ -1,4 +1,4 @@
-import { MessageConsumerKafkaJS } from "@dugongjs/kafkajs";
+import { MessageConsumerKafkaJs } from "@dugongjs/kafkajs";
 import { Inject, Injectable, Optional, type OnModuleDestroy } from "@nestjs/common";
 import type { ConsumerConfig, ConsumerRunConfig, ConsumerSubscribeTopics } from "kafkajs";
 import { KafkaService } from "../kafka/kafka.service.js";
@@ -9,7 +9,7 @@ import {
 } from "./message-consumer-kafkajs.tokens.js";
 
 @Injectable()
-export class MessageConsumerKafkaJSService extends MessageConsumerKafkaJS implements OnModuleDestroy {
+export class MessageConsumerKafkaJsService extends MessageConsumerKafkaJs implements OnModuleDestroy {
     constructor(
         kafkaService: KafkaService,
         @Optional() @Inject(KAFKAJS_CONSUMER_CONFIG_TOKEN) consumerConfig?: ConsumerConfig,

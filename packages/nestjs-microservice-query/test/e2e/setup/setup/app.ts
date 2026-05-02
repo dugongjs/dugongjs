@@ -1,5 +1,5 @@
-import { EventIssuerModule } from "@dugongjs/nestjs";
-import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";
+import { DugongAdapterBuilder, DugongModule } from "@dugongjs/nestjs";
+import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
 import { ConsumedMessageEntity, DomainEventEntity, OutboxEntity, SnapshotEntity } from "@dugongjs/typeorm";
 import type { INestApplication } from "@nestjs/common";
 import { ClientProxyFactory, type MicroserviceOptions, Transport } from "@nestjs/microservices";
@@ -11,6 +11,7 @@ import { AggregateQueryClientProxyService } from "../../../../src/client/aggrega
 import { AggregateQueryMicroserviceModule } from "../../../../src/server/aggregate-query-microservice.module.js";
 import { UserCommandModule } from "../../fixtures/user/application/command/user.command.module.js";
 import { UserQueryModule } from "../../fixtures/user/application/query/user.query.module.js";
+import { pinoLoggerAdapter } from "./pino-logger.factory.adapter.js";
 
 let app: INestApplication;
 let dataSource: DataSource;
@@ -33,9 +34,14 @@ beforeAll(async () => {
                 entities: [DomainEventEntity, SnapshotEntity, ConsumedMessageEntity, OutboxEntity],
                 synchronize: true
             }),
-            EventIssuerModule.forRoot({ currentOrigin: "IAM-UserService" }),
-            RepositoryTypeOrmModule.forRoot(),
-            TransactionManagerTypeOrmModule.forRoot(),
+            DugongModule.forRoot({
+                currentOrigin: "IAM-UserService",
+                adapters: new DugongAdapterBuilder()
+                    .register(pinoLoggerAdapter)
+                    .register(typeOrmTransactionManagerAdapter)
+                    .register(typeOrmRepositoryAdapter)
+                    .build()
+            }),
             AggregateQueryMicroserviceModule,
             UserCommandModule,
             UserQueryModule

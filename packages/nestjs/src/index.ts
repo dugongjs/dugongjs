@@ -1,3 +1,5 @@
+export { loggerAdapter } from "./adapters/logger.adapter.js";
+export { messageBrokerInMemoryAdapter } from "./adapters/message-broker-in-memory.adapter.js";
 export { AggregateDomainEventConsumerExplorerService } from "./aggregate-domain-event-consumer/aggregate-domain-event-consumer-explorer.service.js";
 export { AggregateDomainEventConsumerModule } from "./aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 export { AggregateMessageConsumerService } from "./aggregate-message-consumer/aggregate-message-consumer.service.js";
@@ -10,6 +12,7 @@ export {
 export { InjectConsumedMessageRepository } from "./decorators/inject-consumed-message-repository.decorator.js";
 export { InjectCurrentOrigin } from "./decorators/inject-current-origin.decorator.js";
 export { InjectDomainEventRepository } from "./decorators/inject-domain-event-repository.decorator.js";
+export { InjectLoggerFactory } from "./decorators/inject-logger-factory.decorator.js";
 export { InjectMessageConsumer } from "./decorators/inject-message-consumer.decorator.js";
 export { InjectMessageProducer } from "./decorators/inject-message-producer.decorator.js";
 export { InjectSnapshotRepository } from "./decorators/inject-snapshot-repository.decorator.js";
@@ -21,6 +24,10 @@ export { EventIssuerModule, type EventIssuerModuleOptions } from "./event-issuer
 export { EventSourcingModule, type EventSourcingModuleOptions } from "./event-sourcing/event-sourcing.module.js";
 export { EventSourcingService } from "./event-sourcing/event-sourcing.service.js";
 export { ExternalOriginModule, type ExternalOriginModuleOptions } from "./external-origin/external-origin.module.js";
+export { ILoggerFactory } from "./logger/i-logger-factory.js";
+export type { ILoggerFactory as ILoggerFactoryContract } from "./logger/i-logger-factory.js";
+export { NestJSLoggerAdapter } from "./logger/nestjs-logger.adapter.js";
+export { NestJSLoggerFactory } from "./logger/nestjs-logger.factory.js";
 export { InMemoryMessageBusService } from "./message-broker-in-memory/in-memory-message-bus.service.js";
 export { InboundMessageMapperInMemoryService } from "./message-broker-in-memory/inbound-message-mapper-in-memory.service.js";
 export { MessageBrokerInMemoryModule } from "./message-broker-in-memory/message-broker-in-memory.module.js";

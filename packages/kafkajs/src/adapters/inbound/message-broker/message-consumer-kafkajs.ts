@@ -8,13 +8,13 @@ import {
     type ConsumerSubscribeTopics,
     type EachMessagePayload
 } from "kafkajs";
-import { MessageChannelParticipantKafkaJS } from "../../common/message-broker/message-channel-participator-kafkajs.js";
+import { MessageChannelParticipantKafkaJs } from "../../common/message-broker/message-channel-participator-kafkajs.js";
 
 /**
- * MessageConsumerKafkaJS is an implementation of the IMessageConsumer interface using the KafkaJS library.
+ * MessageConsumerKafkaJs is an implementation of the IMessageConsumer interface using the KafkaJs library.
  */
-export class MessageConsumerKafkaJS
-    extends MessageChannelParticipantKafkaJS
+export class MessageConsumerKafkaJs
+    extends MessageChannelParticipantKafkaJs
     implements IMessageConsumer<EachMessagePayload>
 {
     private consumers: Consumer[] = [];

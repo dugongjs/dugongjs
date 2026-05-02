@@ -1,19 +1,24 @@
-import type { DomainEventClass } from "@dugongjs/core";
-import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import type { DomainEventClass, ILogger } from "@dugongjs/core";
+import { Injectable, Optional, type OnModuleInit } from "@nestjs/common";
 import { DiscoveryService, MetadataScanner } from "@nestjs/core";
 import { AggregateMessageConsumerService } from "../aggregate-message-consumer/aggregate-message-consumer.service.js";
 import { AGGREGATE_DOMAIN_EVENT_CONSUMER_TOKEN } from "../decorators/aggregate-domain-event-consumer.decorator.js";
+import { InjectLoggerFactory } from "../decorators/inject-logger-factory.decorator.js";
 import { ON_DOMAIN_EVENT_TOKEN } from "../decorators/on-domain-event.decorator.js";
+import type { ILoggerFactory } from "../logger/i-logger-factory.js";
 
 @Injectable()
 export class AggregateDomainEventConsumerExplorerService implements OnModuleInit {
-    private readonly logger = new Logger(AggregateDomainEventConsumerExplorerService.name);
+    private readonly logger?: ILogger;
 
     constructor(
         private readonly discoveryService: DiscoveryService,
         private readonly metadataScanner: MetadataScanner,
-        private readonly aggregateMessageConsumerService: AggregateMessageConsumerService
-    ) {}
+        private readonly aggregateMessageConsumerService: AggregateMessageConsumerService,
+        @Optional() @InjectLoggerFactory() loggerFactory?: ILoggerFactory
+    ) {
+        this.logger = loggerFactory?.createLogger(AggregateDomainEventConsumerExplorerService.name);
+    }
 
     public async onModuleInit() {
         const controllers = this.discoveryService.getControllers();
@@ -50,7 +55,7 @@ export class AggregateDomainEventConsumerExplorerService implements OnModuleInit
 
                         const logPrefix = consumer.getLogPrefix();
                         const logContext = consumer.getMessageLogContext(consumerName, domainEvent);
-                        this.logger.log(logContext, `${logPrefix}Message received`);
+                        this.logger?.log(logContext, `${logPrefix}Message received`);
 
                         await method(context);
                     }

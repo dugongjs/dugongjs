@@ -1,7 +1,7 @@
 import { runMessageConsumerContractTests } from "@dugongjs/testing-contracts";
 import type { Message } from "kafkajs";
 import { randomUUID } from "node:crypto";
-import { MessageConsumerKafkaJS } from "../../../src/index.js";
+import { MessageConsumerKafkaJs } from "../../../src/index.js";
 import { kafka } from "../setup/setup/kafkajs.js";
 import {
     createTopic,
@@ -23,7 +23,7 @@ function createKafkaMessage(overrides: Partial<Message> = {}): Message {
 }
 
 runMessageConsumerContractTests(async () => {
-    const consumer = new MessageConsumerKafkaJS(kafka);
+    const consumer = new MessageConsumerKafkaJs(kafka);
 
     return {
         consumer,

@@ -1,5 +1,5 @@
-import { DugongAdapterBuilder, DugongModule } from "@dugongjs/nestjs";
-import { kafkaJSMessageConsumerAdapter, KafkaModule } from "@dugongjs/nestjs-kafkajs";
+import { DugongAdapterBuilder, DugongModule, loggerAdapter } from "@dugongjs/nestjs";
+import { kafkaJsMessageConsumerAdapter, KafkaModule } from "@dugongjs/nestjs-kafkajs";
 import {
     typeOrmOutboxMessageProducerAdapter,
     typeOrmRepositoryAdapter,
@@ -21,11 +21,12 @@ import { dataSourceOptions } from "./db/data-source-options.js";
         KafkaModule.forRoot({ brokers: process.env.KAFKA_BROKERS!.split(",") }),
         DugongModule.forRoot({
             currentOrigin: "BankingContext-AccountService",
-            adapters: DugongAdapterBuilder.create()
+            adapters: new DugongAdapterBuilder()
+                .register(loggerAdapter)
                 .register(typeOrmRepositoryAdapter)
                 .register(typeOrmTransactionManagerAdapter)
                 .register(typeOrmOutboxMessageProducerAdapter)
-                .register(kafkaJSMessageConsumerAdapter)
+                .register(kafkaJsMessageConsumerAdapter)
                 .build()
         }),
         BankAccountCommandModule,

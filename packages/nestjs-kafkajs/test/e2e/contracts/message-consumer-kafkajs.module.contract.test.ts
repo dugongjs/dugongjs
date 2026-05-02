@@ -4,7 +4,7 @@ import { Test, type TestingModule } from "@nestjs/testing";
 import type { Kafka, Message } from "kafkajs";
 import { KafkaModule } from "../../../src/modules/kafka/kafka.module.js";
 import { KafkaService } from "../../../src/modules/kafka/kafka.service.js";
-import { MessageConsumerKafkaJSModule } from "../../../src/modules/message-consumer-kafkajs/message-consumer-kafkajs.module.js";
+import { MessageConsumerKafkaJsModule } from "../../../src/modules/message-consumer-kafkajs/message-consumer-kafkajs.module.js";
 import {
     createKafkaMessage,
     createTopic,
@@ -23,7 +23,7 @@ async function getApp(): Promise<TestingModule> {
                 KafkaModule.forRoot({
                     brokers: [process.env.KAFKA_BOOTSTRAP_SERVER!]
                 }),
-                MessageConsumerKafkaJSModule.forRoot()
+                MessageConsumerKafkaJsModule.forRoot()
             ]
         }).compile();
 
