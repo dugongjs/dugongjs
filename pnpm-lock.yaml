@@ -366,81 +366,33 @@ importers:
       '@dugongjs/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@dugongjs/nestjs-typeorm':
-        specifier: workspace:*
-        version: link:../nestjs-typeorm
       '@dugongjs/scripts':
         specifier: workspace:*
         version: link:../scripts
-      '@dugongjs/typeorm':
-        specifier: workspace:*
-        version: link:../typeorm
       '@dugongjs/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
-      '@faker-js/faker':
-        specifier: ^8.4.1
-        version: 8.4.1
       '@nestjs/common':
         specifier: ^10.4.17
         version: 10.4.22(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^10.4.17
         version: 10.4.22(@nestjs/common@10.4.22(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@10.4.22)(@nestjs/platform-express@10.4.22)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/platform-express':
-        specifier: ^10.4.17
-        version: 10.4.22(@nestjs/common@10.4.22(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.22)
       '@nestjs/testing':
         specifier: ^10.4.17
         version: 10.4.22(@nestjs/common@10.4.22(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.22)(@nestjs/microservices@10.4.22)(@nestjs/platform-express@10.4.22)
-      '@nestjs/typeorm':
-        specifier: ^10.0.2
-        version: 10.0.2(@nestjs/common@10.4.22(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.22)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(pg@8.18.0))
       '@swc/core':
         specifier: ^1.11.21
         version: 1.15.11(@swc/helpers@0.5.18)
       '@swc/helpers':
         specifier: ^0.5.17
         version: 0.5.18
-      '@testcontainers/postgresql':
-        specifier: ^11.11.0
-        version: 11.11.0
       '@types/node':
         specifier: ^24.5.1
         version: 24.10.13
-      '@types/pg':
-        specifier: ^8.11.14
-        version: 8.16.0
-      '@types/supertest':
-        specifier: ^6.0.3
-        version: 6.0.3
-      '@vitest/ui':
-        specifier: 'catalog:'
-        version: 4.0.18(vitest@4.0.18)
-      dotenv:
-        specifier: ^16.5.0
-        version: 16.6.1
-      nestjs-pino:
-        specifier: ^4.4.0
-        version: 4.5.0(@nestjs/common@10.4.22(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@10.5.0)(pino@9.14.0)(rxjs@7.8.2)
-      pg:
-        specifier: ^8.15.6
-        version: 8.18.0
-      pino:
-        specifier: ^9.6.0
-        version: 9.14.0
-      pino-http:
-        specifier: ^10.5.0
-        version: 10.5.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
-      supertest:
-        specifier: ^7.1.0
-        version: 7.2.2
-      typeorm:
-        specifier: ^0.3.22
-        version: 0.3.28(pg@8.18.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -472,9 +424,15 @@ importers:
       '@dugongjs/kafkajs':
         specifier: workspace:*
         version: link:../kafkajs
+      '@dugongjs/nestjs':
+        specifier: workspace:*
+        version: link:../nestjs
       '@dugongjs/scripts':
         specifier: workspace:*
         version: link:../scripts
+      '@dugongjs/testing-contracts':
+        specifier: workspace:*
+        version: link:../testing-contracts
       '@dugongjs/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -493,12 +451,18 @@ importers:
       '@swc/helpers':
         specifier: ^0.5.17
         version: 0.5.18
+      '@testcontainers/kafka':
+        specifier: ^11.11.0
+        version: 11.11.0
       '@types/node':
         specifier: ^24.5.1
         version: 24.10.13
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.0.18(vitest@4.0.18)
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.6.1
       kafkajs:
         specifier: 2.2.4
         version: 2.2.4
@@ -602,6 +566,9 @@ importers:
       pino:
         specifier: ^9.6.0
         version: 9.14.0
+      pino-http:
+        specifier: ^10.5.0
+        version: 10.5.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -642,9 +609,15 @@ importers:
       '@dugongjs/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@dugongjs/nestjs':
+        specifier: workspace:*
+        version: link:../nestjs
       '@dugongjs/scripts':
         specifier: workspace:*
         version: link:../scripts
+      '@dugongjs/testing-contracts':
+        specifier: workspace:*
+        version: link:../testing-contracts
       '@dugongjs/typeorm':
         specifier: workspace:*
         version: link:../typeorm
@@ -669,12 +642,24 @@ importers:
       '@swc/helpers':
         specifier: ^0.5.17
         version: 0.5.18
+      '@testcontainers/postgresql':
+        specifier: ^11.11.0
+        version: 11.11.0
       '@types/node':
         specifier: ^24.5.1
         version: 24.10.13
+      '@types/pg':
+        specifier: ^8.11.14
+        version: 8.16.0
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.0.18(vitest@4.0.18)
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.6.1
+      pg:
+        specifier: ^8.15.6
+        version: 8.18.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -1597,10 +1582,6 @@ packages:
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
-
-  '@babel/runtime@7.28.6':
-    resolution: {integrity: sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==}
-    engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.29.2':
     resolution: {integrity: sha512-JiDShH45zKHWyGe4ZNVRrCjBz8Nh9TMmZG1kh4QTK8hCBTWBi8Da+i7s1fJw7/lYpM4ccepSNfqzZ/QvABBi5g==}
@@ -10425,8 +10406,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/runtime@7.28.6': {}
-
   '@babel/runtime@7.29.2': {}
 
   '@babel/template@7.28.6':
@@ -12153,7 +12132,7 @@ snapshots:
 
   '@manypkg/get-packages@1.1.3':
     dependencies:
-      '@babel/runtime': 7.28.6
+      '@babel/runtime': 7.29.2
       '@changesets/types': 4.1.0
       '@manypkg/find-root': 1.1.0
       fs-extra: 8.1.0

@@ -1,4 +1,4 @@
-import type { Constructor, HandleMessageOptions } from "@dugongjs/core";
+import { IInboundMessageMapper, IMessageConsumer, type Constructor, type HandleMessageOptions } from "@dugongjs/core";
 import { Module, type DynamicModule, type ModuleMetadata } from "@nestjs/common";
 import { AggregateMessageConsumerService } from "../aggregate-message-consumer/aggregate-message-consumer.service.js";
 import { EventSourcingModule } from "../event-sourcing/event-sourcing.module.js";
@@ -22,11 +22,27 @@ export type QueryModelProjectionConsumerModuleOptions = {
 })
 export class QueryModelProjectionConsumerModule {
     public static register(options: QueryModelProjectionConsumerModuleOptions): DynamicModule {
+        const providers = [...(options.module?.providers ?? [])];
+
+        if (options.messageBroker?.messageConsumer) {
+            providers.push({
+                provide: IMessageConsumer,
+                useClass: options.messageBroker.messageConsumer
+            });
+        }
+
+        if (options.messageBroker?.inboundMessageMapper) {
+            providers.push({
+                provide: IInboundMessageMapper,
+                useClass: options.messageBroker.inboundMessageMapper
+            });
+        }
+
         return {
             module: QueryModelProjectionConsumerModule,
             imports: options.module?.imports,
             providers: [
-                ...(options.module?.providers ?? []),
+                ...providers,
                 {
                     provide: IQueryModelProjectionHandler,
                     useClass: options.queryModelProjectionHandler
