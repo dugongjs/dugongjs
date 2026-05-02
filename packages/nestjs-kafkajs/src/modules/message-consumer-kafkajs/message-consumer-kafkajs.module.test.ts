@@ -3,18 +3,18 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { mock } from "vitest-mock-extended";
 import { KafkaModule } from "../kafka/kafka.module.js";
 import { KafkaService } from "../kafka/kafka.service.js";
-import type { InboundMessageMapperKafkaJSService } from "./inbound-message-mapper-kafkajs.service.js";
-import { MessageConsumerKafkaJSModule } from "./message-consumer-kafkajs.module.js";
-import { MessageConsumerKafkaJSService } from "./message-consumer-kafkajs.service.js";
+import type { InboundMessageMapperKafkaJsService } from "./inbound-message-mapper-kafkajs.service.js";
+import { MessageConsumerKafkaJsModule } from "./message-consumer-kafkajs.module.js";
+import { MessageConsumerKafkaJsService } from "./message-consumer-kafkajs.service.js";
 
-describe("MessageConsumerKafkaJSModule", () => {
+describe("MessageConsumerKafkaJsModule", () => {
     let app: TestingModule;
-    let messageConsumer: MessageConsumerKafkaJSService;
-    let inboundMessageMapper: InboundMessageMapperKafkaJSService;
+    let messageConsumer: MessageConsumerKafkaJsService;
+    let inboundMessageMapper: InboundMessageMapperKafkaJsService;
 
     beforeEach(async () => {
         app = await Test.createTestingModule({
-            imports: [KafkaModule.forRoot({} as any), MessageConsumerKafkaJSModule]
+            imports: [KafkaModule.forRoot({} as any), MessageConsumerKafkaJsModule]
         })
             .overrideProvider(KafkaService)
             .useValue(mock<KafkaService>())

@@ -3,22 +3,22 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { mock } from "vitest-mock-extended";
 import { KafkaModule } from "../kafka/kafka.module.js";
 import { KafkaService } from "../kafka/kafka.service.js";
-import type { InboundMessageMapperKafkaJSService } from "../message-consumer-kafkajs/inbound-message-mapper-kafkajs.service.js";
-import type { MessageConsumerKafkaJSService } from "../message-consumer-kafkajs/message-consumer-kafkajs.service.js";
-import type { MessageProducerKafkaJSService } from "../message-producer-kafkajs/message-producer-kafkajs.service.js";
-import type { OutboundMessageMapperKafkaJSService } from "../message-producer-kafkajs/outbound-message-mapper-kafkajs.service.js";
-import { MessageBrokerKafkaJSModule } from "./message-broker-kafkajs.module.js";
+import type { InboundMessageMapperKafkaJsService } from "../message-consumer-kafkajs/inbound-message-mapper-kafkajs.service.js";
+import type { MessageConsumerKafkaJsService } from "../message-consumer-kafkajs/message-consumer-kafkajs.service.js";
+import type { MessageProducerKafkaJsService } from "../message-producer-kafkajs/message-producer-kafkajs.service.js";
+import type { OutboundMessageMapperKafkaJsService } from "../message-producer-kafkajs/outbound-message-mapper-kafkajs.service.js";
+import { MessageBrokerKafkaJsModule } from "./message-broker-kafkajs.module.js";
 
-describe("MessageBrokerKafkaJS", () => {
+describe("MessageBrokerKafkaJs", () => {
     let app: TestingModule;
-    let messageConsumer: MessageConsumerKafkaJSService;
-    let messageProducer: MessageProducerKafkaJSService;
-    let inboundMessageMapper: InboundMessageMapperKafkaJSService;
-    let outboundMessageMapper: OutboundMessageMapperKafkaJSService;
+    let messageConsumer: MessageConsumerKafkaJsService;
+    let messageProducer: MessageProducerKafkaJsService;
+    let inboundMessageMapper: InboundMessageMapperKafkaJsService;
+    let outboundMessageMapper: OutboundMessageMapperKafkaJsService;
 
     beforeEach(async () => {
         app = await Test.createTestingModule({
-            imports: [KafkaModule.forRoot({} as any), MessageBrokerKafkaJSModule]
+            imports: [KafkaModule.forRoot({} as any), MessageBrokerKafkaJsModule]
         })
             .overrideProvider(KafkaService)
             .useValue(mock<KafkaService>())

@@ -1,5 +1,5 @@
-import { OutboundMessageMapperKafkaJS } from "@dugongjs/kafkajs";
+import { OutboundMessageMapperKafkaJs } from "@dugongjs/kafkajs";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
-export class OutboundMessageMapperKafkaJSService extends OutboundMessageMapperKafkaJS {}
+export class OutboundMessageMapperKafkaJsService extends OutboundMessageMapperKafkaJs {}

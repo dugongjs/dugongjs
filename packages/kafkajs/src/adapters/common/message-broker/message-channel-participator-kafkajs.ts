@@ -2,9 +2,9 @@ import type { IMessageChannelParticipant } from "@dugongjs/core";
 import * as changeCase from "change-case";
 
 /**
- * MessageChannelParticipantKafkaJS is an implementation of the IMessageChannelParticipant interface that provides a method to generate message channel IDs for Kafka topics based on the origin and aggregate type.
+ * MessageChannelParticipantKafkaJs is an implementation of the IMessageChannelParticipant interface that provides a method to generate message channel IDs for Kafka topics based on the origin and aggregate type.
  */
-export class MessageChannelParticipantKafkaJS implements IMessageChannelParticipant {
+export class MessageChannelParticipantKafkaJs implements IMessageChannelParticipant {
     /**
      * Generates a unique message channel ID based on the provided origin and aggregate type.
      * @param origin The origin or source of the messages (e.g., service name or application name).

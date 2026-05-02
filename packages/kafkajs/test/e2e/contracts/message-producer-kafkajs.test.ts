@@ -2,7 +2,7 @@ import { runMessageProducerContractTests } from "@dugongjs/testing-contracts";
 import type { Message } from "kafkajs";
 import { randomUUID } from "node:crypto";
 import { vi } from "vitest";
-import { MessageProducerKafkaJS } from "../../../src/index.js";
+import { MessageProducerKafkaJs } from "../../../src/index.js";
 import { kafka } from "../setup/setup/kafkajs.js";
 import { collectMessages, createTopic, normalizeKafkaMessage } from "./setup/kafka-contract-test-helpers.js";
 
@@ -21,7 +21,7 @@ function createKafkaMessage(overrides: Partial<Message> = {}): Message {
 }
 
 runMessageProducerContractTests(async () => {
-    const producer = new MessageProducerKafkaJS(kafka);
+    const producer = new MessageProducerKafkaJs(kafka);
 
     await producer.connect();
 

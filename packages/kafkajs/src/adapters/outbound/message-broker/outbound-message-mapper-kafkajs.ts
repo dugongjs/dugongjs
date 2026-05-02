@@ -2,13 +2,13 @@ import type { IOutboundMessageMapper, SerializedDomainEvent } from "@dugongjs/co
 import type { Message } from "kafkajs";
 
 /**
- * OutboundMessageMapperKafkaJS is an implementation of the IOutboundMessageMapper interface that maps a SerializedDomainEvent to a KafkaJS Message format, including the necessary headers and payload for publishing to Kafka topics.
+ * OutboundMessageMapperKafkaJs is an implementation of the IOutboundMessageMapper interface that maps a SerializedDomainEvent to a KafkaJs Message format, including the necessary headers and payload for publishing to Kafka topics.
  */
-export class OutboundMessageMapperKafkaJS implements IOutboundMessageMapper<Message> {
+export class OutboundMessageMapperKafkaJs implements IOutboundMessageMapper<Message> {
     /**
-     * Maps a SerializedDomainEvent to a KafkaJS Message by extracting the relevant fields and constructing the message with appropriate headers and payload. The method ensures that all required fields are included in the message headers and that the payload is properly serialized as a JSON string.
-     * @param domainEvent The SerializedDomainEvent to be mapped to a KafkaJS Message.
-     * @returns A KafkaJS Message object constructed from the SerializedDomainEvent, ready to be published to a Kafka topic. The message includes the aggregate ID as the key, the payload as the value, and all relevant fields as headers for proper processing by consumers.
+     * Maps a SerializedDomainEvent to a KafkaJs Message by extracting the relevant fields and constructing the message with appropriate headers and payload. The method ensures that all required fields are included in the message headers and that the payload is properly serialized as a JSON string.
+     * @param domainEvent The SerializedDomainEvent to be mapped to a KafkaJs Message.
+     * @returns A KafkaJs Message object constructed from the SerializedDomainEvent, ready to be published to a Kafka topic. The message includes the aggregate ID as the key, the payload as the value, and all relevant fields as headers for proper processing by consumers.
      */
     public map(domainEvent: SerializedDomainEvent): Message {
         const {

@@ -1,11 +1,11 @@
 import type { IMessageProducer, TransactionContext } from "@dugongjs/core";
 import { Partitioners, type Kafka, type Message, type Producer, type ProducerConfig } from "kafkajs";
-import { MessageChannelParticipantKafkaJS } from "../../common/message-broker/message-channel-participator-kafkajs.js";
+import { MessageChannelParticipantKafkaJs } from "../../common/message-broker/message-channel-participator-kafkajs.js";
 
 /**
- * MessageProducerKafkaJS is an implementation of the IMessageProducer interface using the KafkaJS library. It provides methods to publish messages to Kafka topics, as well as to connect and disconnect the producer.
+ * MessageProducerKafkaJs is an implementation of the IMessageProducer interface using the KafkaJs library. It provides methods to publish messages to Kafka topics, as well as to connect and disconnect the producer.
  */
-export class MessageProducerKafkaJS extends MessageChannelParticipantKafkaJS implements IMessageProducer<Message> {
+export class MessageProducerKafkaJs extends MessageChannelParticipantKafkaJs implements IMessageProducer<Message> {
     private producer: Producer;
     private isConnected: boolean = false;
 
@@ -25,7 +25,7 @@ export class MessageProducerKafkaJS extends MessageChannelParticipantKafkaJS imp
      * Publishes a single message to the specified message channel (Kafka topic). The method ensures that the producer is connected before attempting to send the message.
      * @param _ TransactionContext is not used in this implementation, but is reserved for other implementations such as the outbox pattern.
      * @param messageChannelId The ID of the message channel (Kafka topic) to which the message should be published.
-     * @param message The message object to be published, which should conform to the KafkaJS Message format.
+     * @param message The message object to be published, which should conform to the KafkaJs Message format.
      * @returns A promise that resolves when the message is successfully published, or rejects if there is an error during publishing.
      */
     public async publishMessage(
@@ -45,7 +45,7 @@ export class MessageProducerKafkaJS extends MessageChannelParticipantKafkaJS imp
      * Publishes multiple messages to the specified message channel (Kafka topic). The method ensures that the producer is connected before attempting to send the messages.
      * @param _ TransactionContext is not used in this implementation, but is reserved for other implementations such as the outbox pattern.
      * @param messageChannelId The ID of the message channel (Kafka topic) to which the messages should be published.
-     * @param messages An array of message objects to be published, which should conform to the KafkaJS Message format.
+     * @param messages An array of message objects to be published, which should conform to the KafkaJs Message format.
      * @returns A promise that resolves when the messages are successfully published, or rejects if there is an error during publishing.
      */
     public async publishMessages(

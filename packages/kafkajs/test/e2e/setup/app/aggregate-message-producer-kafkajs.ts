@@ -5,35 +5,35 @@ import {
 } from "@dugongjs/core";
 import { TransactionManagerTypeOrm } from "@dugongjs/typeorm";
 import type { Message } from "kafkajs";
-import { MessageProducerKafkaJS } from "../../../../src/adapters/outbound/message-broker/message-producer-kafkajs.js";
-import { OutboundMessageMapperKafkaJS } from "../../../../src/adapters/outbound/message-broker/outbound-message-mapper-kafkajs.js";
+import { MessageProducerKafkaJs } from "../../../../src/adapters/outbound/message-broker/message-producer-kafkajs.js";
+import { OutboundMessageMapperKafkaJs } from "../../../../src/adapters/outbound/message-broker/outbound-message-mapper-kafkajs.js";
 import { dataSource } from "../setup/data-source.js";
 import { kafka } from "../setup/kafkajs.js";
 import { Logger } from "./logger.js";
 
-export type AggregateMessageProducerKafkaJSOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = Omit<
+export type AggregateMessageProducerKafkaJsOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = Omit<
     AggregateMessageProducerOptions<TAggregateRootClass, Message>,
     "transactionManager" | "messageProducer" | "outboundMessageMapper" | "logger"
 >;
 
-export class AggregateMessageProducerKafkaJS<
+export class AggregateMessageProducerKafkaJs<
     TAggregateRootClass extends EventSourcedAggregateRoot
 > extends AggregateMessageProducer<TAggregateRootClass, Message> {
-    constructor(options: AggregateMessageProducerKafkaJSOptions<TAggregateRootClass>) {
+    constructor(options: AggregateMessageProducerKafkaJsOptions<TAggregateRootClass>) {
         super({
             ...options,
             transactionManager: new TransactionManagerTypeOrm(dataSource),
-            messageProducer: new MessageProducerKafkaJS(kafka),
-            outboundMessageMapper: new OutboundMessageMapperKafkaJS(),
+            messageProducer: new MessageProducerKafkaJs(kafka),
+            outboundMessageMapper: new OutboundMessageMapperKafkaJs(),
             logger: new Logger()
         });
     }
 
     public async connect(): Promise<void> {
-        await (this["messageProducer"] as MessageProducerKafkaJS).connect();
+        await (this["messageProducer"] as MessageProducerKafkaJs).connect();
     }
 
     public async disconnect(): Promise<void> {
-        await (this["messageProducer"] as MessageProducerKafkaJS).disconnect();
+        await (this["messageProducer"] as MessageProducerKafkaJs).disconnect();
     }
 }

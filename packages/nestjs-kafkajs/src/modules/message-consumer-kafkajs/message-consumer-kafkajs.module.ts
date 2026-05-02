@@ -1,25 +1,25 @@
 import { IInboundMessageMapper, IMessageConsumer } from "@dugongjs/core";
-import { InboundMessageMapperKafkaJS } from "@dugongjs/kafkajs";
+import { InboundMessageMapperKafkaJs } from "@dugongjs/kafkajs";
 import { Module, type DynamicModule } from "@nestjs/common";
-import { MessageConsumerKafkaJSService } from "./message-consumer-kafkajs.service.js";
+import { MessageConsumerKafkaJsService } from "./message-consumer-kafkajs.service.js";
 
 @Module({
     providers: [
         {
             provide: IMessageConsumer,
-            useClass: MessageConsumerKafkaJSService
+            useClass: MessageConsumerKafkaJsService
         },
         {
             provide: IInboundMessageMapper,
-            useClass: InboundMessageMapperKafkaJS
+            useClass: InboundMessageMapperKafkaJs
         }
     ],
     exports: [IMessageConsumer, IInboundMessageMapper]
 })
-export class MessageConsumerKafkaJSModule {
+export class MessageConsumerKafkaJsModule {
     public static forRoot(): DynamicModule {
         return {
-            module: MessageConsumerKafkaJSModule,
+            module: MessageConsumerKafkaJsModule,
             global: true
         };
     }
