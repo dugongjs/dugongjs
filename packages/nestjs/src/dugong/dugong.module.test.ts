@@ -9,6 +9,7 @@ import {
     ISnapshotRepository,
     ITransactionManager
 } from "@dugongjs/core";
+import { Injectable } from "@nestjs/common";
 import "reflect-metadata";
 import { AggregateDomainEventConsumerModule } from "../aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 import { EventIssuerModule } from "../event-issuer/event-issuer.module.js";
@@ -34,6 +35,9 @@ class TestLoggerFactory {
         };
     }
 }
+
+@Injectable()
+class TestCustomProvider {}
 
 describe("DugongModule", () => {
     it("should register adapter providers for mapped tokens", () => {
@@ -87,6 +91,28 @@ describe("DugongModule", () => {
         expect(module.providers).toEqual(
             expect.arrayContaining([{ provide: ILoggerFactory, useClass: TestLoggerFactory }])
         );
+    });
+
+    it("should include adapter providers in module providers", () => {
+        const module = DugongModule.register({
+            currentOrigin: "TestOrigin",
+            adapters: {
+                providers: [TestCustomProvider]
+            }
+        });
+
+        expect(module.providers).toEqual(expect.arrayContaining([TestCustomProvider]));
+    });
+
+    it("should include adapter providers in module exports", () => {
+        const module = DugongModule.register({
+            currentOrigin: "TestOrigin",
+            adapters: {
+                providers: [TestCustomProvider]
+            }
+        });
+
+        expect(module.exports).toEqual(expect.arrayContaining([TestCustomProvider]));
     });
 
     it("should auto-include aggregate consumer module when required adapters are present", () => {
