@@ -191,9 +191,9 @@ export class BankAccountQueryModule {
 Finally, we'll register this module in `AppModule`:
 
 ```typescript title="src/app.module.ts" showLineNumbers
-import { DugongAdapterBuilder, DugongModule, inMemoryMessageBrokerAdapter, loggerAdapter } from "@dugongjs/nestjs";
+import { DugongAdapterBuilder, DugongModule, messageBrokerInMemoryAdapter, loggerAdapter } from "@dugongjs/nestjs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
-import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
+import { repositoryTypeOrmAdapter, transactionManagerTypeOrmAdapter } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { BankAccountQueryModelReadRepositoryTypeOrmService } from "./bank-account/adapters/repository/bank-account-query-model-read-repository-typeorm.service.js";
@@ -211,9 +211,9 @@ import { dataSourceOptions } from "./db/data-source-options.js";
             currentOrigin: "BankingContext-AccountService",
             adapters: new DugongAdapterBuilder()
                 .register(loggerAdapter)
-                .register(typeOrmRepositoryAdapter)
-                .register(typeOrmTransactionManagerAdapter)
-                .register(inMemoryMessageBrokerAdapter)
+                .register(repositoryTypeOrmAdapter)
+                .register(transactionManagerTypeOrmAdapter)
+                .register(messageBrokerInMemoryAdapter)
                 .build()
         }),
         AggregateQueryMicroserviceModule,

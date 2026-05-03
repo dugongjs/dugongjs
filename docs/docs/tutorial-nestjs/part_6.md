@@ -98,12 +98,12 @@ To keep our query models in sync with domain events, we’ll introduce a message
 The in-memory broker is not suitable for production environments. In later parts, we’ll show how to replace it with Kafka.
 :::
 
-Enable it in `DugongModule` by registering the `inMemoryMessageBrokerAdapter`:
+Enable it in `DugongModule` by registering the `messageBrokerInMemoryAdapter`:
 
 ```typescript title="src/app.module.ts" showLineNumbers
-import { DugongAdapterBuilder, DugongModule, inMemoryMessageBrokerAdapter, loggerAdapter } from "@dugongjs/nestjs";
+import { DugongAdapterBuilder, DugongModule, messageBrokerInMemoryAdapter, loggerAdapter } from "@dugongjs/nestjs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
-import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
+import { repositoryTypeOrmAdapter, transactionManagerTypeOrmAdapter } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { BankAccountCommandModule } from "./bank-account/application/command/bank-account.command.module.js";
@@ -116,9 +116,9 @@ import { dataSourceOptions } from "./db/data-source-options.js";
             currentOrigin: "BankingContext-AccountService",
             adapters: new DugongAdapterBuilder()
                 .register(loggerAdapter)
-                .register(typeOrmRepositoryAdapter)
-                .register(typeOrmTransactionManagerAdapter)
-                .register(inMemoryMessageBrokerAdapter)
+                .register(repositoryTypeOrmAdapter)
+                .register(transactionManagerTypeOrmAdapter)
+                .register(messageBrokerInMemoryAdapter)
                 .build()
         }),
         AggregateQueryMicroserviceModule,
@@ -275,9 +275,9 @@ This module might look complex, but it’s actually a simple wrapper around `Que
 Finally, we'll register this module in `AppModule`:
 
 ```typescript title="src/app.module.ts" showLineNumbers
-import { DugongAdapterBuilder, DugongModule, inMemoryMessageBrokerAdapter, loggerAdapter } from "@dugongjs/nestjs";
+import { DugongAdapterBuilder, DugongModule, messageBrokerInMemoryAdapter, loggerAdapter } from "@dugongjs/nestjs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
-import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
+import { repositoryTypeOrmAdapter, transactionManagerTypeOrmAdapter } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { BankAccountQueryModelWriteRepositoryTypeOrmService } from "./bank-account/adapters/repository/bank-account-query-model-write-repository-typeorm.service.js";
@@ -292,9 +292,9 @@ import { dataSourceOptions } from "./db/data-source-options.js";
             currentOrigin: "BankingContext-AccountService",
             adapters: new DugongAdapterBuilder()
                 .register(loggerAdapter)
-                .register(typeOrmRepositoryAdapter)
-                .register(typeOrmTransactionManagerAdapter)
-                .register(inMemoryMessageBrokerAdapter)
+                .register(repositoryTypeOrmAdapter)
+                .register(transactionManagerTypeOrmAdapter)
+                .register(messageBrokerInMemoryAdapter)
                 .build()
         }),
         AggregateQueryMicroserviceModule,
