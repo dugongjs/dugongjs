@@ -41,6 +41,8 @@ export class DugongModule {
             .withClassProvider(IOutboundMessageMapper, adapters.outboundMessageMapper)
             .build();
 
+        const allProviders = [...providers, ...(adapters.providers ?? [])];
+
         return {
             module: DugongModule,
             imports: [
@@ -49,8 +51,8 @@ export class DugongModule {
                 ...(includeAggregateDomainEventConsumers ? [AggregateDomainEventConsumerModule] : []),
                 ...(adapters.imports ?? [])
             ],
-            providers,
-            exports: providers
+            providers: allProviders,
+            exports: allProviders
         };
     }
 

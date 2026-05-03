@@ -1,29 +1,29 @@
 import { IInboundMessageMapper, IMessageConsumer, IMessageProducer, IOutboundMessageMapper } from "@dugongjs/core";
 import { Module, type DynamicModule } from "@nestjs/common";
+import { InMemoryInboundMessageMapperService } from "./in-memory-inbound-message-mapper.service.js";
 import { InMemoryMessageBusService } from "./in-memory-message-bus.service.js";
-import { InboundMessageMapperInMemoryService } from "./inbound-message-mapper-in-memory.service.js";
-import { MessageConsumerInMemoryService } from "./message-consumer-in-memory.service.js";
-import { MessageProducerInMemoryService } from "./message-producer-in-memory.service.js";
-import { OutboundMessageMapperInMemoryService } from "./outbound-message-mapper-in-memory.service.js";
+import { InMemoryMessageConsumerService } from "./in-memory-message-consumer.service.js";
+import { InMemoryMessageProducerService } from "./in-memory-message-producer.service.js";
+import { InMemoryOutboundMessageMapperService } from "./in-memory-outbound-message-mapper.service.js";
 
 @Module({
     providers: [
         InMemoryMessageBusService,
         {
             provide: IInboundMessageMapper,
-            useClass: InboundMessageMapperInMemoryService
+            useClass: InMemoryInboundMessageMapperService
         },
         {
             provide: IOutboundMessageMapper,
-            useClass: OutboundMessageMapperInMemoryService
+            useClass: InMemoryOutboundMessageMapperService
         },
         {
             provide: IMessageConsumer,
-            useClass: MessageConsumerInMemoryService
+            useClass: InMemoryMessageConsumerService
         },
         {
             provide: IMessageProducer,
-            useClass: MessageProducerInMemoryService
+            useClass: InMemoryMessageProducerService
         }
     ],
     exports: [

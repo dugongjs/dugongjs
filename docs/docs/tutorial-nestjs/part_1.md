@@ -183,9 +183,9 @@ docker compose up
 
 In `src/app.module.ts`, connect TypeORM, the DugongJS adapters, and set the current origin for event publishing:
 
-```typescript title="src/app.module.ts"showLineNumbers
-import { EventIssuerModule } from "@dugongjs/nestjs";
-import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";
+```typescript title="src/app.module.ts" showLineNumbers
+import { DugongAdapterBuilder, DugongModule, loggerAdapter } from "@dugongjs/nestjs";
+import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { dataSourceOptions } from "./db/data-source-options.js";
@@ -193,9 +193,14 @@ import { dataSourceOptions } from "./db/data-source-options.js";
 @Module({
     imports: [
         TypeOrmModule.forRoot(dataSourceOptions),
-        RepositoryTypeOrmModule.forRoot(),
-        TransactionManagerTypeOrmModule.forRoot(),
-        EventIssuerModule.forRoot({ currentOrigin: "BankingContext-AccountService" })
+        DugongModule.forRoot({
+            currentOrigin: "BankingContext-AccountService",
+            adapters: new DugongAdapterBuilder()
+                .register(loggerAdapter)
+                .register(typeOrmRepositoryAdapter)
+                .register(typeOrmTransactionManagerAdapter)
+                .build()
+        })
     ]
 })
 export class AppModule {}
@@ -204,8 +209,11 @@ export class AppModule {}
 Let’s break down what each module does:
 
 - `TypeOrmModule.forRoot()` sets up TypeORM using our previously defined config.
-- `RepositoryTypeOrmModule` provides adapters for the DugongJS [repository ports](../ports/repositories.md).
-- `TransactionManagerTypeOrmModule` provides an adapter for the DugongJS [transaction manager port](../ports/transaction-manager.md).
-- `EventIssuerModule` configures the `currentOrigin` — a label that identifies which service owns the aggregates and emits domain events. See [origin](../core-concepts/origin.md) for more details.
+- `DugongModule.forRoot()` sets up the required providers for event sourcing, with the following options:
+    - `currentOrigin` is a label that identifies which service owns the aggregates and emits domain events. This is primarily needed when you have several microservices using DugongJS, but must be set to a value. See [origin](../core-concepts/origin.md) for more details.
+    - `adapters` defines adapters for different ports:
+        - `loggerAdapter` sets up logging using the NestJS `Logger`.
+        - `typeOrmRepositoryAdapter` sets up TypeORM as the repository adapter.
+        - `typeOrmTransactionManagerAdapter` sets up TypeORM as the transaction adapter.
 
 In the next part, we’ll implement the domain layer, including the aggregate, domain events, and commands for our bank account model.

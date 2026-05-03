@@ -33,7 +33,7 @@ The mapping logic is handled by the inbound and outbound message mapper ports. T
 
 ## Example: Kafka
 
-When publishing domain events to **Kafka**, the `OutboundMessageMapperKafkaJS` adapter maps domain events to satisfy the Kafka message protocol. The structure of a Kafka message is illustrated below:
+When publishing domain events to **Kafka**, the `OutboundMessageMapperKafkaJs` adapter maps domain events to satisfy the Kafka message protocol. The structure of a Kafka message is illustrated below:
 
 ```mermaid
 
@@ -60,5 +60,5 @@ flowchart LR
 The aggregate ID is mapped to the message key, the payload to the message value and the rest is mapped to message headers. Mapping the aggregate ID to the Kafka key ensures that all events for a given aggregate are delivered to the same Kafka partition. This guarantees sequential delivery for that aggregate instance in consumers.
 
 :::tip
-The `OutboundMessageMapperKafkaJS` is imported from `@dugongjs/kafkajs`.
+The `OutboundMessageMapperKafkaJs` is imported from `@dugongjs/kafkajs`.
 :::

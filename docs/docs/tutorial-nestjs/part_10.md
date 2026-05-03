@@ -78,5 +78,5 @@ If you performed a query after triggering the error, you might have been surpris
 
 This might seem like the system maintained transactionality — but in fact, it didn’t. The reason the query model remains consistent is because the consumer rebuilds the aggregate from the event log before deciding whether to update or delete the model. Since the event log wasn’t updated (due to the transaction being rolled back), the `AccountClosed` event wasn’t applied to the aggregate.
 
-In other words, this is a coincidence, not a guarantee. The message was still published, and any consumers not reconstructing aggregates from the event log (e.g., projections built purely from message payloads) could have reacted incorrectly.
+In other words, this is just a coincidence. The message was still published, and any consumers not reconstructing aggregates from the event log (e.g., projections built purely from message payloads) could have reacted incorrectly.
 :::
