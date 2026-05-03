@@ -1,5 +1,11 @@
 # @dugongjs/kafkajs
 
+## 0.0.23
+
+### Patch Changes
+
+- 092a2f6: Standardize KafkaJS naming
+
 ## 0.0.22
 
 ### Patch Changes

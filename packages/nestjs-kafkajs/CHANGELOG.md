@@ -1,5 +1,18 @@
 # @dugongjs/nestjs-kafkajs
 
+## 0.0.25
+
+### Patch Changes
+
+- 6cdfe4f: Added producer and broker adapters
+- 092a2f6: Standardize KafkaJS naming
+- Updated dependencies [6cdfe4f]
+- Updated dependencies [092a2f6]
+- Updated dependencies [6cdfe4f]
+- Updated dependencies [092a2f6]
+    - @dugongjs/nestjs@0.0.28
+    - @dugongjs/kafkajs@0.0.23
+
 ## 0.0.24
 
 ### Patch Changes
