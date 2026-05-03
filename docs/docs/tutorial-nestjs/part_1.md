@@ -185,7 +185,7 @@ In `src/app.module.ts`, connect TypeORM, the DugongJS adapters, and set the curr
 
 ```typescript title="src/app.module.ts" showLineNumbers
 import { DugongAdapterBuilder, DugongModule, loggerAdapter } from "@dugongjs/nestjs";
-import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
+import { repositoryTypeOrmAdapter, transactionManagerTypeOrmAdapter } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { dataSourceOptions } from "./db/data-source-options.js";
@@ -197,8 +197,8 @@ import { dataSourceOptions } from "./db/data-source-options.js";
             currentOrigin: "BankingContext-AccountService",
             adapters: new DugongAdapterBuilder()
                 .register(loggerAdapter)
-                .register(typeOrmRepositoryAdapter)
-                .register(typeOrmTransactionManagerAdapter)
+                .register(repositoryTypeOrmAdapter)
+                .register(transactionManagerTypeOrmAdapter)
                 .build()
         })
     ]
@@ -213,7 +213,7 @@ Let’s break down what each module does:
     - `currentOrigin` is a label that identifies which service owns the aggregates and emits domain events. This is primarily needed when you have several microservices using DugongJS, but must be set to a value. See [origin](../core-concepts/origin.md) for more details.
     - `adapters` defines adapters for different ports:
         - `loggerAdapter` sets up logging using the NestJS `Logger`.
-        - `typeOrmRepositoryAdapter` sets up TypeORM as the repository adapter.
-        - `typeOrmTransactionManagerAdapter` sets up TypeORM as the transaction adapter.
+        - `repositoryTypeOrmAdapter` sets up TypeORM as the repository adapter.
+        - `transactionManagerTypeOrmAdapter` sets up TypeORM as the transaction adapter.
 
 In the next part, we’ll implement the domain layer, including the aggregate, domain events, and commands for our bank account model.

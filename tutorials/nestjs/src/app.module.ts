@@ -1,9 +1,9 @@
 import { DugongAdapterBuilder, DugongModule, loggerAdapter } from "@dugongjs/nestjs";
-import { kafkaJsMessageConsumerAdapter, KafkaModule } from "@dugongjs/nestjs-kafkajs";
+import { KafkaModule, messageConsumerKafkaJsAdapter } from "@dugongjs/nestjs-kafkajs";
 import {
-    typeOrmOutboxMessageProducerAdapter,
-    typeOrmRepositoryAdapter,
-    typeOrmTransactionManagerAdapter
+    outboxMessageProducerTypeOrmAdapter,
+    repositoryTypeOrmAdapter,
+    transactionManagerTypeOrmAdapter
 } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -23,10 +23,10 @@ import { dataSourceOptions } from "./db/data-source-options.js";
             currentOrigin: "BankingContext-AccountService",
             adapters: new DugongAdapterBuilder()
                 .register(loggerAdapter)
-                .register(typeOrmRepositoryAdapter)
-                .register(typeOrmTransactionManagerAdapter)
-                .register(typeOrmOutboxMessageProducerAdapter)
-                .register(kafkaJsMessageConsumerAdapter)
+                .register(repositoryTypeOrmAdapter)
+                .register(transactionManagerTypeOrmAdapter)
+                .register(outboxMessageProducerTypeOrmAdapter)
+                .register(messageConsumerKafkaJsAdapter)
                 .build()
         }),
         BankAccountCommandModule,

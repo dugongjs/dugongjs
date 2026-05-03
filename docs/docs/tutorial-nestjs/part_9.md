@@ -120,13 +120,13 @@ DB_NAME=account_service_db
 KAFKA_BROKERS=localhost:9092
 ```
 
-Then update your `AppModule`. Replace the `inMemoryMessageBrokerAdapter` with Kafka adapters, and keep Kafka client setup via `KafkaModule`:
+Then update your `AppModule`. Replace the `messageBrokerInMemoryAdapter` with Kafka adapters, and keep Kafka client setup via `KafkaModule`:
 
 ```typescript title="src/app.module.ts" showLineNumbers
 import { DugongAdapterBuilder, DugongModule, loggerAdapter } from "@dugongjs/nestjs";
-import { KafkaModule, kafkaJsMessageBrokerAdapter } from "@dugongjs/nestjs-kafkajs";
+import { KafkaModule, messageBrokerKafkaJsAdapter } from "@dugongjs/nestjs-kafkajs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
-import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
+import { repositoryTypeOrmAdapter, transactionManagerTypeOrmAdapter } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { BankAccountQueryModelReadRepositoryTypeOrmService } from "./bank-account/adapters/repository/bank-account-query-model-read-repository-typeorm.service.js";
@@ -146,10 +146,10 @@ import { dataSourceOptions } from "./db/data-source-options.js";
             currentOrigin: "BankingContext-AccountService",
             adapters: new DugongAdapterBuilder()
                 .register(loggerAdapter)
-                .register(typeOrmRepositoryAdapter)
-                .register(typeOrmTransactionManagerAdapter)
+                .register(repositoryTypeOrmAdapter)
+                .register(transactionManagerTypeOrmAdapter)
                 // highlight-next-line
-                .register(kafkaJsMessageBrokerAdapter)
+                .register(messageBrokerKafkaJsAdapter)
                 .build()
         }),
         AggregateQueryMicroserviceModule,

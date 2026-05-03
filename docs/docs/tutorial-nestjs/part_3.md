@@ -109,7 +109,7 @@ We inject `EventSourcingService` from `@dugongjs/nestjs`. This is a wrapper arou
 
 The `EventSourcingService` has two methods:
 
-1. `transaction()` which starts a transaction using the current transaction manager (since we registered `typeOrmTransactionManagerAdapter` in `DugongModule` in our `AppModule`, this starts a TypeORM transaction).
+1. `transaction()` which starts a transaction using the current transaction manager (since we registered `transactionManagerTypeOrmAdapter` in `DugongModule` in our `AppModule`, this starts a TypeORM transaction).
 2. `createAggregateContext()` which returns an `AggregateContext` for a given aggregate class. It can be passed the `transaction` object which will then be used by all internal repository operation, ensuring transactionality.
 
 Next, let's take a closer look at the `openAccount()` method:
@@ -271,7 +271,7 @@ Finally, we'll add the module to our `AppModule`:
 
 ```typescript title="src/app.module.ts" showLineNumbers
 import { DugongAdapterBuilder, DugongModule, loggerAdapter } from "@dugongjs/nestjs";
-import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
+import { repositoryTypeOrmAdapter, transactionManagerTypeOrmAdapter } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { BankAccountCommandModule } from "./bank-account/application/command/bank-account.command.module.js";
@@ -284,8 +284,8 @@ import { dataSourceOptions } from "./db/data-source-options.js";
             currentOrigin: "BankingContext-AccountService",
             adapters: new DugongAdapterBuilder()
                 .register(loggerAdapter)
-                .register(typeOrmRepositoryAdapter)
-                .register(typeOrmTransactionManagerAdapter)
+                .register(repositoryTypeOrmAdapter)
+                .register(transactionManagerTypeOrmAdapter)
                 .build()
         }),
         // highlight-next-line

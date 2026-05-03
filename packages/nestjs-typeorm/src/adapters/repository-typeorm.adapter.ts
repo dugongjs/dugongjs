@@ -5,7 +5,7 @@ import { ConsumedMessageRepositoryTypeOrmService } from "../modules/repository-t
 import { DomainEventRepositoryTypeOrmService } from "../modules/repository-typeorm/domain-event-repository-typeorm.service.js";
 import { SnapshotRepositoryTypeOrmService } from "../modules/repository-typeorm/snapshot-repository-typeorm.service.js";
 
-export const typeOrmRepositoryAdapter = {
+export const repositoryTypeOrmAdapter = {
     imports: [TypeOrmModule.forFeature([DomainEventEntity, SnapshotEntity, ConsumedMessageEntity])],
     domainEventRepository: DomainEventRepositoryTypeOrmService,
     snapshotRepository: SnapshotRepositoryTypeOrmService,

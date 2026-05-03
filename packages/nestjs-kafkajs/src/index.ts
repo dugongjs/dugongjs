@@ -1,6 +1,6 @@
-export { kafkaJsMessageBrokerAdapter } from "./adapters/kafkajs-message-broker.adapter.js";
-export { kafkaJsMessageConsumerAdapter } from "./adapters/kafkajs-message-consumer.adapter.js";
-export { kafkaJsMessageProducerAdapter } from "./adapters/kafkajs-message-producer.adapter.js";
+export { messageBrokerKafkaJsAdapter } from "./adapters/message-broker-kafkajs.adapter.js";
+export { messageConsumerKafkaJsAdapter } from "./adapters/message-consumer-kafkajs.adapter.js";
+export { messageProducerKafkaJsAdapter } from "./adapters/message-producer-kafkajs.adapter.js";
 export { KafkaModule } from "./modules/kafka/kafka.module.js";
 export { KafkaService } from "./modules/kafka/kafka.service.js";
 export { MessageBrokerKafkaJsModule } from "./modules/message-broker-kafkajs/message-broker-kafkajs.module.js";
