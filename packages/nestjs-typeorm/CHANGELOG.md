@@ -1,5 +1,13 @@
 # @dugongjs/nestjs-typeorm
 
+## 0.0.25
+
+### Patch Changes
+
+- d018c6d: Standardize TypeORM NestJS adapter export names
+- Updated dependencies [9e2d7a9]
+    - @dugongjs/nestjs@0.0.29
+
 ## 0.0.24
 
 ### Patch Changes
