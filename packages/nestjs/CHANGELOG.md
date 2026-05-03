@@ -1,5 +1,13 @@
 # @dugongjs/nestjs
 
+## 0.0.28
+
+### Patch Changes
+
+- 6cdfe4f: Renamed in-memory message broker adapters
+- 092a2f6: Add optional logger factory integration to adapters and services, including adapter presets for logger and in-memory message broker
+- 6cdfe4f: Fixed an issue with DugongModule where adapter providers were not properly included
+
 ## 0.0.27
 
 ### Patch Changes
