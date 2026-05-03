@@ -1,5 +1,5 @@
+export { inMemoryMessageBrokerAdapter } from "./adapters/in-memory-message-broker.adapter.js";
 export { loggerAdapter } from "./adapters/logger.adapter.js";
-export { messageBrokerInMemoryAdapter } from "./adapters/message-broker-in-memory.adapter.js";
 export { AggregateDomainEventConsumerExplorerService } from "./aggregate-domain-event-consumer/aggregate-domain-event-consumer-explorer.service.js";
 export { AggregateDomainEventConsumerModule } from "./aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 export { AggregateMessageConsumerService } from "./aggregate-message-consumer/aggregate-message-consumer.service.js";
@@ -28,12 +28,12 @@ export { ILoggerFactory } from "./logger/i-logger-factory.js";
 export type { ILoggerFactory as ILoggerFactoryContract } from "./logger/i-logger-factory.js";
 export { NestJSLoggerAdapter } from "./logger/nestjs-logger.adapter.js";
 export { NestJSLoggerFactory } from "./logger/nestjs-logger.factory.js";
+export { InMemoryInboundMessageMapperService } from "./message-broker-in-memory/in-memory-inbound-message-mapper.service.js";
 export { InMemoryMessageBusService } from "./message-broker-in-memory/in-memory-message-bus.service.js";
-export { InboundMessageMapperInMemoryService } from "./message-broker-in-memory/inbound-message-mapper-in-memory.service.js";
+export { InMemoryMessageConsumerService } from "./message-broker-in-memory/in-memory-message-consumer.service.js";
+export { InMemoryMessageProducerService } from "./message-broker-in-memory/in-memory-message-producer.service.js";
+export { InMemoryOutboundMessageMapperService } from "./message-broker-in-memory/in-memory-outbound-message-mapper.service.js";
 export { MessageBrokerInMemoryModule } from "./message-broker-in-memory/message-broker-in-memory.module.js";
-export { MessageConsumerInMemoryService } from "./message-broker-in-memory/message-consumer-in-memory.service.js";
-export { MessageProducerInMemoryService } from "./message-broker-in-memory/message-producer-in-memory.service.js";
-export { OutboundMessageMapperInMemoryService } from "./message-broker-in-memory/outbound-message-mapper-in-memory.service.js";
 export type {
     ConsumedMessageRepositoryProvider,
     DomainEventRepositoryProvider,
