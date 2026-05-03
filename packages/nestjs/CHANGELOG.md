@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.29
+
+### Patch Changes
+
+- 9e2d7a9: Standardize in-memory NestJS adapter and service names
+
 ## 0.0.28
 
 ### Patch Changes
