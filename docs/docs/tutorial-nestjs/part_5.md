@@ -93,9 +93,9 @@ Here, we are setting up a TCP microservice on port 3001. **This port should not 
 Finally, we'll add the `AggregateQueryMicroserviceModule` to the `AppModule`:
 
 ```typescript title="src/app.module.ts" showLineNumbers
-import { EventIssuerModule } from "@dugongjs/nestjs";
+import { DugongAdapterBuilder, DugongModule, loggerAdapter } from "@dugongjs/nestjs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
-import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";
+import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { BankAccountCommandModule } from "./bank-account/application/command/bank-account.command.module.js";
@@ -104,9 +104,14 @@ import { dataSourceOptions } from "./db/data-source-options.js";
 @Module({
     imports: [
         TypeOrmModule.forRoot(dataSourceOptions),
-        RepositoryTypeOrmModule.forRoot(),
-        TransactionManagerTypeOrmModule.forRoot(),
-        EventIssuerModule.forRoot({ currentOrigin: "BankingContext-AccountService" }),
+        DugongModule.forRoot({
+            currentOrigin: "BankingContext-AccountService",
+            adapters: new DugongAdapterBuilder()
+                .register(loggerAdapter)
+                .register(typeOrmRepositoryAdapter)
+                .register(typeOrmTransactionManagerAdapter)
+                .build()
+        }),
         // highlight-next-line
         AggregateQueryMicroserviceModule,
         BankAccountCommandModule

@@ -7,7 +7,7 @@ sidebar_position: 12
 
 In the previous part, we demonstrated a critical flaw: after switching from the in-memory message broker to Kafka, our system lost its transactionality. Specifically, we observed that domain events could be published to Kafka even if the corresponding transaction on the command side failed — leading to potential divergence between services.
 
-In this part, we will solve this using the _outbox pattern_. We will implement an _asymmetric messaging strategy_ where KafkaJS is still used to set up consumers, but an outbox database table will take on the role as the producer.
+In this part, we will solve this using the _outbox pattern_. We will implement an _asymmetric messaging strategy_ where Kafka is still used to set up consumers, but an outbox database table will take on the role as the producer.
 
 ### Background
 
@@ -375,13 +375,13 @@ Here we’ve added the `OutboxEntity`, which introduces the outbox table to our 
 Next, update `AppModule`:
 
 ```typescript title="src/app.module.ts" showLineNumbers
-import { EventIssuerModule } from "@dugongjs/nestjs";
-import { KafkaModule, MessageConsumerKafkaJSModule } from "@dugongjs/nestjs-kafkajs";
+import { DugongAdapterBuilder, DugongModule, loggerAdapter } from "@dugongjs/nestjs";
+import { KafkaModule, kafkaJsMessageConsumerAdapter } from "@dugongjs/nestjs-kafkajs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
 import {
-    OutboxMessageProducerTypeOrmModule,
-    RepositoryTypeOrmModule,
-    TransactionManagerTypeOrmModule
+    typeOrmOutboxMessageProducerAdapter,
+    typeOrmRepositoryAdapter,
+    typeOrmTransactionManagerAdapter
 } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -397,14 +397,19 @@ import { dataSourceOptions } from "./db/data-source-options.js";
     imports: [
         TypeOrmModule.forRoot(dataSourceOptions),
         KafkaModule.forRoot({ brokers: process.env.KAFKA_BROKERS!.split(",") }),
-        RepositoryTypeOrmModule.forRoot(),
-        TransactionManagerTypeOrmModule.forRoot(),
-        EventIssuerModule.forRoot({ currentOrigin: "BankingContext-AccountService" }),
+        DugongModule.forRoot({
+            currentOrigin: "BankingContext-AccountService",
+            adapters: new DugongAdapterBuilder()
+                .register(loggerAdapter)
+                .register(typeOrmRepositoryAdapter)
+                .register(typeOrmTransactionManagerAdapter)
+                // highlight-start
+                .register(typeOrmOutboxMessageProducerAdapter)
+                .register(kafkaJsMessageConsumerAdapter)
+                // highlight-end
+                .build()
+        }),
         AggregateQueryMicroserviceModule,
-        // highlight-start
-        MessageConsumerKafkaJSModule.forRoot(),
-        OutboxMessageProducerTypeOrmModule.forRoot(),
-        // highlight-end
         BankAccountCommandModule,
         BankAccountQueryModelProjectionConsumerModule.register({
             repository: BankAccountQueryModelWriteRepositoryTypeOrmService
@@ -420,7 +425,7 @@ export class AppModule {}
 
 Two important changes have been made:
 
-1. Switched from `MessageBrokerKafkaJSModule` to `MessageConsumerKafkaJSModule`: This module only registers Kafka as a _consumer_. Previously, we used `MessageBrokerKafkaJSModule`, which is a wrapper around both `MessageConsumerKafkaJSModule` and `MessageProducerKafkaJSModule`. Since message publishing is now handled via the outbox, we no longer need the Kafka producer.
-2. Added `OutboxMessageProducerTypeOrmModule`: This enables DugongJS to write messages to the outbox table during the same database transaction as the command handling — ensuring transactionality.
+1. Switched from `kafkaJsMessageBrokerAdapter` to `kafkaJsMessageConsumerAdapter`: This adapter only registers Kafka as a _consumer_. Previously, we used `kafkaJsMessageBrokerAdapter`, which sets up both consumer and producer adapters for Kafka. Since message publishing is now handled via the outbox, we no longer need the Kafka producer part.
+2. Added `typeOrmOutboxMessageProducerAdapter`: This adapter causes DugongJS to write to the outbox table instead of producing messages directly to the message broker. This is one of the many advantages of the ports-and-adapters architecture used by DugongJS - changing the underlying infrastructure does not require significant changes to the source code, we only need to swap out the relevant adapters.
 
 In the next part we will once again evaluate the transactionality of the system.

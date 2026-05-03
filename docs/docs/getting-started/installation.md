@@ -62,11 +62,11 @@ npm install @nestjs/typeorm @dugongjs/nestjs-typeorm
 DugongJS provides a Kafka adapter for messaging using Apache Kafka. To install the Kafka adapter, run:
 
 ```bash npm2yarn
-npm install kafkajs @dugongjs/kafka
+npm install kafkajs @dugongjs/kafkajs
 ```
 
 For NestJS integration with Kafka, also install the following:
 
 ```bash npm2yarn
-npm install @dugongjs/nestjs-kafka
+npm install @dugongjs/nestjs-kafkajs
 ```

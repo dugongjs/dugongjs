@@ -90,7 +90,7 @@ Then run:
 docker compose up
 ```
 
-This starts
+This starts:
 
 - Zookeeper (required by Kafka).
 - Kafka
@@ -120,13 +120,13 @@ DB_NAME=account_service_db
 KAFKA_BROKERS=localhost:9092
 ```
 
-Then update your `AppModule`. Remove the `MessageBrokerInMemoryModule` and instead import `KafkaModule` and `MessageBrokerKafkaJSModule` from `@dugongjs/nestjs-kafkajs`:
+Then update your `AppModule`. Replace the `inMemoryMessageBrokerAdapter` with Kafka adapters, and keep Kafka client setup via `KafkaModule`:
 
 ```typescript title="src/app.module.ts" showLineNumbers
-import { EventIssuerModule } from "@dugongjs/nestjs";
-import { KafkaModule, MessageBrokerKafkaJSModule } from "@dugongjs/nestjs-kafkajs";
+import { DugongAdapterBuilder, DugongModule, loggerAdapter } from "@dugongjs/nestjs";
+import { KafkaModule, kafkaJsMessageBrokerAdapter } from "@dugongjs/nestjs-kafkajs";
 import { AggregateQueryMicroserviceModule } from "@dugongjs/nestjs-microservice-query";
-import { RepositoryTypeOrmModule, TransactionManagerTypeOrmModule } from "@dugongjs/nestjs-typeorm";
+import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { BankAccountQueryModelReadRepositoryTypeOrmService } from "./bank-account/adapters/repository/bank-account-query-model-read-repository-typeorm.service.js";
@@ -142,12 +142,17 @@ import { dataSourceOptions } from "./db/data-source-options.js";
         TypeOrmModule.forRoot(dataSourceOptions),
         // highlight-next-line
         KafkaModule.forRoot({ brokers: process.env.KAFKA_BROKERS!.split(",") }),
-        RepositoryTypeOrmModule.forRoot(),
-        TransactionManagerTypeOrmModule.forRoot(),
-        EventIssuerModule.forRoot({ currentOrigin: "BankingContext-AccountService" }),
+        DugongModule.forRoot({
+            currentOrigin: "BankingContext-AccountService",
+            adapters: new DugongAdapterBuilder()
+                .register(loggerAdapter)
+                .register(typeOrmRepositoryAdapter)
+                .register(typeOrmTransactionManagerAdapter)
+                // highlight-next-line
+                .register(kafkaJsMessageBrokerAdapter)
+                .build()
+        }),
         AggregateQueryMicroserviceModule,
-        // highlight-next-line
-        MessageBrokerKafkaJSModule.forRoot(),
         BankAccountCommandModule,
         BankAccountQueryModelProjectionConsumerModule.register({
             repository: BankAccountQueryModelWriteRepositoryTypeOrmService
