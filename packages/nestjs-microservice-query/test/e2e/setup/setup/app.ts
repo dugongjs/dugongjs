@@ -1,5 +1,5 @@
 import { DugongAdapterBuilder, DugongModule } from "@dugongjs/nestjs";
-import { typeOrmRepositoryAdapter, typeOrmTransactionManagerAdapter } from "@dugongjs/nestjs-typeorm";
+import { repositoryTypeOrmAdapter, transactionManagerTypeOrmAdapter } from "@dugongjs/nestjs-typeorm";
 import { ConsumedMessageEntity, DomainEventEntity, OutboxEntity, SnapshotEntity } from "@dugongjs/typeorm";
 import type { INestApplication } from "@nestjs/common";
 import { ClientProxyFactory, type MicroserviceOptions, Transport } from "@nestjs/microservices";
@@ -38,8 +38,8 @@ beforeAll(async () => {
                 currentOrigin: "IAM-UserService",
                 adapters: new DugongAdapterBuilder()
                     .register(pinoLoggerAdapter)
-                    .register(typeOrmTransactionManagerAdapter)
-                    .register(typeOrmRepositoryAdapter)
+                    .register(transactionManagerTypeOrmAdapter)
+                    .register(repositoryTypeOrmAdapter)
                     .build()
             }),
             AggregateQueryMicroserviceModule,

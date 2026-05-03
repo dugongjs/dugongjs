@@ -3,7 +3,7 @@ import { OutboxEntity, OutboxMessageMapperTypeOrm } from "@dugongjs/typeorm";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { OutboxMessageProducerTypeOrmService } from "../modules/outbox-message-producer-typeorm/outbox-message-producer-typeorm.service.js";
 
-export const typeOrmOutboxMessageProducerAdapter = {
+export const outboxMessageProducerTypeOrmAdapter = {
     imports: [TypeOrmModule.forFeature([OutboxEntity])],
     messageProducer: OutboxMessageProducerTypeOrmService,
     outboundMessageMapper: OutboxMessageMapperTypeOrm

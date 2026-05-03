@@ -1,6 +1,6 @@
-export { typeOrmOutboxMessageProducerAdapter } from "./adapters/typeorm-outbox-message-producer.adapter.js";
-export { typeOrmRepositoryAdapter } from "./adapters/typeorm-repository.adapter.js";
-export { typeOrmTransactionManagerAdapter } from "./adapters/typeorm-transaction-manager.adapter.js";
+export { outboxMessageProducerTypeOrmAdapter } from "./adapters/outbox-message-producer-typeorm.adapter.js";
+export { repositoryTypeOrmAdapter } from "./adapters/repository-typeorm.adapter.js";
+export { transactionManagerTypeOrmAdapter } from "./adapters/transaction-manager-typeorm.adapter.js";
 export { OutboxMessageProducerTypeOrmModule } from "./modules/outbox-message-producer-typeorm/outbox-message-producer-typeorm.module.js";
 export { OutboxMessageProducerTypeOrmService } from "./modules/outbox-message-producer-typeorm/outbox-message-producer-typeorm.service.js";
 export { ConsumedMessageRepositoryTypeOrmService } from "./modules/repository-typeorm/consumed-message-repository-typeorm.service.js";
