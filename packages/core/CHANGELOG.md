@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.18
+
+### Patch Changes
+
+- 6249b05: Added in-memory adapters for repository and transaction ports
+
 ## 0.0.17
 
 ### Patch Changes

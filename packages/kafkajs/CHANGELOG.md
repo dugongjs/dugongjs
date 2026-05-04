@@ -1,5 +1,12 @@
 # @dugongjs/kafkajs
 
+## 0.0.24
+
+### Patch Changes
+
+- Updated dependencies [6249b05]
+    - @dugongjs/core@0.0.18
+
 ## 0.0.23
 
 ### Patch Changes

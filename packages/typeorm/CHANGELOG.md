@@ -1,5 +1,12 @@
 # @dugongjs/typeorm
 
+## 0.0.21
+
+### Patch Changes
+
+- Updated dependencies [6249b05]
+    - @dugongjs/core@0.0.18
+
 ## 0.0.20
 
 ### Patch Changes
