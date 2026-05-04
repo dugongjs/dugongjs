@@ -82,7 +82,7 @@ export function runConsumedMessageRepositoryContractTests(
 
                 await expect(
                     fixture.repository.markMessageAsConsumed(ctx, domainEventId, CONSUMER_ID)
-                ).rejects.toThrow();
+                ).rejects.toThrowError(Error);
             });
 
             it("should allow the same message to be marked as consumed by different consumers", async () => {

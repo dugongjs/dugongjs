@@ -3,3 +3,7 @@ export { InboundMessageMapperInMemory } from "./inbound/message-broker/inbound-m
 export { MessageConsumerInMemory } from "./inbound/message-broker/message-consumer-in-memory.js";
 export { MessageProducerInMemory } from "./outbound/message-broker/message-producer-in-memory.js";
 export { OutboundMessageMapperInMemory } from "./outbound/message-broker/outbound-message-mapper-in-memory.js";
+export { ConsumedMessageRepositoryInMemory } from "./outbound/repository/consumed-message-repository-in-memory.js";
+export { DomainEventRepositoryInMemory } from "./outbound/repository/domain-event-repository-in-memory.js";
+export { SnapshotRepositoryInMemory } from "./outbound/repository/snapshot-repository-in-memory.js";
+export { TransactionManagerInMemory } from "./outbound/transaction-manager/transaction-manager-in-memory.js";
