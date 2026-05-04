@@ -54,6 +54,11 @@ const sidebars: SidebarsConfig = {
             ]
         },
         {
+            type: "doc",
+            label: "Testing",
+            id: "testing"
+        },
+        {
             type: "category",
             label: "Tutorial: NestJS",
             items: [
