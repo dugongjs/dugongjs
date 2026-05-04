@@ -1,5 +1,11 @@
 # @dugongjs/testing
 
+## 0.0.20
+
+### Patch Changes
+
+- ea07c31: Added assertion functions for aggregate testing
+
 ## 0.0.19
 
 ### Patch Changes
