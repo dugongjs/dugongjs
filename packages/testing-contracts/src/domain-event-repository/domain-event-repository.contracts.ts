@@ -147,7 +147,7 @@ export function runDomainEventRepositoryContractTests(setup: () => Promise<Domai
 
                 await expect(
                     fixture.repository.saveDomainEvents(ctx, [makeDomainEvent(aggregateId, 1)])
-                ).rejects.toThrow();
+                ).rejects.toThrowError(Error);
             });
 
             it("should throw when saving an event with a duplicate event ID", async () => {
@@ -158,7 +158,72 @@ export function runDomainEventRepositoryContractTests(setup: () => Promise<Domai
 
                 const duplicate = { ...event, sequenceNumber: 2 };
 
-                await expect(fixture.repository.saveDomainEvents(ctx, [duplicate])).rejects.toThrow();
+                await expect(fixture.repository.saveDomainEvents(ctx, [duplicate])).rejects.toThrowError(Error);
+            });
+
+            it("should allow only one concurrent client to append the same next sequence number", async () => {
+                const aggregateId = uuidv4();
+
+                const [firstResult, secondResult] = await Promise.allSettled([
+                    fixture.repository.saveDomainEvents(ctx, [makeDomainEvent(aggregateId, 1)]),
+                    fixture.repository.saveDomainEvents(ctx, [makeDomainEvent(aggregateId, 1)])
+                ]);
+
+                const successCount = [firstResult, secondResult].filter(
+                    (result) => result.status === "fulfilled"
+                ).length;
+                const failureCount = [firstResult, secondResult].filter(
+                    (result) => result.status === "rejected"
+                ).length;
+
+                expect(successCount).toBe(1);
+                expect(failureCount).toBe(1);
+
+                const storedEvents = await fixture.repository.getAggregateDomainEvents(
+                    ctx,
+                    ORIGIN,
+                    AGGREGATE_TYPE,
+                    aggregateId
+                );
+
+                expect(storedEvents).toHaveLength(1);
+                expect(storedEvents[0].sequenceNumber).toBe(1);
+            });
+
+            it("should allow concurrent appends with same aggregate and sequence number for different tenants", async () => {
+                const aggregateId = uuidv4();
+
+                const [tenantAResult, tenantBResult] = await Promise.allSettled([
+                    fixture.repository.saveDomainEvents(ctx, [
+                        makeDomainEvent(aggregateId, 1, { tenantId: "tenant-a" })
+                    ]),
+                    fixture.repository.saveDomainEvents(ctx, [
+                        makeDomainEvent(aggregateId, 1, { tenantId: "tenant-b" })
+                    ])
+                ]);
+
+                expect(tenantAResult.status).toBe("fulfilled");
+                expect(tenantBResult.status).toBe("fulfilled");
+
+                const tenantAEvents = await fixture.repository.getAggregateDomainEvents(
+                    ctx,
+                    ORIGIN,
+                    AGGREGATE_TYPE,
+                    aggregateId,
+                    "tenant-a"
+                );
+                const tenantBEvents = await fixture.repository.getAggregateDomainEvents(
+                    ctx,
+                    ORIGIN,
+                    AGGREGATE_TYPE,
+                    aggregateId,
+                    "tenant-b"
+                );
+
+                expect(tenantAEvents).toHaveLength(1);
+                expect(tenantBEvents).toHaveLength(1);
+                expect(tenantAEvents[0].sequenceNumber).toBe(1);
+                expect(tenantBEvents[0].sequenceNumber).toBe(1);
             });
         });
 
