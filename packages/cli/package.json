@@ -46,7 +46,7 @@
         "ink-text-input": "^6.0.0",
         "jsondiffpatch": "^0.7.3",
         "react": "^19.1.1",
-        "reflect-metadata": "^0.2.2",
+        "reflect-metadata": "catalog:",
         "rxjs": "^7.8.1"
     },
     "devDependencies": {
