@@ -1,5 +1,13 @@
 # @dugongjs/typeorm
 
+## 0.0.22
+
+### Patch Changes
+
+- 667eddf: Fixed an issue with empty tenant ID filtering
+- Updated dependencies [667eddf]
+    - @dugongjs/core@0.0.19
+
 ## 0.0.21
 
 ### Patch Changes

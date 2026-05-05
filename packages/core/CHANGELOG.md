@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.19
+
+### Patch Changes
+
+- 667eddf: Fixed an issue with empty tenant ID filtering
+
 ## 0.0.18
 
 ### Patch Changes
