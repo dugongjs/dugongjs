@@ -1,5 +1,7 @@
 export { loggerAdapter } from "./adapters/logger.adapter.js";
 export { messageBrokerInMemoryAdapter } from "./adapters/message-broker-in-memory.adapter.js";
+export { repositoryInMemoryAdapter } from "./adapters/repository-in-memory.adapter.js";
+export { transactionManagerInMemoryAdapter } from "./adapters/transaction-manager-in-memory.adapter.js";
 export { AggregateDomainEventConsumerExplorerService } from "./aggregate-domain-event-consumer/aggregate-domain-event-consumer-explorer.service.js";
 export { AggregateDomainEventConsumerModule } from "./aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 export { AggregateMessageConsumerService } from "./aggregate-message-consumer/aggregate-message-consumer.service.js";
@@ -56,4 +58,10 @@ export {
     type QueryModelProjectionConsumerModuleOptions
 } from "./query-model-projection-consumer/query-model-projection-consumer.module.js";
 export { QueryModelProjectionConsumerService } from "./query-model-projection-consumer/query-model-projection-consumer.service.js";
+export { ConsumedMessageRepositoryInMemoryService } from "./repository-in-memory/consumed-message-repository-in-memory.service.js";
+export { DomainEventRepositoryInMemoryService } from "./repository-in-memory/domain-event-repository-in-memory.service.js";
+export { RepositoryInMemoryModule } from "./repository-in-memory/repository-in-memory.module.js";
+export { SnapshotRepositoryInMemoryService } from "./repository-in-memory/snapshot-repository-in-memory.service.js";
+export { TransactionManagerInMemoryModule } from "./transaction-manager-in-memory/transaction-manager-in-memory.module.js";
+export { TransactionManagerInMemoryService } from "./transaction-manager-in-memory/transaction-manager-in-memory.service.js";
 export { WaitForMessageConsumerService } from "./wait-for-message-consumer/wait-for-message-consumer.service.js";
