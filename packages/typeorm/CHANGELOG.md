@@ -1,5 +1,11 @@
 # @dugongjs/typeorm
 
+## 0.0.25
+
+### Patch Changes
+
+- 5ba2123: Removed default value for `tenantId` from all entities`
+
 ## 0.0.24
 
 ### Patch Changes
