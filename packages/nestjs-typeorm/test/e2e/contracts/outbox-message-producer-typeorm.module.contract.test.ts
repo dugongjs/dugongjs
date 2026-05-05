@@ -75,11 +75,11 @@ runMessageProducerContractTests(async () => {
         }),
         normalizePublishedMessageForComparison: (message) => ({
             ...(message as OutboxEntity),
-            tenantId: (message as OutboxEntity).tenantId ?? undefined
+            tenantId: (message as OutboxEntity).tenantId ?? null
         }),
         normalizeExpectedPublishedMessageForComparison: (message) => ({
             ...(message as OutboxEntity),
-            tenantId: (message as OutboxEntity).tenantId ?? "__dugongjs_no_tenant__"
+            tenantId: (message as OutboxEntity).tenantId ?? null
         })
     };
 });
