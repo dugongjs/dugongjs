@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.31
+
+### Patch Changes
+
+- 25cd807: Added in-memory adapters for repository and transaction manager ports
+
 ## 0.0.30
 
 ### Patch Changes
