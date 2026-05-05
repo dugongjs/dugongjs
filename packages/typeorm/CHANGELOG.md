@@ -1,5 +1,11 @@
 # @dugongjs/typeorm
 
+## 0.0.23
+
+### Patch Changes
+
+- dd6a3b7: Removed default tenant ID from outbox entity
+
 ## 0.0.22
 
 ### Patch Changes
