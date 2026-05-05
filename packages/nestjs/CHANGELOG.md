@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.34
+
+### Patch Changes
+
+- 03f60d5: Fixed an issue where `tenantId` was not properly forwarded in `QueryModelProjectionConsumerService`
+
 ## 0.0.33
 
 ### Patch Changes
