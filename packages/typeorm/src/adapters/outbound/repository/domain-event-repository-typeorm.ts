@@ -11,7 +11,7 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
         origin: string,
         aggregateType: string,
         aggregateId: string,
-        tenantId?: string,
+        tenantId?: string | null,
         fromSequenceNumber?: number
     ): Promise<SerializedDomainEvent[]> {
         const domainEventRepository =
@@ -21,12 +21,9 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
             origin,
             aggregateType,
             aggregateId,
-            sequenceNumber: fromSequenceNumber ? MoreThanOrEqual(fromSequenceNumber) : undefined
+            sequenceNumber: fromSequenceNumber ? MoreThanOrEqual(fromSequenceNumber) : undefined,
+            tenantId: normalizeTenantId(tenantId)
         };
-
-        if (tenantId !== undefined) {
-            where.tenantId = normalizeTenantId(tenantId);
-        }
 
         const serializedDomainEvents = await domainEventRepository.find({
             where,
@@ -56,9 +53,7 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
             .where("domainEvent.origin = :origin", { origin })
             .andWhere("domainEvent.aggregateType = :aggregateType", { aggregateType })
             .orderBy("domainEvent.aggregateId", "ASC")
-            .andWhere(tenantId !== undefined ? "domainEvent.tenantId = :tenantId" : "TRUE", {
-                tenantId: normalizeTenantId(tenantId)
-            })
+            .andWhere("domainEvent.tenantId = :tenantId", { tenantId: normalizeTenantId(tenantId) })
             .getRawMany();
 
         return aggregateIds.map((row) => row.aggregateId);
