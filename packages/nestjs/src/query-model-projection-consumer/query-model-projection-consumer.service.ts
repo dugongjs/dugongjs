@@ -16,10 +16,14 @@ export class QueryModelProjectionConsumerService {
     }
 
     public async updateQueryModel(context: HandleMessageContext): Promise<void> {
-        const aggregateContext = this.eventSourcingService.createAggregateContext(
+        const tenantId = context.domainEvent.getTenantId();
+
+        const baseAggregateContext = this.eventSourcingService.createAggregateContext(
             context.transactionContext,
             this.queryModelProjectionHandler.getAggregateClass()
         );
+
+        const aggregateContext = tenantId ? baseAggregateContext.withTenantId(tenantId) : baseAggregateContext;
 
         const aggregateId = context.domainEvent.getAggregateId();
 
