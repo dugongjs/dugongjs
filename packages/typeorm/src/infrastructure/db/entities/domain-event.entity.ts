@@ -34,7 +34,7 @@ export class DomainEventEntity implements SerializedDomainEvent {
     timestamp: Date;
 
     @Column({ type: "varchar", length: 255, nullable: true, default: NO_TENANT_ID })
-    tenantId: string;
+    tenantId?: string;
 
     @Column({ type: "uuid", nullable: true })
     correlationId?: string;
