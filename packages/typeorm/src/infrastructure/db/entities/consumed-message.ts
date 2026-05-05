@@ -1,5 +1,4 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { NO_TENANT_ID } from "../no-tenant-id.js";
 
 @Entity("consumed_messages")
 @Unique(["domainEventId", "consumerId", "tenantId"])
@@ -13,6 +12,6 @@ export class ConsumedMessageEntity {
     @Column({ type: "varchar", length: 255 })
     consumerId: string;
 
-    @Column({ type: "varchar", length: 255, default: NO_TENANT_ID })
+    @Column({ type: "varchar", length: 255 })
     tenantId: string;
 }

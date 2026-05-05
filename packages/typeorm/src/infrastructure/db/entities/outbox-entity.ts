@@ -3,9 +3,6 @@ import { DomainEventEntity } from "./domain-event.entity.js";
 
 @Entity("outbox")
 export class OutboxEntity extends DomainEventEntity {
-    @Column({ type: "varchar", length: 255, nullable: true, default: null })
-    tenantId?: string;
-
     @Column({ type: "varchar", length: 255 })
     channelId: string;
 }
