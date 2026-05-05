@@ -1,5 +1,11 @@
 # @dugongjs/typeorm
 
+## 0.0.24
+
+### Patch Changes
+
+- a6c3b37: Fixed an issue with the tenantId field on the outbox entity
+
 ## 0.0.23
 
 ### Patch Changes
