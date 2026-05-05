@@ -37,7 +37,9 @@
     },
     "pnpm": {
         "overrides": {
-            "webpackbar": "^7.0.0"
+            "webpackbar": "^7.0.0",
+            "protobufjs": "^7.5.5",
+            "vite": "6.4.2"
         }
     }
 }
