@@ -47,6 +47,7 @@ describe("aggregate lifecycle behavior", () => {
             expect(userCreatedOutboxMessage.origin).toBe("IAM-UserService");
             expect(userCreatedOutboxMessage.aggregateType).toBe("User");
             expect(userCreatedOutboxMessage.aggregateId).toBe(user.getId());
+            expect(userCreatedOutboxMessage.tenantId).toBeNull();
             expect(userCreatedOutboxMessage.sequenceNumber).toBe(1);
             expect(userCreatedOutboxMessage.timestamp).toBeInstanceOf(Date);
             expect(userCreatedOutboxMessage.payload).toEqual({

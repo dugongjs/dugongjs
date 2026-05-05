@@ -15,6 +15,7 @@ export class OutboxMessageProducerTypeOrm implements IMessageProducer<OutboxEnti
 
         const outboxEntry: OutboxEntity = {
             ...message,
+            tenantId: (message.tenantId ?? null) as any,
             channelId: messageChannelId
         };
 
@@ -30,6 +31,7 @@ export class OutboxMessageProducerTypeOrm implements IMessageProducer<OutboxEnti
 
         const outboxEntries: OutboxEntity[] = messages.map((message) => ({
             ...message,
+            tenantId: (message.tenantId ?? null) as any,
             channelId: messageChannelId
         }));
 

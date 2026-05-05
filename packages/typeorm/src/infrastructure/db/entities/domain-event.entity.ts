@@ -33,7 +33,7 @@ export class DomainEventEntity implements SerializedDomainEvent {
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP", update: false })
     timestamp: Date;
 
-    @Column({ type: "varchar", length: 255, default: NO_TENANT_ID })
+    @Column({ type: "varchar", length: 255, nullable: true, default: NO_TENANT_ID })
     tenantId: string;
 
     @Column({ type: "uuid", nullable: true })
