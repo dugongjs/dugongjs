@@ -24,6 +24,7 @@ export class DomainEventRepositoryInMemory implements IDomainEventRepository {
         fromSequenceNumber?: number
     ): Promise<SerializedDomainEvent[]> {
         const inMemoryTransactionContext = getInMemoryTransactionContext(transactionContext);
+        const normalizedTenantId = normalizeTenantId(tenantId);
 
         const domainEvents = this.getDomainEventsStore(inMemoryTransactionContext)
             .filter((domainEvent) => {
@@ -35,11 +36,7 @@ export class DomainEventRepositoryInMemory implements IDomainEventRepository {
                     return false;
                 }
 
-                if (tenantId !== undefined && tenantId !== null) {
-                    return normalizeTenantId(domainEvent.tenantId) === tenantId;
-                }
-
-                return true;
+                return normalizeTenantId(domainEvent.tenantId) === normalizedTenantId;
             })
             .sort((eventA, eventB) => eventA.sequenceNumber - eventB.sequenceNumber)
             .filter((domainEvent) => {
@@ -60,6 +57,7 @@ export class DomainEventRepositoryInMemory implements IDomainEventRepository {
         tenantId?: string | null
     ): Promise<string[]> {
         const inMemoryTransactionContext = getInMemoryTransactionContext(transactionContext);
+        const normalizedTenantId = normalizeTenantId(tenantId);
 
         const aggregateIds = new Set(
             this.getDomainEventsStore(inMemoryTransactionContext)
@@ -68,11 +66,7 @@ export class DomainEventRepositoryInMemory implements IDomainEventRepository {
                         return false;
                     }
 
-                    if (tenantId !== undefined && tenantId !== null) {
-                        return normalizeTenantId(domainEvent.tenantId) === tenantId;
-                    }
-
-                    return true;
+                    return normalizeTenantId(domainEvent.tenantId) === normalizedTenantId;
                 })
                 .map((domainEvent) => domainEvent.aggregateId)
         );
