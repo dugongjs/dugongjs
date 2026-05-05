@@ -39,6 +39,21 @@ export class WaitForMessageConsumer extends AbstractAggregateHandler<any> {
      * @returns A promise that resolves when all messages are consumed.
      */
     public async waitForMessagesToBeConsumed(consumerName: string, ...ids: string[]): Promise<void> {
+        return this.waitForMessagesToBeConsumedByTenant(consumerName, null, ...ids);
+    }
+
+    /**
+     * Waits for the specified messages to be consumed by the given message consumer within a tenant scope.
+     * @param consumerName Name of the message consumer.
+     * @param tenantId Tenant ID to scope consumed-message lookups. Pass null for non-tenant scope.
+     * @param ids IDs of the messages to wait for.
+     * @returns A promise that resolves when all messages are consumed.
+     */
+    public async waitForMessagesToBeConsumedByTenant(
+        consumerName: string,
+        tenantId: string | null,
+        ...ids: string[]
+    ): Promise<void> {
         const messageConsumerId = this.messageConsumer.generateMessageConsumerIdForAggregate(
             this.currentOrigin,
             this.aggregateType,
@@ -57,7 +72,7 @@ export class WaitForMessageConsumer extends AbstractAggregateHandler<any> {
 
             const results = await Promise.all(
                 remainingIdsArray.map(async (id) =>
-                    this.consumedMessageRepository.checkIfMessageIsConsumed(null, id, messageConsumerId)
+                    this.consumedMessageRepository.checkIfMessageIsConsumed(null, id, messageConsumerId, tenantId)
                 )
             );
 
@@ -112,6 +127,6 @@ export class WaitForMessageConsumer extends AbstractAggregateHandler<any> {
         }
 
         const ids = domainEvents.map((event) => event.id);
-        await this.waitForMessagesToBeConsumed(consumerName, ...ids);
+        await this.waitForMessagesToBeConsumedByTenant(consumerName, tenantId ?? null, ...ids);
     }
 }

@@ -82,6 +82,30 @@ describe("WaitForMessageConsumer", () => {
         expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenCalledTimes(3);
     });
 
+    it("should scope list-based waiting by tenant", async () => {
+        mockConsumedMessageRepository.checkIfMessageIsConsumed.mockResolvedValueOnce(true).mockResolvedValueOnce(true);
+
+        const consumer = new WaitForMessageConsumer(defaultOptions);
+
+        await consumer.waitForMessagesToBeConsumedByTenant("consumer-id", "tenant-a", "message-1", "message-2");
+
+        expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenCalledTimes(2);
+        expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenNthCalledWith(
+            1,
+            null,
+            "message-1",
+            "consumer-id",
+            "tenant-a"
+        );
+        expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenNthCalledWith(
+            2,
+            null,
+            "message-2",
+            "consumer-id",
+            "tenant-a"
+        );
+    });
+
     it("should wait for all domain events of an aggregate to be consumed", async () => {
         mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([
             { id: "event-1" },
@@ -104,5 +128,41 @@ describe("WaitForMessageConsumer", () => {
         );
         expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenCalledTimes(2);
         expect(mockLogger.verbose).toHaveBeenCalledWith("All messages consumed");
+    });
+
+    it("should scope aggregate waiting by tenant", async () => {
+        mockDomainEventRepository.getAggregateDomainEvents.mockResolvedValue([
+            { id: "event-1" },
+            { id: "event-2" }
+        ] as any);
+
+        mockConsumedMessageRepository.checkIfMessageIsConsumed.mockResolvedValueOnce(true).mockResolvedValueOnce(true);
+
+        const consumer = new WaitForMessageConsumer(defaultOptions);
+
+        await consumer.waitForAggregateDomainEventsToBeConsumed("consumer-id", "aggregate-id", "tenant-a");
+
+        expect(mockDomainEventRepository.getAggregateDomainEvents).toHaveBeenCalledWith(
+            null,
+            "TestOrigin",
+            "Test",
+            "aggregate-id",
+            "tenant-a",
+            undefined
+        );
+        expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenNthCalledWith(
+            1,
+            null,
+            "event-1",
+            "consumer-id",
+            "tenant-a"
+        );
+        expect(mockConsumedMessageRepository.checkIfMessageIsConsumed).toHaveBeenNthCalledWith(
+            2,
+            null,
+            "event-2",
+            "consumer-id",
+            "tenant-a"
+        );
     });
 });

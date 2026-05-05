@@ -44,9 +44,18 @@ export class WaitForMessageConsumerService {
         consumerName: string,
         ...ids: string[]
     ): Promise<void> {
+        return this.waitForMessagesToBeConsumedByTenant(aggregateClass, consumerName, null, ...ids);
+    }
+
+    public async waitForMessagesToBeConsumedByTenant(
+        aggregateClass: EventSourcedAggregateRoot,
+        consumerName: string,
+        tenantId: string | null,
+        ...ids: string[]
+    ): Promise<void> {
         const waitForMessageConsumer = this.getWaitForMessageConsumer(aggregateClass);
 
-        return waitForMessageConsumer.waitForMessagesToBeConsumed(consumerName, ...ids);
+        return waitForMessageConsumer.waitForMessagesToBeConsumedByTenant(consumerName, tenantId, ...ids);
     }
 
     public async waitForAggregateDomainEventsToBeConsumed(
