@@ -1,5 +1,13 @@
 # @dugongjs/nestjs
 
+## 0.0.33
+
+### Patch Changes
+
+- a470809: Added `waitForMessagesToBeConsumedByTenant` to `WaitForMessageConsumer`
+- Updated dependencies [a470809]
+    - @dugongjs/core@0.0.20
+
 ## 0.0.32
 
 ### Patch Changes

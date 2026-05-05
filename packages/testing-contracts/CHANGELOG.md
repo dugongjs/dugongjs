@@ -1,5 +1,12 @@
 # @dugongjs/testing-contracts
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [a470809]
+    - @dugongjs/core@0.0.20
+
 ## 0.0.3
 
 ### Patch Changes

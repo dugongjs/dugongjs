@@ -1,6 +1,6 @@
 {
     "name": "@dugongjs/nestjs-kafkajs",
-    "version": "0.0.29",
+    "version": "0.0.30",
     "author": "Erik Lysne",
     "license": "MIT",
     "engines": {
