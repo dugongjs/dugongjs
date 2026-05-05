@@ -1,5 +1,12 @@
 # @dugongjs/testing
 
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies [a470809]
+    - @dugongjs/core@0.0.20
+
 ## 0.0.21
 
 ### Patch Changes

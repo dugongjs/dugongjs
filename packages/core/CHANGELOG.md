@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.20
+
+### Patch Changes
+
+- a470809: Added `waitForMessagesToBeConsumedByTenant` to `WaitForMessageConsumer`
+
 ## 0.0.19
 
 ### Patch Changes
