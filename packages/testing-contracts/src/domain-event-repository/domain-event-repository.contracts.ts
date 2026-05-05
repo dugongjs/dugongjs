@@ -123,7 +123,8 @@ export function runDomainEventRepositoryContractTests(setup: () => Promise<Domai
                     ctx,
                     ORIGIN,
                     AGGREGATE_TYPE,
-                    aggregateId
+                    aggregateId,
+                    event.tenantId
                 );
 
                 expect(retrieved.id).toBe(event.id);
@@ -225,6 +226,27 @@ export function runDomainEventRepositoryContractTests(setup: () => Promise<Domai
                 expect(tenantAEvents[0].sequenceNumber).toBe(1);
                 expect(tenantBEvents[0].sequenceNumber).toBe(1);
             });
+
+            it("should treat undefined tenantId as no-tenant scope when retrieving aggregate domain events", async () => {
+                const aggregateId = uuidv4();
+
+                await fixture.repository.saveDomainEvents(ctx, [makeDomainEvent(aggregateId, 1)]);
+                await fixture.repository.saveDomainEvents(ctx, [
+                    makeDomainEvent(aggregateId, 1, { tenantId: "tenant-a" })
+                ]);
+
+                const result = await fixture.repository.getAggregateDomainEvents(
+                    ctx,
+                    ORIGIN,
+                    AGGREGATE_TYPE,
+                    aggregateId,
+                    undefined
+                );
+
+                expect(result).toHaveLength(1);
+                expect(result[0].tenantId).toBeUndefined();
+                expect(result[0].sequenceNumber).toBe(1);
+            });
         });
 
         describe("getAggregateIds", () => {
@@ -259,6 +281,20 @@ export function runDomainEventRepositoryContractTests(setup: () => Promise<Domai
 
                 expect(result).toHaveLength(1);
                 expect(result).toContain(idA);
+            });
+
+            it("should treat undefined tenantId as no-tenant scope when retrieving aggregate IDs", async () => {
+                const noTenantAggregateId = uuidv4();
+                const tenantAggregateId = uuidv4();
+
+                await fixture.repository.saveDomainEvents(ctx, [makeDomainEvent(noTenantAggregateId, 1)]);
+                await fixture.repository.saveDomainEvents(ctx, [
+                    makeDomainEvent(tenantAggregateId, 1, { tenantId: "tenant-a" })
+                ]);
+
+                const result = await fixture.repository.getAggregateIds(ctx, ORIGIN, AGGREGATE_TYPE, undefined);
+
+                expect(result).toEqual([noTenantAggregateId]);
             });
         });
     });
