@@ -1,6 +1,6 @@
 {
     "name": "@dugongjs/nestjs",
-    "version": "0.0.35",
+    "version": "0.0.36",
     "author": "Erik Lysne",
     "license": "MIT",
     "engines": {

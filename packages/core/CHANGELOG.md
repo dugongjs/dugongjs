@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.21
+
+### Patch Changes
+
+- 1f1492a: Fixed an issue with idempotent saves in the in-memory domain events repository
+
 ## 0.0.20
 
 ### Patch Changes
