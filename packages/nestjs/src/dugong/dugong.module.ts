@@ -1,6 +1,7 @@
 import {
     IConsumedMessageRepository,
     IDomainEventRepository,
+    IExternalOriginMap,
     IInboundMessageMapper,
     IMessageConsumer,
     IMessageProducer,
@@ -8,18 +9,34 @@ import {
     ISnapshotRepository,
     ITransactionManager
 } from "@dugongjs/core";
-import { Module, type DynamicModule, type Provider, type Type } from "@nestjs/common";
+import {
+    Module,
+    type ClassProvider,
+    type DynamicModule,
+    type FactoryProvider,
+    type Provider,
+    type Type,
+    type ValueProvider
+} from "@nestjs/common";
 import { AggregateDomainEventConsumerModule } from "../aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 import { EventIssuerModule } from "../event-issuer/event-issuer.module.js";
-import { ExternalOriginModule, type ExternalOriginModuleOptions } from "../external-origin/external-origin.module.js";
 import { ILoggerFactory } from "../logger/i-logger-factory.js";
+import type { ModuleInjectables } from "../providers/module-providers.js";
 import type { DugongAdapters } from "./dugong-adapter.js";
+
+export type DugongExternalOriginsOptions = {
+    module?: ModuleInjectables;
+    externalOriginMap:
+        | Omit<FactoryProvider<IExternalOriginMap>, "provide">
+        | Omit<ClassProvider<IExternalOriginMap>, "provide">
+        | Omit<ValueProvider<IExternalOriginMap>, "provide">;
+};
 
 export type DugongModuleOptions = {
     currentOrigin: string;
     adapters: DugongAdapters;
     aggregateDomainEventConsumers?: boolean;
-    externalOrigins?: Omit<ExternalOriginModuleOptions, "isGlobal">;
+    externalOrigins?: DugongExternalOriginsOptions;
 };
 
 @Module({})
@@ -41,13 +58,18 @@ export class DugongModule {
             .withClassProvider(IOutboundMessageMapper, adapters.outboundMessageMapper)
             .build();
 
-        const allProviders = [...providers, ...(adapters.providers ?? [])];
+        const allProviders = [
+            ...providers,
+            ...this.createExternalOriginMapProviders(options.externalOrigins),
+            ...(options.externalOrigins?.module?.providers ?? []),
+            ...(adapters.providers ?? [])
+        ];
 
         return {
             module: DugongModule,
             imports: [
                 EventIssuerModule.forRoot({ currentOrigin: options.currentOrigin }),
-                ...(options.externalOrigins ? [ExternalOriginModule.register(options.externalOrigins)] : []),
+                ...(options.externalOrigins?.module?.imports ?? []),
                 ...(includeAggregateDomainEventConsumers ? [AggregateDomainEventConsumerModule] : []),
                 ...(adapters.imports ?? [])
             ],
@@ -73,6 +95,19 @@ export class DugongModule {
             adapters.messageConsumer !== undefined &&
             adapters.inboundMessageMapper !== undefined
         );
+    }
+
+    private static createExternalOriginMapProviders(options: DugongExternalOriginsOptions | undefined): Provider[] {
+        if (!options) {
+            return [];
+        }
+
+        return [
+            {
+                provide: IExternalOriginMap,
+                ...options.externalOriginMap
+            }
+        ];
     }
 }
 
