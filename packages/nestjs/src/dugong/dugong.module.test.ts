@@ -13,7 +13,6 @@ import { Injectable } from "@nestjs/common";
 import "reflect-metadata";
 import { AggregateDomainEventConsumerModule } from "../aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 import { EventIssuerModule } from "../event-issuer/event-issuer.module.js";
-import { ExternalOriginModule } from "../external-origin/external-origin.module.js";
 import { ILoggerFactory } from "../logger/i-logger-factory.js";
 import { DugongModule } from "./dugong.module.js";
 
@@ -158,7 +157,7 @@ describe("DugongModule", () => {
         expect(module.imports).not.toContain(AggregateDomainEventConsumerModule);
     });
 
-    it("should register external origin module when provided", () => {
+    it("should register external origin map provider when provided", () => {
         const externalOriginMap = new Map<string, any>([["TestOrigin", {}]]);
 
         const module = DugongModule.register({
@@ -171,10 +170,7 @@ describe("DugongModule", () => {
             adapters: {}
         });
 
-        const externalOriginImport = (module.imports as any[]).find((entry) => entry?.module === ExternalOriginModule);
-
-        expect(externalOriginImport).toBeDefined();
-        expect(externalOriginImport.providers).toEqual(
+        expect(module.providers).toEqual(
             expect.arrayContaining([
                 {
                     provide: IExternalOriginMap,
