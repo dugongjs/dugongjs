@@ -1,5 +1,13 @@
 # @dugongjs/typeorm
 
+## 0.0.27
+
+### Patch Changes
+
+- 1f1492a: Fixed an issue with idempotent saves in the domain events repository
+- Updated dependencies [1f1492a]
+    - @dugongjs/core@0.0.21
+
 ## 0.0.26
 
 ### Patch Changes

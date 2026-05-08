@@ -1,5 +1,13 @@
 # @dugongjs/testing-contracts
 
+## 0.0.5
+
+### Patch Changes
+
+- 1f1492a: Added contract tests for idempotent domain event saves
+- Updated dependencies [1f1492a]
+    - @dugongjs/core@0.0.21
+
 ## 0.0.4
 
 ### Patch Changes
