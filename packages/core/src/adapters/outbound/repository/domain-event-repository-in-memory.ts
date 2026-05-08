@@ -85,7 +85,7 @@ export class DomainEventRepositoryInMemory implements IDomainEventRepository {
             const existingEventWithId = store.find((domainEvent) => domainEvent.id === event.id);
 
             if (existingEventWithId) {
-                throw new Error(`Domain event with id ${event.id} already exists`);
+                continue;
             }
 
             const existingEventWithSequenceNumber = store.find(
