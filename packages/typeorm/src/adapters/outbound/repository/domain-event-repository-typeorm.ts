@@ -1,5 +1,5 @@
 import type { IDomainEventRepository, SerializedDomainEvent } from "@dugongjs/core";
-import { MoreThanOrEqual, type EntityManager, type FindOptionsWhere, type Repository } from "typeorm";
+import { In, MoreThanOrEqual, type EntityManager, type FindOptionsWhere, type Repository } from "typeorm";
 import { DomainEventEntity } from "../../../infrastructure/db/entities/domain-event.entity.js";
 import { denormalizeTenantId, normalizeTenantId } from "../../../infrastructure/db/no-tenant-id.js";
 
@@ -70,8 +70,26 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
             return;
         }
 
+        // Check which events already exist by ID
+        const eventIds = events.map((event) => event.id);
+        const existingEvents = await domainEventRepository.find({
+            where: {
+                id: In(eventIds)
+            },
+            select: ["id"]
+        });
+
+        const existingIds = new Set(existingEvents.map((event) => event.id));
+
+        // Only insert events that don't already exist by ID
+        const newEvents = events.filter((event) => !existingIds.has(event.id));
+
+        if (newEvents.length === 0) {
+            return;
+        }
+
         const domainEventEntities = domainEventRepository.create(
-            events.map((event) => ({
+            newEvents.map((event) => ({
                 ...event,
                 tenantId: normalizeTenantId(event.tenantId)
             }))

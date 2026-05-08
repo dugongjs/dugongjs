@@ -36,7 +36,7 @@ describe("DomainEventRepositoryInMemory", () => {
         expect(events[1]!.sequenceNumber).toBe(2);
     });
 
-    it("should throw on duplicate event id", async () => {
+    it("should not throw on duplicate event id", async () => {
         const repository = new DomainEventRepositoryInMemory();
         const aggregateId = randomUUID();
         const event = createDomainEvent(aggregateId, 1);
@@ -50,7 +50,10 @@ describe("DomainEventRepositoryInMemory", () => {
                     id: event.id
                 }
             ])
-        ).rejects.toThrow();
+        ).resolves.not.toThrow();
+
+        const stored = await repository.getAggregateDomainEvents(null, "TestOrigin", "TestAggregate", aggregateId);
+        expect(stored).toHaveLength(1);
     });
 
     it("should throw on duplicate sequence for same aggregate and tenant", async () => {
