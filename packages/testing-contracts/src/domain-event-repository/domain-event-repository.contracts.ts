@@ -139,27 +139,49 @@ export function runDomainEventRepositoryContractTests(setup: () => Promise<Domai
             });
         });
 
-        describe("optimistic concurrency", () => {
-            it("should throw when saving an event with a duplicate sequence number for the same aggregate", async () => {
+        describe("idempotent saves on duplicate event ID", () => {
+            it("should not throw when re-saving an event with the same ID", async () => {
                 const aggregateId = uuidv4();
                 const event = makeDomainEvent(aggregateId, 1);
 
                 await fixture.repository.saveDomainEvents(ctx, [event]);
+
+                // Re-save the exact same event — should not throw
+                await expect(fixture.repository.saveDomainEvents(ctx, [event])).resolves.not.toThrow();
+
+                const stored = await fixture.repository.getAggregateDomainEvents(
+                    ctx,
+                    ORIGIN,
+                    AGGREGATE_TYPE,
+                    aggregateId
+                );
+
+                expect(stored).toHaveLength(1);
+                expect(stored[0].id).toBe(event.id);
+            });
+
+            it("should throw when a different event claims an already-used sequence number", async () => {
+                const aggregateId = uuidv4();
+                const event1 = makeDomainEvent(aggregateId, 1);
+
+                await fixture.repository.saveDomainEvents(ctx, [event1]);
+
+                // Different event, same sequence number — should throw
+                const event2 = makeDomainEvent(aggregateId, 1);
+
+                await expect(fixture.repository.saveDomainEvents(ctx, [event2])).rejects.toThrowError(Error);
+            });
+        });
+
+        describe("optimistic concurrency", () => {
+            it("should throw when saving an event with a duplicate sequence number for the same aggregate", async () => {
+                const aggregateId = uuidv4();
+
+                await fixture.repository.saveDomainEvents(ctx, [makeDomainEvent(aggregateId, 1)]);
 
                 await expect(
                     fixture.repository.saveDomainEvents(ctx, [makeDomainEvent(aggregateId, 1)])
                 ).rejects.toThrowError(Error);
-            });
-
-            it("should throw when saving an event with a duplicate event ID", async () => {
-                const aggregateId = uuidv4();
-                const event = makeDomainEvent(aggregateId, 1);
-
-                await fixture.repository.saveDomainEvents(ctx, [event]);
-
-                const duplicate = { ...event, sequenceNumber: 2 };
-
-                await expect(fixture.repository.saveDomainEvents(ctx, [duplicate])).rejects.toThrowError(Error);
             });
 
             it("should allow only one concurrent client to append the same next sequence number", async () => {
