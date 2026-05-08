@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.35
+
+### Patch Changes
+
+- 9958853: Fixed an issue where external origins were not made globally available through `DugongModule.forRoot()`
+
 ## 0.0.34
 
 ### Patch Changes
