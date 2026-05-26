@@ -2,7 +2,10 @@ import type { DomainEventClass, ILogger } from "@dugongjs/core";
 import { Injectable, Optional, type OnModuleInit } from "@nestjs/common";
 import { DiscoveryService, MetadataScanner } from "@nestjs/core";
 import { AggregateMessageConsumerService } from "../aggregate-message-consumer/aggregate-message-consumer.service.js";
-import { AGGREGATE_DOMAIN_EVENT_CONSUMER_TOKEN } from "../decorators/aggregate-domain-event-consumer.decorator.js";
+import {
+    AGGREGATE_DOMAIN_EVENT_CONSUMER_TOKEN,
+    type AggregateDomainEventConsumerMetadata
+} from "../decorators/aggregate-domain-event-consumer.decorator.js";
 import { InjectLoggerFactory } from "../decorators/inject-logger-factory.decorator.js";
 import { ON_DOMAIN_EVENT_TOKEN } from "../decorators/on-domain-event.decorator.js";
 import type { ILoggerFactory } from "../logger/i-logger-factory.js";
@@ -34,33 +37,37 @@ export class AggregateDomainEventConsumerExplorerService implements OnModuleInit
             const aggregateDomainEventConsumerMetadata = Reflect.getMetadata(
                 AGGREGATE_DOMAIN_EVENT_CONSUMER_TOKEN,
                 metatype
-            );
+            ) as AggregateDomainEventConsumerMetadata | undefined;
 
             if (!aggregateDomainEventConsumerMetadata) {
                 continue;
             }
 
-            const { aggregateClass, consumerName } = aggregateDomainEventConsumerMetadata;
+            const { aggregateClass, consumerName, options } = aggregateDomainEventConsumerMetadata;
 
             const handlers = this.collectHandlers(instance);
 
             const consumer = this.aggregateMessageConsumerService.getAggregateMessageConsumer(aggregateClass);
 
-            await consumer.registerMessageConsumerForAggregate(consumerName, async (context) => {
-                const { domainEvent } = context;
+            await consumer.registerMessageConsumerForAggregate(
+                consumerName,
+                async (context) => {
+                    const { domainEvent } = context;
 
-                for (const [methodKey, domainEventClasses] of handlers) {
-                    if (domainEventClasses.some((cls) => domainEvent instanceof cls)) {
-                        const method = instance[methodKey].bind(instance);
+                    for (const [methodKey, domainEventClasses] of handlers) {
+                        if (domainEventClasses.some((cls) => domainEvent instanceof cls)) {
+                            const method = instance[methodKey].bind(instance);
 
-                        const logPrefix = consumer.getLogPrefix();
-                        const logContext = consumer.getMessageLogContext(consumerName, domainEvent);
-                        this.logger?.log(logContext, `${logPrefix}Message received`);
+                            const logPrefix = consumer.getLogPrefix();
+                            const logContext = consumer.getMessageLogContext(consumerName, domainEvent);
+                            this.logger?.log(logContext, `${logPrefix}Message received`);
 
-                        await method(context);
+                            await method(context);
+                        }
                     }
-                }
-            });
+                },
+                options
+            );
         }
     }
 
