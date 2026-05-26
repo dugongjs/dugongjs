@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.37
+
+### Patch Changes
+
+- 485a3a5: Added options parameter to `AggregateDomainEventConsumer` decorator
+
 ## 0.0.36
 
 ### Patch Changes
