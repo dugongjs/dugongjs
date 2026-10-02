@@ -68,7 +68,9 @@ export class EventSourcingService {
         try {
             const manager = context.getManager();
             manager.setTransactionContext(transactionContext);
-        } catch {}
+        } catch {
+            // Event-sourced-only aggregates have no manager, so there is nothing to propagate to.
+        }
 
         return context;
     }

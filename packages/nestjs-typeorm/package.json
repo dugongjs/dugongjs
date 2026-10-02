@@ -57,6 +57,7 @@
         "@types/pg": "^8.11.14",
         "@vitest/ui": "catalog:",
         "dotenv": "^16.5.0",
+        "eslint": "catalog:",
         "pg": "^8.15.6",
         "reflect-metadata": "catalog:",
         "typeorm": "^0.3.22",

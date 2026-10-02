@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { BankAccount } from "src/bank-account/domain/bank-account.aggregate.js";
 import { EntityManager } from "typeorm";
-import { IBankAccountQueryModelWriteRepository } from "../../ports/repository/i-bank-account-query-model-Write-repository.js";
+import { IBankAccountQueryModelWriteRepository } from "../../ports/repository/i-bank-account-query-model-write-repository.js";
 import { BankAccountQueryModelEntity } from "./bank-account-query-model.entity.js";
 
 @Injectable()

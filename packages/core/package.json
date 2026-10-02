@@ -41,6 +41,7 @@
         "@swc/helpers": "^0.5.17",
         "@types/node": "^24.5.1",
         "@types/uuid": "^9.0.8",
+        "eslint": "catalog:",
         "reflect-metadata": "catalog:",
         "typescript": "catalog:",
         "unplugin-swc": "catalog:",

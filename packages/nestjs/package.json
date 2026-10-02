@@ -43,6 +43,7 @@
         "@swc/core": "^1.11.21",
         "@swc/helpers": "^0.5.17",
         "@types/node": "^24.5.1",
+        "eslint": "catalog:",
         "reflect-metadata": "catalog:",
         "typescript": "catalog:",
         "unplugin-swc": "catalog:",

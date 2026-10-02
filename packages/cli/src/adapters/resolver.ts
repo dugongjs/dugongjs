@@ -17,7 +17,7 @@ export function getAggregateQueryAdapter(): AggregateQueryAdapterWrapper {
     }
 
     switch (context.adapter) {
-        case "nestjs-microservices":
+        case "nestjs-microservices": {
             const transportMap: Record<Transport, NestJSTransport> = {
                 tcp: NestJSTransport.TCP
             };
@@ -36,6 +36,7 @@ export function getAggregateQueryAdapter(): AggregateQueryAdapterWrapper {
                 adapter,
                 close: () => adapter.close()
             };
+        }
         default:
             throw new Error(`Unknown adapter "${context.adapter}".`);
     }

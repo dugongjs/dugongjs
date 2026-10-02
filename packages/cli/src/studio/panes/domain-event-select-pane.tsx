@@ -28,7 +28,7 @@ export const DomainEventSelectPane: React.FC<DomainEventSelectPaneProps> = ({
     const containerRef = React.useRef<DOMElement>(null);
     const [visibleLines, setVisibleLines] = React.useState<number>(10);
     const [scrollOffset, setScrollOffset] = React.useState<number>(0);
-    const [_, rows] = useStdoutDimensions();
+    const [, rows] = useStdoutDimensions();
 
     React.useEffect(() => {
         if (containerRef.current) {
