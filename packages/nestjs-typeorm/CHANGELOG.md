@@ -1,5 +1,15 @@
 # @dugongjs/nestjs-typeorm
 
+## 0.0.38
+
+### Patch Changes
+
+- 0a1ad68: Added the MIT license text to every published package
+- Updated dependencies [0a1ad68]
+    - @dugongjs/core@0.0.22
+    - @dugongjs/nestjs@0.0.39
+    - @dugongjs/typeorm@0.0.28
+
 ## 0.0.37
 
 ### Patch Changes

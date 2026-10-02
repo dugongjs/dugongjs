@@ -1,6 +1,6 @@
 {
     "name": "@dugongjs/nestjs-microservice-query",
-    "version": "0.0.39",
+    "version": "0.0.40",
     "author": "Erik Lysne",
     "license": "MIT",
     "engines": {
