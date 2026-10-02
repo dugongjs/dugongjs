@@ -1,5 +1,15 @@
 # @dugongjs/cli
 
+## 0.0.42
+
+### Patch Changes
+
+- 0a1ad68: Added the MIT license text to every published package
+- Updated dependencies [0a1ad68]
+    - @dugongjs/core@0.0.22
+    - @dugongjs/nestjs@0.0.39
+    - @dugongjs/nestjs-microservice-query@0.0.40
+
 ## 0.0.41
 
 ### Patch Changes

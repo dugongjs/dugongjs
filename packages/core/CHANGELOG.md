@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.22
+
+### Patch Changes
+
+- 0a1ad68: Added the MIT license text to every published package
+
 ## 0.0.21
 
 ### Patch Changes

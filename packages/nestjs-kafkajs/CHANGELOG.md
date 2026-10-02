@@ -1,5 +1,15 @@
 # @dugongjs/nestjs-kafkajs
 
+## 0.0.36
+
+### Patch Changes
+
+- 0a1ad68: Added the MIT license text to every published package
+- Updated dependencies [0a1ad68]
+    - @dugongjs/core@0.0.22
+    - @dugongjs/kafkajs@0.0.28
+    - @dugongjs/nestjs@0.0.39
+
 ## 0.0.35
 
 ### Patch Changes
