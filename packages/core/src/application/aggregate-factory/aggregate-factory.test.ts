@@ -11,7 +11,6 @@ import { domainEventDeserializer } from "../../domain/domain-event-deserializer/
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ISnapshotRepository, SerializedSnapshot } from "../../ports/outbound/repository/i-snapshot-repository.js";
 import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
-import type { AggregateQueryService } from "../aggregate-query-service/aggregate-query-service.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import type { ILogger } from "../logger/i-logger.js";
 import { AggregateFactory, type AggregateFactoryOptions } from "./aggregate-factory.js";
@@ -40,7 +39,6 @@ describe("AggregateFactory", () => {
     });
     const mockDomainEventRepository = mock<IDomainEventRepository>();
     const mockSnapshotRepository = mock<ISnapshotRepository>();
-    const mockExternalOriginMap = mock<Map<string, AggregateQueryService>>();
     const mockLogger = mock<ILogger>();
 
     const mockAggregateMetadata: AggregateMetadata = {

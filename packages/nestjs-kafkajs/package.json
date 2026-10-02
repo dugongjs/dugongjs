@@ -54,6 +54,7 @@
         "@types/node": "^24.5.1",
         "@vitest/ui": "catalog:",
         "dotenv": "^16.5.0",
+        "eslint": "catalog:",
         "kafkajs": "2.2.4",
         "reflect-metadata": "catalog:",
         "typescript": "catalog:",

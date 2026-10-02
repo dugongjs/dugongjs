@@ -28,8 +28,6 @@ export const DomainEventViewPane: React.FC<DomainEventViewPaneProps> = ({
     const [metaViewport, setMetaViewport] = React.useState(6);
     const [payloadViewport, setPayloadViewport] = React.useState(6);
 
-    const sequenceNumberDisplay = `${domainEvent?.sequenceNumber ?? "0"}/${maximumSequenceNumber ?? "0"}`;
-
     React.useLayoutEffect(() => {
         if (!containerRef.current) return;
 

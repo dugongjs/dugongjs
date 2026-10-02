@@ -432,6 +432,7 @@ describe("AbstractDomainEvent", () => {
             };
 
             //@ts-expect-error: NonSerializablePayload is not serializable
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- the declaration is the assertion
             class InvalidPayloadEvent extends AbstractDomainEvent<NonSerializablePayload> {
                 public readonly origin = "TestOrigin";
                 public readonly aggregateType = "TestAggregate";
@@ -582,6 +583,7 @@ describe("AbstractDomainEvent", () => {
                 active: z.boolean()
             });
 
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only in type position
             class InferredEvent extends AbstractDomainEvent.fromSchema(schema) {
                 public origin = "TestOrigin";
                 public aggregateType = "TestAggregate";
@@ -621,6 +623,7 @@ describe("AbstractDomainEvent", () => {
         });
 
         it("should accept schema based domain events as domain event classes", () => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only in type position
             class SchemaBasedEvent extends AbstractDomainEvent.fromSchema(z.object({ data: z.string() })) {
                 public origin = "TestOrigin";
                 public aggregateType = "TestAggregate";

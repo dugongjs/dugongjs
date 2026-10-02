@@ -21,7 +21,7 @@ export const AggregateDiffPane: React.FC<AggregateDiffPaneProps> = ({
         if (!current || !previous) return null;
         try {
             return jsonDiff(previous, current);
-        } catch (err) {
+        } catch {
             return { error: "Failed to compute diff" };
         }
     }, [current, previous]);

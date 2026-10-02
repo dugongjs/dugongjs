@@ -73,7 +73,9 @@ export class AggregateContext<TAggregateRootClass extends EventSourcedAggregateR
             newContext.getFactory().setTransactionContext(currentTxContext);
             try {
                 newContext.getManager().setTransactionContext(currentTxContext);
-            } catch {}
+            } catch {
+                // Event-sourced-only aggregates have no manager, so there is nothing to propagate to.
+            }
         }
 
         return newContext;

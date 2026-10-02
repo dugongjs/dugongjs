@@ -51,6 +51,7 @@
         "@types/pg": "^8.11.14",
         "@vitest/ui": "catalog:",
         "dotenv": "^16.5.0",
+        "eslint": "catalog:",
         "kafkajs": "^2.2.4",
         "pg": "^8.15.6",
         "pino": "^9.6.0",

@@ -168,6 +168,7 @@ describe("AggregateContext", () => {
         });
 
         it("should return never for the manager for AbstractEventSourcedAggregateRoot", () => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- used only in the ReturnType query below
             const aggregateContext = new AggregateContext({
                 aggregateClass: TestEventSourcedAggregate,
                 currentOrigin: "TestOrigin",

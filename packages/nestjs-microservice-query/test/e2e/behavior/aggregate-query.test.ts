@@ -22,7 +22,7 @@ describe("aggregate query behavior", () => {
         it("should return all aggregate ids for a given aggregate type", async () => {
             const userManager = eventSourcingService.createAggregateContext(null, User);
 
-            for await (const i of Array.from({ length: 10 })) {
+            for (let i = 0; i < 10; i++) {
                 const user = new User();
 
                 user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- opaque marker type that adapters widen
 export type TransactionContext = {};
 
 export type RunInTransaction<TResult> = (context: TransactionContext) => Promise<TResult>;

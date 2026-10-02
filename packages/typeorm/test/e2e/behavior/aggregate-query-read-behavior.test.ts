@@ -31,7 +31,7 @@ describe("aggregate query read behavior", () => {
 
     describe("when listing aggregate ids", () => {
         it("should return aggregate ids for persisted aggregates", async () => {
-            for await (const i of Array.from({ length: 10 })) {
+            for (let i = 0; i < 10; i++) {
                 const user = new User();
 
                 user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
@@ -47,7 +47,7 @@ describe("aggregate query read behavior", () => {
         });
 
         it("should include ids for deleted aggregates", async () => {
-            for await (const i of Array.from({ length: 10 })) {
+            for (let i = 0; i < 10; i++) {
                 const user = new User();
 
                 user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
