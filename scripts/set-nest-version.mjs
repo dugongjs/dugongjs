@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Pins every @nestjs/* package to a single major via pnpm overrides, so the test
- * suite can be run against each NestJS major the packages claim to support.
- *
- * The @dugongjs/nestjs* packages declare NestJS as a peer dependency with the range
- * `^10.4.13 || ^11.0.0 || ^12.0.0`, but devDependencies can only resolve one major at
- * a time. Overrides force a single major across every workspace package at once
- * (including transitive dependents such as @nestjs/typeorm), which is what makes a
- * matrix leg meaningful.
+ * Pins every @nestjs/* package to a single major via pnpm overrides, so the test suite
+ * can be run against each NestJS major the packages support. devDependencies resolve
+ * one major at a time; overrides force that major across every workspace package at
+ * once, which is what makes a matrix leg meaningful.
  *
  * Usage:
  *   node scripts/set-nest-version.mjs 11     # pin to NestJS v11
@@ -17,9 +13,8 @@
  * Follow either with `pnpm install --no-frozen-lockfile`, since overrides change
  * resolution and therefore the lockfile. Do not commit the resulting lockfile churn.
  *
- * Note on Node: NestJS itself declares no `engines`, but its transitive `file-type`
- * dependency does — v10 needs Node >=18, v11 >=20 and v12 >=22. Node 22 is the only
- * version that satisfies all three.
+ * NestJS declares no `engines`, but its transitive `file-type` dependency does: v10
+ * needs Node >=18, v11 >=20 and v12 >=22.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";

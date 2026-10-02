@@ -32,11 +32,11 @@ jobs:
           cache: 'pnpm'
 
       - name: Pin NestJS to v${{ matrix.nest }}
-        if: matrix.nest != '10'
+        if: matrix.nest != '12'
         run: node scripts/set-nest-version.mjs ${{ matrix.nest }}
 
       - name: Install dependencies
-        run: pnpm install ${{ matrix.nest == '10' && '--frozen-lockfile' || '--no-frozen-lockfile' }}
+        run: pnpm install ${{ matrix.nest == '12' && '--frozen-lockfile' || '--no-frozen-lockfile' }}
 
       - name: Report resolved NestJS version
         run: pnpm why @nestjs/common --recursive --depth 0 || true
