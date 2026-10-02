@@ -10,7 +10,13 @@ on:
 
 jobs:
   test:
+    name: Test (NestJS v${{ matrix.nest }})
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        nest: ['10', '11', '12']
 
     steps:
       - name: Checkout code
@@ -25,8 +31,15 @@ jobs:
           node-version: 22
           cache: 'pnpm'
 
+      - name: Pin NestJS to v${{ matrix.nest }}
+        if: matrix.nest != '10'
+        run: node scripts/set-nest-version.mjs ${{ matrix.nest }}
+
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install ${{ matrix.nest == '10' && '--frozen-lockfile' || '--no-frozen-lockfile' }}
+
+      - name: Report resolved NestJS version
+        run: pnpm why @nestjs/common --recursive --depth 0 || true
 
       - name: Run tests
         run: pnpm test:run
