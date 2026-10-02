@@ -1,5 +1,13 @@
 # @dugongjs/cli
 
+## 0.0.41
+
+### Patch Changes
+
+- Updated dependencies [facd510]
+    - @dugongjs/nestjs@0.0.38
+    - @dugongjs/nestjs-microservice-query@0.0.39
+
 ## 0.0.40
 
 ### Patch Changes

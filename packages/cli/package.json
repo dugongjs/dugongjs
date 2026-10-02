@@ -1,6 +1,6 @@
 {
     "name": "@dugongjs/cli",
-    "version": "0.0.40",
+    "version": "0.0.41",
     "author": "Erik Lysne",
     "license": "MIT",
     "engines": {
