@@ -1,5 +1,13 @@
 # @dugongjs/nestjs-typeorm
 
+## 0.0.37
+
+### Patch Changes
+
+- facd510: Widened NestJS peer dependency ranges to support v10, v11 and v12
+- Updated dependencies [facd510]
+    - @dugongjs/nestjs@0.0.38
+
 ## 0.0.36
 
 ### Patch Changes
