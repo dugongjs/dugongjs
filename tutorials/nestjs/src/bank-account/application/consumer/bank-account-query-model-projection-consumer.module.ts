@@ -1,7 +1,7 @@
 import { Constructor } from "@dugongjs/core";
 import { QueryModelProjectionConsumerModule, QueryModelProjectionConsumerModuleOptions } from "@dugongjs/nestjs";
 import { DynamicModule, Module } from "@nestjs/common";
-import { IBankAccountQueryModelWriteRepository } from "../../ports/repository/i-bank-account-query-model-Write-repository.js";
+import { IBankAccountQueryModelWriteRepository } from "../../ports/repository/i-bank-account-query-model-write-repository.js";
 import { BankAccountQueryModelProjectionHandlerService } from "./bank-account-query-model-projection-handler.service.js";
 
 export type BankAccountQueryModelProjectionConsumerModuleOptions = Omit<
