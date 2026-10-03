@@ -89,3 +89,17 @@ jobs:
 
       - name: Run build
         run: pnpm build
+
+  changeset:
+    name: Changeset
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for a changeset
+        run: node scripts/check-changeset.mjs origin/${{ github.base_ref }}
