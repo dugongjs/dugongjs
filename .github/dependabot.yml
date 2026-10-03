@@ -47,6 +47,15 @@ updates:
         patterns:
           - pino
           - pino-*
+      all-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@nestjs/*"
+          - nestjs-pino
+          - pino
+          - pino-*
 
   - package-ecosystem: github-actions
     directory: /
