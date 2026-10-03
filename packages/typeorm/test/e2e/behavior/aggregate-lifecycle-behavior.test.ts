@@ -32,7 +32,7 @@ describe("aggregate lifecycle behavior", () => {
             const user = new User();
 
             const email = faker.internet.email();
-            const username = faker.internet.userName();
+            const username = faker.internet.username();
 
             user.createUser({ email, username });
 
@@ -61,7 +61,7 @@ describe("aggregate lifecycle behavior", () => {
             const user = new User();
 
             const email = faker.internet.email();
-            const username = faker.internet.userName();
+            const username = faker.internet.username();
 
             user.createUser({ email, username });
 
@@ -78,7 +78,7 @@ describe("aggregate lifecycle behavior", () => {
 
         beforeEach(async () => {
             const email = faker.internet.email();
-            const username = faker.internet.userName();
+            const username = faker.internet.username();
 
             const user = new User();
             user.createUser({ email, username });
@@ -243,7 +243,7 @@ describe("aggregate lifecycle behavior", () => {
 
         beforeEach(async () => {
             const email = faker.internet.email();
-            const username = faker.internet.userName();
+            const username = faker.internet.username();
 
             const user = new User();
             user.createUser({ email, username });

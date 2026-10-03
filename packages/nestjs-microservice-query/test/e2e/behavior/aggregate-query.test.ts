@@ -25,9 +25,9 @@ describe("aggregate query behavior", () => {
             for (let i = 0; i < 10; i++) {
                 const user = new User();
 
-                user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
+                user.createUser({ email: faker.internet.email(), username: faker.internet.username() });
                 user.updateEmail({ email: faker.internet.email() });
-                user.updateUsername({ username: faker.internet.userName() });
+                user.updateUsername({ username: faker.internet.username() });
                 user.deleteUser();
 
                 await userManager.commitStagedDomainEvents(user);
@@ -45,9 +45,9 @@ describe("aggregate query behavior", () => {
 
             const user = new User();
 
-            user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
+            user.createUser({ email: faker.internet.email(), username: faker.internet.username() });
             user.updateEmail({ email: faker.internet.email() });
-            user.updateUsername({ username: faker.internet.userName() });
+            user.updateUsername({ username: faker.internet.username() });
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
@@ -69,11 +69,11 @@ describe("aggregate query behavior", () => {
             const user = new User();
 
             const initialEmail = faker.internet.email();
-            const initialUsername = faker.internet.userName();
+            const initialUsername = faker.internet.username();
 
             user.createUser({ email: initialEmail, username: initialUsername });
             user.updateEmail({ email: faker.internet.email() });
-            user.updateUsername({ username: faker.internet.userName() });
+            user.updateUsername({ username: faker.internet.username() });
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
@@ -102,9 +102,9 @@ describe("aggregate query behavior", () => {
 
             const user = new User();
 
-            user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
+            user.createUser({ email: faker.internet.email(), username: faker.internet.username() });
             user.updateEmail({ email: faker.internet.email() });
-            user.updateUsername({ username: faker.internet.userName() });
+            user.updateUsername({ username: faker.internet.username() });
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 

@@ -42,7 +42,7 @@
         "@dugongjs/testing-contracts": "workspace:*",
         "@dugongjs/typeorm": "workspace:*",
         "@dugongjs/typescript-config": "workspace:*",
-        "@faker-js/faker": "^8.4.1",
+        "@faker-js/faker": "^10.5.0",
         "@swc/core": "^1.11.21",
         "@swc/helpers": "^0.5.17",
         "@testcontainers/kafka": "catalog:",
