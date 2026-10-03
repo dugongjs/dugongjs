@@ -1,5 +1,15 @@
 # @dugongjs/cli
 
+## 0.0.43
+
+### Patch Changes
+
+- a890804: Updated the bundled NestJS to v12 and removed the unused `@nestjs/platform-express` dependency
+- Updated dependencies [7143dc5]
+    - @dugongjs/core@0.0.23
+    - @dugongjs/nestjs@0.0.40
+    - @dugongjs/nestjs-microservice-query@0.0.41
+
 ## 0.0.42
 
 ### Patch Changes
