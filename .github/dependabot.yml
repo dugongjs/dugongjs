@@ -18,6 +18,8 @@ updates:
       - dependency-name: reflect-metadata
       - dependency-name: unplugin-swc
       - dependency-name: "@testcontainers/*"
+      - dependency-name: webpackbar
+      - dependency-name: vite
       - dependency-name: "@docusaurus/*"
         update-types:
           - version-update:semver-major
