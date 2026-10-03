@@ -1,5 +1,13 @@
 # @dugongjs/testing
 
+## 0.0.25
+
+### Patch Changes
+
+- 7143dc5: Upgraded `uuid` to v12, which resolves a reported advisory and removes the need for `@types/uuid`
+- Updated dependencies [7143dc5]
+    - @dugongjs/core@0.0.23
+
 ## 0.0.24
 
 ### Patch Changes
