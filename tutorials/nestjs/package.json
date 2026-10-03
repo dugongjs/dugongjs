@@ -26,7 +26,7 @@
         "kafkajs": "^2.2.4",
         "reflect-metadata": "^0.2.0",
         "rxjs": "^7.8.1",
-        "typeorm": "^0.3.22"
+        "typeorm": "^0.3.31"
     },
     "devDependencies": {
         "@types/express": "^4.17.17",
@@ -35,7 +35,7 @@
         "dotenv-cli": "^8.0.0",
         "supertest": "^7.0.0",
         "typescript": "catalog:",
-        "vite": "^6.4.2",
+        "vite": "^8.3.2",
         "vite-node": "^3.1.2",
         "vite-plugin-node": "^5.0.1"
     }
