@@ -61,7 +61,7 @@ describe("aggregate factory integration behavior", () => {
                 aggregateId: userId,
                 domainEventSequenceNumber: 1,
                 snapshotData: {
-                    username: faker.internet.userName()
+                    username: faker.internet.username()
                 },
                 origin: currentOrigin,
                 aggregateType: "User"
@@ -80,7 +80,7 @@ describe("aggregate factory integration behavior", () => {
 
             domainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce([
                 new UserCreatedEvent(userId, {
-                    username: faker.internet.userName()
+                    username: faker.internet.username()
                 })
                     .setSequenceNumber(1)
                     .setAggregateId(userId)
@@ -100,7 +100,7 @@ describe("aggregate factory integration behavior", () => {
                 aggregateId: userId,
                 domainEventSequenceNumber: 3,
                 snapshotData: {
-                    username: faker.internet.userName()
+                    username: faker.internet.username()
                 },
                 origin: currentOrigin,
                 aggregateType: "User"
@@ -129,7 +129,7 @@ describe("aggregate factory integration behavior", () => {
                 aggregateId: userId,
                 domainEventSequenceNumber: 3,
                 snapshotData: {
-                    username: faker.internet.userName()
+                    username: faker.internet.username()
                 },
                 origin: currentOrigin,
                 aggregateType: "User"
@@ -170,7 +170,7 @@ describe("aggregate factory integration behavior", () => {
 
             domainEventRepository.getAggregateDomainEvents.mockResolvedValueOnce([
                 new UserCreatedEvent(userId, {
-                    username: faker.internet.userName()
+                    username: faker.internet.username()
                 })
                     .setSequenceNumber(1)
                     .setAggregateId(userId)
@@ -185,10 +185,10 @@ describe("aggregate factory integration behavior", () => {
 
         it("should rehydrate aggregate state from a multi-event history", async () => {
             const userId = faker.string.uuid();
-            const createdUsername = faker.internet.userName();
-            const updatedUsernameA = faker.internet.userName();
-            const updatedUsernameB = faker.internet.userName();
-            const updatedUsernameC = faker.internet.userName();
+            const createdUsername = faker.internet.username();
+            const updatedUsernameA = faker.internet.username();
+            const updatedUsernameB = faker.internet.username();
+            const updatedUsernameC = faker.internet.username();
 
             const userCreatedEvent = new UserCreatedEvent(userId, {
                 username: createdUsername
@@ -245,7 +245,7 @@ describe("aggregate factory integration behavior", () => {
                 aggregateId: userId,
                 domainEventSequenceNumber: 1,
                 snapshotData: {
-                    username: faker.internet.userName()
+                    username: faker.internet.username()
                 },
                 origin: currentOrigin,
                 aggregateType: "User"
@@ -266,17 +266,17 @@ describe("aggregate factory integration behavior", () => {
                 aggregateId: userId,
                 domainEventSequenceNumber: 3,
                 snapshotData: {
-                    username: faker.internet.userName()
+                    username: faker.internet.username()
                 },
                 origin: currentOrigin,
                 aggregateType: "User"
             };
 
             const userCreatedEvent = new UserCreatedEvent(userId, {
-                username: faker.internet.userName()
+                username: faker.internet.username()
             });
             const userUpdatedEvent = new UserUpdatedEvent(userId, {
-                username: faker.internet.userName()
+                username: faker.internet.username()
             });
             const userDeletedEvent = new UserDeletedEvent(userId);
 

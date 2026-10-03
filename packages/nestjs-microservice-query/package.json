@@ -43,7 +43,7 @@
         "@dugongjs/scripts": "workspace:*",
         "@dugongjs/typeorm": "workspace:*",
         "@dugongjs/typescript-config": "workspace:*",
-        "@faker-js/faker": "^8.4.1",
+        "@faker-js/faker": "^10.5.0",
         "@nestjs/common": "^12.0.1",
         "@nestjs/core": "^12.0.1",
         "@nestjs/microservices": "^12.0.1",

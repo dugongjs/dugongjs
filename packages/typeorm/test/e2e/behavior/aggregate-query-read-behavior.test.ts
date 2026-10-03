@@ -34,9 +34,9 @@ describe("aggregate query read behavior", () => {
             for (let i = 0; i < 10; i++) {
                 const user = new User();
 
-                user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
+                user.createUser({ email: faker.internet.email(), username: faker.internet.username() });
                 user.updateEmail({ email: faker.internet.email() });
-                user.updateUsername({ username: faker.internet.userName() });
+                user.updateUsername({ username: faker.internet.username() });
 
                 await userManager.commitStagedDomainEvents(user);
             }
@@ -50,9 +50,9 @@ describe("aggregate query read behavior", () => {
             for (let i = 0; i < 10; i++) {
                 const user = new User();
 
-                user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
+                user.createUser({ email: faker.internet.email(), username: faker.internet.username() });
                 user.updateEmail({ email: faker.internet.email() });
-                user.updateUsername({ username: faker.internet.userName() });
+                user.updateUsername({ username: faker.internet.username() });
                 user.deleteUser();
 
                 await userManager.commitStagedDomainEvents(user);
@@ -66,12 +66,12 @@ describe("aggregate query read behavior", () => {
 
     describe("when rebuilding an aggregate", () => {
         it("should return the latest aggregate state", async () => {
-            const finalUsername = faker.internet.userName();
+            const finalUsername = faker.internet.username();
             const finalEmail = faker.internet.email();
 
             const user = new User();
 
-            user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
+            user.createUser({ email: faker.internet.email(), username: faker.internet.username() });
             user.updateUsername({ username: finalUsername });
             user.updateEmail({ email: finalEmail });
 
@@ -84,13 +84,13 @@ describe("aggregate query read behavior", () => {
         });
 
         it("should support rebuilding up to a specific sequence number", async () => {
-            const initialUsername = faker.internet.userName();
+            const initialUsername = faker.internet.username();
             const initialEmail = faker.internet.email();
 
             const user = new User();
 
             user.createUser({ email: initialEmail, username: initialUsername });
-            user.updateUsername({ username: faker.internet.userName() });
+            user.updateUsername({ username: faker.internet.username() });
             user.updateEmail({ email: faker.internet.email() });
 
             await userManager.commitStagedDomainEvents(user);
@@ -112,9 +112,9 @@ describe("aggregate query read behavior", () => {
         it("should return all events for the aggregate", async () => {
             const user = new User();
 
-            user.createUser({ email: faker.internet.email(), username: faker.internet.userName() });
+            user.createUser({ email: faker.internet.email(), username: faker.internet.username() });
             user.updateEmail({ email: faker.internet.email() });
-            user.updateUsername({ username: faker.internet.userName() });
+            user.updateUsername({ username: faker.internet.username() });
 
             await userManager.commitStagedDomainEvents(user);
 
