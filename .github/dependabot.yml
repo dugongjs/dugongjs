@@ -1,0 +1,70 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: ":arrow_up:"
+      include: scope
+    ignore:
+      - dependency-name: typescript
+      - dependency-name: eslint
+      - dependency-name: vitest
+      - dependency-name: "@vitest/ui"
+      - dependency-name: reflect-metadata
+      - dependency-name: unplugin-swc
+      - dependency-name: "@testcontainers/*"
+      - dependency-name: "@docusaurus/*"
+        update-types:
+          - version-update:semver-major
+    groups:
+      nestjs:
+        patterns:
+          - "@nestjs/*"
+          - nestjs-pino
+      pino:
+        patterns:
+          - pino
+          - pino-*
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
+          - docusaurus-*
+      types:
+        patterns:
+          - "@types/*"
+      nestjs-security:
+        applies-to: security-updates
+        patterns:
+          - "@nestjs/*"
+          - nestjs-pino
+      pino-security:
+        applies-to: security-updates
+        patterns:
+          - pino
+          - pino-*
+      all-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@nestjs/*"
+          - nestjs-pino
+          - pino
+          - pino-*
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ":arrow_up:"
+    groups:
+      actions:
+        patterns:
+          - "*"
