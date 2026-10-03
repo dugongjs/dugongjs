@@ -203,8 +203,8 @@ importers:
         specifier: ^3.1.3
         version: 3.1.3
       uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
+        specifier: ^12.0.1
+        version: 12.0.1
     devDependencies:
       '@dugongjs/eslint-config':
         specifier: workspace:*
@@ -227,9 +227,6 @@ importers:
       '@types/node':
         specifier: ^24.5.1
         version: 24.10.13
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
       eslint:
         specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
@@ -594,7 +591,7 @@ importers:
         version: 9.39.2(jiti@2.6.1)
       nestjs-pino:
         specifier: ^4.4.0
-        version: 4.5.0(@nestjs/common@12.1.2(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@10.5.0)(pino@9.14.0)(rxjs@7.8.2)
+        version: 4.6.1(@nestjs/common@12.1.2(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@10.5.0)(pino@9.14.0)(rxjs@7.8.2)
       pg:
         specifier: ^8.15.6
         version: 8.18.0
@@ -752,8 +749,8 @@ importers:
   packages/testing:
     dependencies:
       uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
+        specifier: ^12.0.1
+        version: 12.0.1
     devDependencies:
       '@dugongjs/core':
         specifier: workspace:*
@@ -770,9 +767,6 @@ importers:
       '@types/node':
         specifier: ^24.5.1
         version: 24.10.13
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
       eslint:
         specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
@@ -807,9 +801,6 @@ importers:
       '@types/node':
         specifier: ^24.5.1
         version: 24.10.13
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
       eslint:
         specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
@@ -823,8 +814,8 @@ importers:
         specifier: 'catalog:'
         version: 1.5.9(@swc/core@1.15.11(@swc/helpers@0.5.18))(rollup@4.57.1)
       uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
+        specifier: ^12.0.1
+        version: 12.0.1
       vitest:
         specifier: 'catalog:'
         version: 4.1.5(@types/node@24.10.13)(@vitest/ui@4.1.5)(jiti@2.6.1)(terser@5.46.1)(yaml@2.8.2)
@@ -7050,8 +7041,8 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  nestjs-pino@4.5.0:
-    resolution: {integrity: sha512-e54ChJMACSGF8gPYaHsuD07RW7l/OVoV6aI8Hqhpp0ZQ4WA8QY3eewL42JX7Z1U6rV7byNU7bGBV9l6d9V6PDQ==}
+  nestjs-pino@4.6.1:
+    resolution: {integrity: sha512-nuARXa0xpdJ1lY2+fgycIQr6H3g0VgqAWNK3xMYjOFcj2DoPETNXj0lV3Y86nRuI7BUfQp5PGiVoZvT4dTWbpQ==}
     engines: {node: '>= 14'}
     peerDependencies:
       '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
@@ -9248,13 +9239,13 @@ packages:
     resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
     hasBin: true
 
+  uuid@12.0.1:
+    resolution: {integrity: sha512-9obBF8sMIHJWNQaO6IGOG8giGa/jUpKX34bz6o4whVs8M0WAvhID2tNxYp6A2XEBJPuZSX8wsS/6TEKfIDc+nw==}
+    hasBin: true
+
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
-    hasBin: true
-
-  uuid@9.0.1:
-    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -17426,7 +17417,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  nestjs-pino@4.5.0(@nestjs/common@12.1.2(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@10.5.0)(pino@9.14.0)(rxjs@7.8.2):
+  nestjs-pino@4.6.1(@nestjs/common@12.1.2(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@10.5.0)(pino@9.14.0)(rxjs@7.8.2):
     dependencies:
       '@nestjs/common': 12.1.2(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       pino: 9.14.0
@@ -19933,9 +19924,9 @@ snapshots:
 
   uuid@11.1.0: {}
 
-  uuid@8.3.2: {}
+  uuid@12.0.1: {}
 
-  uuid@9.0.1: {}
+  uuid@8.3.2: {}
 
   validate-npm-package-license@3.0.4:
     dependencies:

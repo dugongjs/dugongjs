@@ -32,10 +32,9 @@
         "reflect-metadata": "catalog:",
         "@dugongjs/typescript-config": "workspace:*",
         "@types/node": "^24.5.1",
-        "@types/uuid": "^9.0.8",
         "eslint": "catalog:",
         "typescript": "catalog:",
-        "uuid": "^9.0.1",
+        "uuid": "^12.0.1",
         "vitest": "catalog:"
     }
 }
