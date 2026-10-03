@@ -29,7 +29,7 @@
     },
     "peerDependencies": {
         "@dugongjs/core": "workspace:*",
-        "typeorm": "^0.3.22"
+        "typeorm": "^0.3.31"
     },
     "dependencies": {
         "change-case": "^5.4.4"
@@ -40,7 +40,7 @@
         "@dugongjs/scripts": "workspace:*",
         "@dugongjs/testing-contracts": "workspace:*",
         "@dugongjs/typescript-config": "workspace:*",
-        "@faker-js/faker": "^8.4.1",
+        "@faker-js/faker": "^10.5.0",
         "@swc/core": "^1.11.21",
         "@swc/helpers": "^0.5.17",
         "@testcontainers/postgresql": "catalog:",
@@ -53,7 +53,7 @@
         "pg": "^8.15.6",
         "pino": "^10.4.0",
         "reflect-metadata": "catalog:",
-        "typeorm": "^0.3.22",
+        "typeorm": "^0.3.31",
         "typescript": "catalog:",
         "unplugin-swc": "catalog:",
         "vite-node": "^3.1.2",
