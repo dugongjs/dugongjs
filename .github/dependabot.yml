@@ -64,6 +64,13 @@ updates:
       day: monday
     commit-message:
       prefix: ":arrow_up:"
+    ignore:
+      - dependency-name: changesets/action
+        update-types:
+          - version-update:semver-major
+      - dependency-name: actions/create-github-app-token
+        update-types:
+          - version-update:semver-major
     groups:
       actions:
         patterns:
