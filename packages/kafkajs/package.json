@@ -54,7 +54,7 @@
         "eslint": "catalog:",
         "kafkajs": "^2.2.4",
         "pg": "^8.15.6",
-        "pino": "^9.6.0",
+        "pino": "^10.4.0",
         "reflect-metadata": "catalog:",
         "typeorm": "^0.3.22",
         "typescript": "catalog:",
