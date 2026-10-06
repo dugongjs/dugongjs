@@ -66,4 +66,58 @@ describe("AggregateSnapshotTransformer", () => {
             expect(result.isEqual).toBe(false);
         });
     });
+
+    describe("canBeRestoredFromSnapshot field fidelity", () => {
+        class WithPrimitives extends AbstractEventSourcedAggregateRoot {
+            public name = "a";
+            public count = 1;
+            public flag = true;
+            public nothing: string | null = null;
+        }
+
+        class WithUndecoratedDate extends AbstractEventSourcedAggregateRoot {
+            public at = new Date("2026-01-01T00:00:00.000Z");
+        }
+
+        class WithDecoratedDate extends AbstractEventSourcedAggregateRoot {
+            @Type(() => Date)
+            public at = new Date("2026-01-01T00:00:00.000Z");
+        }
+
+        class WithUndecoratedMap extends AbstractEventSourcedAggregateRoot {
+            public entries = new Map<string, number>([["a", 1]]);
+        }
+
+        class WithDecoratedMap extends AbstractEventSourcedAggregateRoot {
+            @Type(() => Map)
+            public entries = new Map<string, number>([["a", 1]]);
+        }
+
+        function check<T extends typeof AbstractEventSourcedAggregateRoot>(aggregateClass: T): boolean {
+            const aggregate = new (aggregateClass as any)();
+            aggregate.setId(faker.string.uuid());
+
+            return aggregateSnapshotTransformer.canBeRestoredFromSnapshot(aggregateClass as any, aggregate).isEqual;
+        }
+
+        it("should restore primitive and null fields", () => {
+            expect(check(WithPrimitives)).toBe(true);
+        });
+
+        it("should not restore a Date field without @Type", () => {
+            expect(check(WithUndecoratedDate)).toBe(false);
+        });
+
+        it("should restore a Date field decorated with @Type", () => {
+            expect(check(WithDecoratedDate)).toBe(true);
+        });
+
+        it("should not restore a Map field without @Type", () => {
+            expect(check(WithUndecoratedMap)).toBe(false);
+        });
+
+        it("should restore a Map field decorated with @Type", () => {
+            expect(check(WithDecoratedMap)).toBe(true);
+        });
+    });
 });

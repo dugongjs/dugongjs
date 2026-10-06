@@ -21,7 +21,8 @@
     },
     "scripts": {
         "lint": "eslint .",
-        "test:run": "vitest run",
+        "test:unit:run": "vitest --config vitest.config.unit.ts run",
+        "test:unit:watch": "vitest --config vitest.config.unit.ts watch",
         "build": "vite-node ./scripts/build.ts",
         "prepublishOnly": "pnpm build"
     },
