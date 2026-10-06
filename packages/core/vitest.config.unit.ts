@@ -6,7 +6,7 @@ export default defineConfig({
     test: {
         globals: true,
         root: __dirname,
-        include: ["src/**/*.test.ts"],
+        include: ["src/**/*.test.ts", "test/integration/**/*.test.ts"],
         reporters: ["verbose"],
         setupFiles: [join(__dirname, "test", "setup", "reflect-metadata.ts")]
     },
