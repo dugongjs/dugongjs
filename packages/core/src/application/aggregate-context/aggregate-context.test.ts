@@ -123,6 +123,45 @@ describe("AggregateContext", () => {
             expect(newContext.getFactory().getTransactionContext()).toBe(mockTransactionContext);
             expect(newContext.getManager().getTransactionContext()).toBe(mockTransactionContext);
         });
+
+        it("should not throw for an AbstractEventSourcedAggregateRoot, which has no manager", () => {
+            const aggregateContext = createAggregateContext({
+                aggregateClass: TestEventSourcedAggregate,
+                snapshotRepository: mockSnapshotRepository
+            });
+
+            const tenantId = "TestTenant";
+
+            expect(() => aggregateContext.withTenantId(tenantId)).not.toThrow();
+            expect(aggregateContext.withTenantId(tenantId).getFactory()["tenantId"]).toBe(tenantId);
+        });
+
+        it("should preserve the transaction context on the factory when there is no manager", () => {
+            const aggregateContext = createAggregateContext({
+                aggregateClass: TestEventSourcedAggregate,
+                snapshotRepository: mockSnapshotRepository
+            });
+
+            const mockTransactionContext = { id: "test-transaction" };
+            aggregateContext.getFactory().setTransactionContext(mockTransactionContext);
+
+            const newContext = aggregateContext.withTenantId("TestTenant");
+
+            expect(newContext.getFactory().getTransactionContext()).toBe(mockTransactionContext);
+        });
+
+        it("should surface errors from the manager that are not AggregateManagerNotAvailableError", () => {
+            const aggregateContext = createAggregateContext();
+
+            aggregateContext.getFactory().setTransactionContext({ id: "test-transaction" });
+
+            const unexpectedError = new Error("setTransactionContext failed");
+            vi.spyOn(AggregateManager.prototype, "setTransactionContext").mockImplementationOnce(() => {
+                throw unexpectedError;
+            });
+
+            expect(() => aggregateContext.withTenantId("TestTenant")).toThrow(unexpectedError);
+        });
     });
 
     describe("type-safety", () => {

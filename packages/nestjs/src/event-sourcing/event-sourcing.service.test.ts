@@ -1,4 +1,4 @@
-import { Aggregate, AggregateContext } from "@dugongjs/core";
+import { Aggregate, AggregateContext, AggregateManagerNotAvailableError } from "@dugongjs/core";
 import "reflect-metadata";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { EventSourcingService } from "./event-sourcing.service.js";
@@ -63,7 +63,7 @@ describe("EventSourcingService", () => {
         expect(setManagerTransactionContext).toHaveBeenCalledWith(transactionContext);
     });
 
-    it("should swallow manager context errors but still set factory context", () => {
+    it("should skip the manager context for aggregates that have no manager, but still set factory context", () => {
         const service = createService();
         const setFactoryTransactionContext = vi.fn();
 
@@ -71,12 +71,28 @@ describe("EventSourcingService", () => {
             setTransactionContext: setFactoryTransactionContext
         } as any);
         vi.spyOn(AggregateContext.prototype, "getManager").mockImplementation(() => {
-            throw new Error("manager unavailable");
+            throw new AggregateManagerNotAvailableError();
         });
 
         const transactionContext = { id: "tx-2" } as any;
 
         expect(() => service.createAggregateContext(transactionContext, TestAggregate as any)).not.toThrow();
         expect(setFactoryTransactionContext).toHaveBeenCalledWith(transactionContext);
+    });
+
+    it("should surface manager errors that are not AggregateManagerNotAvailableError", () => {
+        const service = createService();
+        const unexpectedError = new Error("manager blew up");
+
+        vi.spyOn(AggregateContext.prototype, "getFactory").mockReturnValue({
+            setTransactionContext: vi.fn()
+        } as any);
+        vi.spyOn(AggregateContext.prototype, "getManager").mockImplementation(() => {
+            throw unexpectedError;
+        });
+
+        expect(() => service.createAggregateContext({ id: "tx-3" } as any, TestAggregate as any)).toThrow(
+            unexpectedError
+        );
     });
 });

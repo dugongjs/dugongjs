@@ -1,5 +1,6 @@
 import {
     AggregateContext,
+    AggregateManagerNotAvailableError,
     IExternalOriginMap,
     IOutboundMessageMapper,
     type AggregateContextOptions,
@@ -68,8 +69,12 @@ export class EventSourcingService {
         try {
             const manager = context.getManager();
             manager.setTransactionContext(transactionContext);
-        } catch {
+        } catch (error) {
             // Event-sourced-only aggregates have no manager, so there is nothing to propagate to.
+            // Anything else is a real failure and must not be swallowed.
+            if (!(error instanceof AggregateManagerNotAvailableError)) {
+                throw error;
+            }
         }
 
         return context;
