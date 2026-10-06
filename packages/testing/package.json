@@ -30,7 +30,7 @@
         "@dugongjs/core": "workspace:*"
     },
     "dependencies": {
-        "uuid": "^12.0.1"
+        "uuid": "^14.0.0"
     },
     "devDependencies": {
         "@dugongjs/core": "workspace:*",
