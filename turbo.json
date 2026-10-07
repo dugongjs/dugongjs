@@ -1,6 +1,17 @@
 {
     "$schema": "https://turbo.build/schema.json",
     "ui": "tui",
+    "globalEnv": [
+        "APP_PORT",
+        "DB_HOST",
+        "DB_NAME",
+        "DB_PASSWORD",
+        "DB_PORT",
+        "DB_USERNAME",
+        "KAFKA_BOOTSTRAP_SERVER",
+        "KAFKA_BROKERS",
+        "TCP_PORT"
+    ],
     "tasks": {
         "build": {
             "dependsOn": ["^build"]
