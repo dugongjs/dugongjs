@@ -1,5 +1,17 @@
 # @dugongjs/testing
 
+## 0.0.26
+
+### Patch Changes
+
+- f9300f0: Raised the minimum Node version to 22, as Node 18 and 20 have both reached end of life
+- db2b1c1: Upgraded `uuid` to v14, which resolves a reported advisory and ships a browser build by default
+- Updated dependencies [5acc388]
+- Updated dependencies [f9300f0]
+- Updated dependencies [db2b1c1]
+- Updated dependencies [a2c29ad]
+    - @dugongjs/core@0.0.24
+
 ## 0.0.25
 
 ### Patch Changes
