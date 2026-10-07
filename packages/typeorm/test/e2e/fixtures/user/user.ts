@@ -33,8 +33,6 @@ export class User extends AbstractAggregateRoot {
 
     @Process()
     public updateUsername(command: UpdateUsernameCommand): void {
-        this.username = command.username;
-
         const event = this.createDomainEvent(UsernameUpdatedEvent, {
             username: command.username
         });
@@ -44,8 +42,6 @@ export class User extends AbstractAggregateRoot {
 
     @Process()
     public updateEmail(command: UpdateEmailCommand): void {
-        this.email = command.email;
-
         const event = this.createDomainEvent(EmailUpdatedEvent, {
             email: command.email
         });

@@ -281,16 +281,18 @@ describe("replay determinism", () => {
         });
     });
 
-    it("should isolate aggregates across runs", async () => {
-        const first = await applyCommands(increments(1));
-        const second = await applyCommands(increments(2));
+    describe("aggregate isolation", () => {
+        it("should keep separate aggregates independent across runs", async () => {
+            const first = await applyCommands(increments(1));
+            const second = await applyCommands(increments(2));
 
-        expect(first).not.toBe(second);
+            expect(first).not.toBe(second);
 
-        const firstAggregate = await factory.build(first);
-        const secondAggregate = await factory.build(second);
+            const firstAggregate = await factory.build(first);
+            const secondAggregate = await factory.build(second);
 
-        expect(firstAggregate!.getApplied()).toBe(2);
-        expect(secondAggregate!.getApplied()).toBe(3);
+            expect(firstAggregate!.getApplied()).toBe(2);
+            expect(secondAggregate!.getApplied()).toBe(3);
+        });
     });
 });

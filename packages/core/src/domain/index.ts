@@ -6,6 +6,7 @@ export {
 export type { AggregateRoot } from "./abstract-aggregate-root/aggregate-root.js";
 export { AggregateIdSetOutsideCreationContextError } from "./abstract-aggregate-root/errors/aggregate-id-set-outside-creation-context.error.js";
 export { MutateEventOutsideCommandContextError } from "./abstract-aggregate-root/errors/mutate-event-outside-command-context.error.js";
+export { StateMutatedInProcessContextError } from "./abstract-aggregate-root/errors/state-mutated-in-process-context.error.js";
 export type { AbstractDomainEventConstructor } from "./abstract-domain-event/abstract-domain-event-constructor.js";
 export type { AbstractDomainEventStatics } from "./abstract-domain-event/abstract-domain-event-statics.js";
 export { AbstractDomainEvent, type DomainEventPayload } from "./abstract-domain-event/abstract-domain-event.js";
