@@ -8,6 +8,12 @@
     "exports": {
         ".": "./src/index.ts"
     },
+    "scripts": {
+        "test:typecheck": "tsc --noEmit",
+        "test:unit:run": "vitest --config vitest.config.unit.ts run",
+        "test:unit:watch": "vitest --config vitest.config.unit.ts watch",
+        "lint": "eslint ."
+    },
     "dependencies": {
         "execa": "^9.5.2",
         "fs-extra": "^11.3.0",
@@ -17,6 +23,9 @@
         "@dugongjs/eslint-config": "workspace:*",
         "@dugongjs/typescript-config": "workspace:*",
         "@types/fs-extra": "^11.0.4",
-        "@types/node": "^24.5.1"
+        "@types/node": "^24.5.1",
+        "eslint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
     }
 }
