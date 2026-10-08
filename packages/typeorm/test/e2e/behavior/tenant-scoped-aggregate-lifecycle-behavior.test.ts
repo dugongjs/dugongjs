@@ -1,9 +1,7 @@
+import { DomainEventEntity, OutboxEntity, SnapshotEntity } from "../../../src/driver/postgres/index.js";
 import type { ITransactionManager } from "@dugongjs/core";
 import { faker } from "@faker-js/faker";
 import { mock } from "vitest-mock-extended";
-import { DomainEventEntity } from "../../../src/infrastructure/db/entities/domain-event.entity.js";
-import { OutboxEntity } from "../../../src/infrastructure/db/entities/outbox-entity.js";
-import { SnapshotEntity } from "../../../src/infrastructure/db/entities/snapshot.entity.js";
 import { User } from "../fixtures/user/user.js";
 import { AggregateFactoryTypeOrm } from "../setup/app/aggregate-factory-typeorm.js";
 import { AggregateManagerTypeOrm } from "../setup/app/aggregate-manager-typeorm.js";

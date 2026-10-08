@@ -1,8 +1,7 @@
+import { DomainEventEntity, SnapshotEntity } from "../../../../src/driver/postgres/index.js";
 import { AggregateFactory, type AggregateFactoryOptions, type AggregateRoot } from "@dugongjs/core";
 import { DomainEventRepositoryTypeOrm } from "../../../../src/adapters/outbound/repository/domain-event-repository-typeorm.js";
 import { SnapshotRepositoryTypeOrm } from "../../../../src/adapters/outbound/repository/snapshot-repository-typeorm.js";
-import { DomainEventEntity } from "../../../../src/infrastructure/db/entities/domain-event.entity.js";
-import { SnapshotEntity } from "../../../../src/infrastructure/db/entities/snapshot.entity.js";
 import { dataSource } from "../setup/data-source.js";
 import { Logger } from "./logger.js";
 

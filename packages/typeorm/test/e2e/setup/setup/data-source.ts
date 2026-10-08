@@ -1,8 +1,5 @@
+import { ConsumedMessageEntity, DomainEventEntity, OutboxEntity, SnapshotEntity } from "../../../../src/driver/postgres/index.js";
 import { DataSource, type DataSourceOptions } from "typeorm";
-import { ConsumedMessageEntity } from "../../../../src/infrastructure/db/entities/consumed-message.js";
-import { DomainEventEntity } from "../../../../src/infrastructure/db/entities/domain-event.entity.js";
-import { OutboxEntity } from "../../../../src/infrastructure/db/entities/outbox-entity.js";
-import { SnapshotEntity } from "../../../../src/infrastructure/db/entities/snapshot.entity.js";
 
 let dataSource: DataSource;
 

@@ -1,10 +1,9 @@
 import type { ISnapshotRepository, SerializedSnapshot } from "@dugongjs/core";
-import type { EntityManager, Repository } from "typeorm";
-import { SnapshotEntity } from "../../../infrastructure/db/entities/snapshot.entity.js";
+import type { EntityManager, FindOptionsWhere, Repository } from "typeorm";
 import { denormalizeTenantId, normalizeTenantId } from "../../../infrastructure/db/no-tenant-id.js";
 
 export class SnapshotRepositoryTypeOrm implements ISnapshotRepository {
-    constructor(private readonly snapshotRepository: Repository<SnapshotEntity>) {}
+    constructor(private readonly snapshotRepository: Repository<SerializedSnapshot>) {}
 
     public async getLatestSnapshot(
         transactionContext: EntityManager | null,
@@ -13,9 +12,9 @@ export class SnapshotRepositoryTypeOrm implements ISnapshotRepository {
         aggregateId: string,
         tenantId?: string
     ): Promise<SerializedSnapshot | null> {
-        const snapshotRepository = transactionContext?.getRepository(SnapshotEntity) ?? this.snapshotRepository;
+        const snapshotRepository = this.resolveRepository(transactionContext);
 
-        const where: Partial<SnapshotEntity> = {
+        const where: FindOptionsWhere<SerializedSnapshot> = {
             origin,
             aggregateType,
             aggregateId
@@ -41,11 +40,15 @@ export class SnapshotRepositoryTypeOrm implements ISnapshotRepository {
     }
 
     public async saveSnapshot(transactionContext: EntityManager | null, snapshot: SerializedSnapshot): Promise<void> {
-        const snapshotRepository = transactionContext?.getRepository(SnapshotEntity) ?? this.snapshotRepository;
+        const snapshotRepository = this.resolveRepository(transactionContext);
 
         await snapshotRepository.save({
             ...snapshot,
             tenantId: normalizeTenantId(snapshot.tenantId)
         });
+    }
+
+    private resolveRepository(transactionContext: EntityManager | null): Repository<SerializedSnapshot> {
+        return transactionContext?.getRepository(this.snapshotRepository.target) ?? this.snapshotRepository;
     }
 }
