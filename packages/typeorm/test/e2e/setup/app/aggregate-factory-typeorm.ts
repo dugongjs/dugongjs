@@ -1,7 +1,7 @@
-import { DomainEventEntity, SnapshotEntity } from "../../../../src/driver/postgres/index.js";
 import { AggregateFactory, type AggregateFactoryOptions, type AggregateRoot } from "@dugongjs/core";
 import { DomainEventRepositoryTypeOrm } from "../../../../src/adapters/outbound/repository/domain-event-repository-typeorm.js";
 import { SnapshotRepositoryTypeOrm } from "../../../../src/adapters/outbound/repository/snapshot-repository-typeorm.js";
+import { activeDriver } from "../drivers/active-driver.js";
 import { dataSource } from "../setup/data-source.js";
 import { Logger } from "./logger.js";
 
@@ -16,8 +16,10 @@ export class AggregateFactoryTypeOrm<
     constructor(options: AggregateFactoryTypeOrmOptions<TAggregateRootClass>) {
         super({
             ...options,
-            domainEventRepository: new DomainEventRepositoryTypeOrm(dataSource.getRepository(DomainEventEntity)),
-            snapshotRepository: new SnapshotRepositoryTypeOrm(dataSource.getRepository(SnapshotEntity)),
+            domainEventRepository: new DomainEventRepositoryTypeOrm(
+                dataSource.getRepository(activeDriver.entities.domainEvent)
+            ),
+            snapshotRepository: new SnapshotRepositoryTypeOrm(dataSource.getRepository(activeDriver.entities.snapshot)),
             logger: new Logger()
         });
     }

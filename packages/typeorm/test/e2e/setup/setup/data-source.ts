@@ -1,22 +1,10 @@
-import { ConsumedMessageEntity, DomainEventEntity, OutboxEntity, SnapshotEntity } from "../../../../src/driver/postgres/index.js";
-import { DataSource, type DataSourceOptions } from "typeorm";
+import { DataSource } from "typeorm";
+import { activeDriver } from "../drivers/active-driver.js";
 
 let dataSource: DataSource;
 
 beforeAll(async () => {
-    const dataSourceOptions: DataSourceOptions = {
-        type: "postgres",
-        schema: "public",
-        port: +process.env.DB_PORT!,
-        host: process.env.DB_HOST!,
-        username: process.env.DB_USERNAME!,
-        password: process.env.DB_PASSWORD!,
-        database: process.env.DB_NAME!,
-        entities: [DomainEventEntity, SnapshotEntity, ConsumedMessageEntity, OutboxEntity],
-        synchronize: true
-    };
-
-    dataSource = new DataSource(dataSourceOptions);
+    dataSource = new DataSource(activeDriver.createDataSourceOptions());
 
     await dataSource.initialize();
 });
@@ -26,10 +14,12 @@ afterAll(async () => {
 });
 
 afterEach(async () => {
-    await dataSource.getRepository(DomainEventEntity).clear();
-    await dataSource.getRepository(SnapshotEntity).clear();
-    await dataSource.getRepository(ConsumedMessageEntity).clear();
-    await dataSource.getRepository(OutboxEntity).clear();
+    const { consumedMessage, domainEvent, outbox, snapshot } = activeDriver.entities;
+
+    await dataSource.getRepository(domainEvent).clear();
+    await dataSource.getRepository(snapshot).clear();
+    await dataSource.getRepository(consumedMessage).clear();
+    await dataSource.getRepository(outbox).clear();
 });
 
 export { dataSource };

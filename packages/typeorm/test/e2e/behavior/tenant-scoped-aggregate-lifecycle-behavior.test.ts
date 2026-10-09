@@ -1,10 +1,10 @@
-import { DomainEventEntity, OutboxEntity, SnapshotEntity } from "../../../src/driver/postgres/index.js";
 import type { ITransactionManager } from "@dugongjs/core";
 import { faker } from "@faker-js/faker";
 import { mock } from "vitest-mock-extended";
 import { User } from "../fixtures/user/user.js";
 import { AggregateFactoryTypeOrm } from "../setup/app/aggregate-factory-typeorm.js";
 import { AggregateManagerTypeOrm } from "../setup/app/aggregate-manager-typeorm.js";
+import { activeDriver } from "../setup/drivers/active-driver.js";
 import { dataSource } from "../setup/setup/data-source.js";
 
 describe("tenant-scoped aggregate lifecycle behavior", () => {
@@ -38,7 +38,7 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.commitStagedDomainEvents(user);
 
-            const outbox = await dataSource.getRepository(OutboxEntity).find({});
+            const outbox = await dataSource.getRepository(activeDriver.entities.outbox).find({});
             const userCreatedOutboxMessage = outbox[0];
 
             expect(userCreatedOutboxMessage.id).toBeDefined();
@@ -101,7 +101,7 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
-            const persistedEvents = await dataSource.getRepository(DomainEventEntity).find({});
+            const persistedEvents = await dataSource.getRepository(activeDriver.entities.domainEvent).find({});
 
             expect(persistedEvents).toHaveLength(2);
             expect(user.getEmail()).toBe(newEmail);
@@ -126,9 +126,9 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
-            const persistedEvents = await dataSource.getRepository(DomainEventEntity).find({});
+            const persistedEvents = await dataSource.getRepository(activeDriver.entities.domainEvent).find({});
 
-            const snapshots = await dataSource.getRepository(SnapshotEntity).find({});
+            const snapshots = await dataSource.getRepository(activeDriver.entities.snapshot).find({});
             const snapshot = snapshots[0];
 
             expect(persistedEvents).toHaveLength(10);
@@ -165,7 +165,7 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
-            const snapshots = await dataSource.getRepository(SnapshotEntity).find({});
+            const snapshots = await dataSource.getRepository(activeDriver.entities.snapshot).find({});
 
             expect(snapshots).toHaveLength(1);
 
@@ -203,7 +203,7 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
-            const snapshots = await dataSource.getRepository(SnapshotEntity).find({});
+            const snapshots = await dataSource.getRepository(activeDriver.entities.snapshot).find({});
 
             expect(snapshots).toHaveLength(1);
 

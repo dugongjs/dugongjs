@@ -362,7 +362,7 @@ importers:
         version: 0.2.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -614,7 +614,7 @@ importers:
         version: 7.2.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -705,7 +705,7 @@ importers:
         version: 0.2.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -864,6 +864,9 @@ importers:
       '@testcontainers/postgresql':
         specifier: 'catalog:'
         version: 11.14.0
+      '@types/better-sqlite3':
+        specifier: ^9.6.0
+        version: 9.6.0
       '@types/node':
         specifier: ^24.5.1
         version: 24.10.13
@@ -876,6 +879,9 @@ importers:
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.1.5(vitest@4.1.5)
+      better-sqlite3:
+        specifier: ^13.0.3
+        version: 13.0.3
       dotenv:
         specifier: ^16.5.0
         version: 16.6.1
@@ -893,7 +899,7 @@ importers:
         version: 0.2.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -965,7 +971,7 @@ importers:
         version: 7.8.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
     devDependencies:
       '@types/express':
         specifier: ^4.17.17
@@ -3369,6 +3375,9 @@ packages:
     cpu: [arm64]
     os: [win32]
 
+  '@types/better-sqlite3@9.6.0':
+    resolution: {integrity: sha512-ZEEwBSgMu7GYJOynoagg5X9JbxfL6dTJDsgViJIqh67jV44kyOr9RXfmFjLK5rzC4MWssP06t9hu/JwGDnUbCg==}
+
   '@types/body-parser@1.19.6':
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
 
@@ -4173,6 +4182,10 @@ packages:
   better-path-resolve@1.0.0:
     resolution: {integrity: sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g==}
     engines: {node: '>=4'}
+
+  better-sqlite3@13.0.3:
+    resolution: {integrity: sha512-RbOBxmLBG8uvFUc15X9+9SFemKcQ0WBuISBVkpuiaUB2qblC8UWlHEjdWVoZ8AdhSwmoEgsiXKfopX0CQxaACQ==}
+    engines: {node: '>=22'}
 
   big.js@5.2.2:
     resolution: {integrity: sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==}
@@ -7215,6 +7228,10 @@ packages:
 
   no-case@3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
+
+  node-addon-api@8.9.2:
+    resolution: {integrity: sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg==}
+    engines: {node: ^18 || ^20 || >= 21}
 
   node-emoji@2.2.0:
     resolution: {integrity: sha512-Z3lTE9pLaJF47NyMhd4ww1yFTAP8YhYI8SleJiHzM46Fgpm5cnNzSl9XfzFNqbaz+VlJrIj3fXQ4DeN1Rjm6cw==}
@@ -12507,7 +12524,7 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 26.6.4
+      '@types/node': 24.10.13
       '@types/yargs': 17.0.35
       chalk: 4.1.2
 
@@ -12799,7 +12816,7 @@ snapshots:
       '@nestjs/core': 12.1.2(@nestjs/common@12.1.2(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@12.1.2)(@nestjs/platform-express@12.1.2)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
-      typeorm: 0.3.31(pg@8.18.0)
+      typeorm: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
 
   '@next/eslint-plugin-next@15.5.12':
     dependencies:
@@ -13292,6 +13309,10 @@ snapshots:
   '@turbo/windows-arm64@2.9.14':
     optional: true
 
+  '@types/better-sqlite3@9.6.0':
+    dependencies:
+      '@types/node': 24.10.13
+
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
@@ -13299,7 +13320,7 @@ snapshots:
 
   '@types/bonjour@3.5.13':
     dependencies:
-      '@types/node': 26.6.4
+      '@types/node': 24.10.13
 
   '@types/chai@5.2.3':
     dependencies:
@@ -13309,7 +13330,7 @@ snapshots:
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
       '@types/express-serve-static-core': 4.19.9
-      '@types/node': 26.6.4
+      '@types/node': 24.10.13
 
   '@types/connect@3.4.38':
     dependencies:
@@ -13468,7 +13489,7 @@ snapshots:
 
   '@types/express-serve-static-core@4.19.9':
     dependencies:
-      '@types/node': 26.6.4
+      '@types/node': 24.10.13
       '@types/qs': 6.15.1
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -13505,7 +13526,7 @@ snapshots:
 
   '@types/http-proxy@1.17.17':
     dependencies:
-      '@types/node': 26.6.4
+      '@types/node': 24.10.13
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
@@ -13619,7 +13640,7 @@ snapshots:
 
   '@types/sockjs@0.3.36':
     dependencies:
-      '@types/node': 26.6.4
+      '@types/node': 24.10.13
 
   '@types/ssh2-streams@0.1.13':
     dependencies:
@@ -13657,7 +13678,7 @@ snapshots:
 
   '@types/ws@8.18.2':
     dependencies:
-      '@types/node': 26.6.4
+      '@types/node': 24.10.13
 
   '@types/yargs-parser@21.0.3': {}
 
@@ -14276,6 +14297,10 @@ snapshots:
   better-path-resolve@1.0.0:
     dependencies:
       is-windows: 1.0.2
+
+  better-sqlite3@13.0.3:
+    dependencies:
+      node-addon-api: 8.9.2
 
   big.js@5.2.2: {}
 
@@ -17010,7 +17035,7 @@ snapshots:
   jest-util@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 26.6.4
+      '@types/node': 24.10.13
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -17024,7 +17049,7 @@ snapshots:
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 26.6.4
+      '@types/node': 24.10.13
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -18014,6 +18039,8 @@ snapshots:
     dependencies:
       lower-case: 2.0.2
       tslib: 2.8.1
+
+  node-addon-api@8.9.2: {}
 
   node-emoji@2.2.0:
     dependencies:
@@ -20329,7 +20356,7 @@ snapshots:
     dependencies:
       is-typedarray: 1.0.0
 
-  typeorm@0.3.31(pg@8.18.0):
+  typeorm@0.3.31(better-sqlite3@13.0.3)(pg@8.18.0):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 4.4.0
@@ -20347,6 +20374,7 @@ snapshots:
       uuid: 11.1.1
       yargs: 17.7.3
     optionalDependencies:
+      better-sqlite3: 13.0.3
       pg: 8.18.0
     transitivePeerDependencies:
       - babel-plugin-macros
