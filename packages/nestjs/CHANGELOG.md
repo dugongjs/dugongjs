@@ -1,5 +1,17 @@
 # @dugongjs/nestjs
 
+## 0.0.41
+
+### Patch Changes
+
+- f9300f0: Raised the minimum Node version to 22, as Node 18 and 20 have both reached end of life
+- a2c29ad: Errors raised while propagating a transaction context to the aggregate manager are no longer swallowed. Only `AggregateManagerNotAvailableError`, which is expected for aggregates without a manager, is ignored
+- Updated dependencies [5acc388]
+- Updated dependencies [f9300f0]
+- Updated dependencies [db2b1c1]
+- Updated dependencies [a2c29ad]
+    - @dugongjs/core@0.0.24
+
 ## 0.0.40
 
 ### Patch Changes

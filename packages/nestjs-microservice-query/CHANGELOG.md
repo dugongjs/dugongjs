@@ -1,5 +1,17 @@
 # @dugongjs/nestjs-microservice-query
 
+## 0.0.42
+
+### Patch Changes
+
+- f9300f0: Raised the minimum Node version to 22, as Node 18 and 20 have both reached end of life
+- Updated dependencies [5acc388]
+- Updated dependencies [f9300f0]
+- Updated dependencies [db2b1c1]
+- Updated dependencies [a2c29ad]
+    - @dugongjs/core@0.0.24
+    - @dugongjs/nestjs@0.0.41
+
 ## 0.0.41
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @dugongjs/core
 
+## 0.0.24
+
+### Patch Changes
+
+- 5acc388: `@Process()` methods now throw `StateMutatedInProcessContextError` if they mutate aggregate state directly, since such mutations are not recorded in the event log and do not survive reconstruction of the aggregate (`@Process({ allowStateMutation: true })` allows bypassing)
+- f9300f0: Raised the minimum Node version to 22, as Node 18 and 20 have both reached end of life
+- db2b1c1: Upgraded `uuid` to v14, which resolves a reported advisory and ships a browser build by default
+- a2c29ad: Errors raised while propagating a transaction context to the aggregate manager are no longer swallowed. Only `AggregateManagerNotAvailableError`, which is expected for aggregates without a manager, is ignored
+
 ## 0.0.23
 
 ### Patch Changes
