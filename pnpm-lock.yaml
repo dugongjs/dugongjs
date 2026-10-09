@@ -682,6 +682,9 @@ importers:
       '@testcontainers/postgresql':
         specifier: 'catalog:'
         version: 11.14.0
+      '@types/better-sqlite3':
+        specifier: ^9.6.0
+        version: 9.6.0
       '@types/node':
         specifier: ^24.5.1
         version: 24.10.13
@@ -691,6 +694,9 @@ importers:
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.1.5(vitest@4.1.5)
+      better-sqlite3:
+        specifier: ^13.0.3
+        version: 13.0.3
       dotenv:
         specifier: ^16.5.0
         version: 16.6.1
