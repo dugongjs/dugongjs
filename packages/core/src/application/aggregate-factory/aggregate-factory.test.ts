@@ -114,7 +114,7 @@ describe("AggregateFactory", () => {
         });
 
         it("should build the aggregate from the event log (with tenant ID if provided)", async () => {
-            const factory = createFactory({ tenantId: "TestTenant" });
+            const factory = createFactory({ tenantScope: { type: "tenant", tenantId: "TestTenant" } });
 
             const mockSerializedEvents = [
                 { id: faker.string.uuid(), sequenceNumber: 1 },

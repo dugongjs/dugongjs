@@ -11,6 +11,7 @@ import {
     type AggregateManagerOptions,
     type CommitOptions
 } from "../aggregate-manager/aggregate-manager.js";
+import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
 import { AggregateManagerNotAvailableError } from "./errors/aggregate-manager-not-available-error.js";
 
 export type AggregateContextOptions<TAggregateRootClass extends EventSourcedAggregateRoot> =
@@ -59,13 +60,26 @@ export class AggregateContext<TAggregateRootClass extends EventSourcedAggregateR
     }
 
     /**
-     * Sets the tenant ID for the context.
+     * Scopes the context to a specific tenant.
      * This can be used in multi-tenant applications to scope operations to a specific tenant.
      * @param tenantId The tenant ID to set for the context.
-     * @returns A new instance of `AggregateContext` with the updated tenant ID.
+     * @returns A new instance of `AggregateContext` scoped to the given tenant.
      */
     public withTenantId(tenantId: string): AggregateContext<TAggregateRootClass> {
-        const newContext = new AggregateContext<TAggregateRootClass>({ ...this.options, tenantId });
+        return this.withTenantScope({ type: "tenant", tenantId });
+    }
+
+    /**
+     * Declares that the context operates without a tenant.
+     * This behaves the same way as leaving the tenant unset, but records that it was intended.
+     * @returns A new instance of `AggregateContext` that is explicitly unscoped.
+     */
+    public withoutTenantId(): AggregateContext<TAggregateRootClass> {
+        return this.withTenantScope({ type: "unscoped" });
+    }
+
+    private withTenantScope(tenantScope: TenantScope): AggregateContext<TAggregateRootClass> {
+        const newContext = new AggregateContext<TAggregateRootClass>({ ...this.options, tenantScope });
 
         // Preserve transaction context from current factory/manager
         const currentTxContext = this.factory?.getTransactionContext();

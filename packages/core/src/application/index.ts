@@ -35,6 +35,7 @@ export {
 export { aggregateSnapshotTransformer } from "./aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 export type { ILogger } from "./logger/i-logger.js";
 export { VoidLogger } from "./logger/void-logger.js";
+export type { TenantScope } from "./tenant-scope/tenant-scope.type.js";
 export {
     WaitForMessageConsumer,
     type WaitForMessageConsumerOptions
