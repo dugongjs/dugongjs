@@ -346,7 +346,12 @@ docker compose down
 Supporting the outbox pattern requires minimal changes to our source code. We do not need to install any additional dependencies, as the `@dugongjs/typeorm` and `@dugongjs/nestjs-typeorm` packages have everything we need. The first update is to our `data-source-config.ts`:
 
 ```typescript title="src/db/data-source-config.ts" showLineNumbers
-import { ConsumedMessageEntity, DomainEventEntity, OutboxEntity, SnapshotEntity } from "@dugongjs/typeorm";
+import {
+    ConsumedMessageEntity,
+    DomainEventEntity,
+    OutboxEntity,
+    SnapshotEntity
+} from "@dugongjs/typeorm/driver/postgres";
 import type { DataSourceOptions } from "typeorm";
 import { BankAccountQueryModelEntity } from "../bank-account/adapters/repository/bank-account-query-model.entity.js";
 
