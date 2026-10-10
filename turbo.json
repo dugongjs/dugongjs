@@ -3,6 +3,7 @@
     "ui": "tui",
     "globalEnv": [
         "APP_PORT",
+        "DB_DRIVER",
         "DB_HOST",
         "DB_NAME",
         "DB_PASSWORD",
@@ -14,25 +15,39 @@
     ],
     "tasks": {
         "build": {
-            "dependsOn": ["^build"]
+            "dependsOn": [
+                "^build"
+            ]
         },
         "lint": {
-            "dependsOn": ["^lint"]
+            "dependsOn": [
+                "^lint"
+            ]
         },
         "test:typecheck": {
-            "dependsOn": ["^test:typecheck"]
+            "dependsOn": [
+                "^test:typecheck"
+            ]
         },
         "test:unit:run": {
-            "dependsOn": ["^test:typecheck"]
+            "dependsOn": [
+                "^test:typecheck"
+            ]
         },
         "test:unit:watch": {
-            "dependsOn": ["test:typecheck"]
+            "dependsOn": [
+                "test:typecheck"
+            ]
         },
         "test:e2e:run": {
-            "dependsOn": ["^test:typecheck"]
+            "dependsOn": [
+                "^test:typecheck"
+            ]
         },
         "test:e2e:watch": {
-            "dependsOn": ["test:typecheck"]
+            "dependsOn": [
+                "test:typecheck"
+            ]
         },
         "dev": {
             "cache": false,

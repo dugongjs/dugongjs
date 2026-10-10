@@ -114,7 +114,7 @@ To keep things organized, we’ll store our database configuration in a dedicate
 Create a data source configuration file:
 
 ```typescript title="src/db/data-source-options.ts" showLineNumbers
-import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm";
+import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm/driver/postgres";
 import type { DataSourceOptions } from "typeorm";
 
 export const dataSourceOptions: DataSourceOptions = {

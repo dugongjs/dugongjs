@@ -3,9 +3,7 @@ import { OutboxMessageMapperTypeOrm } from "../../../../src/adapters/outbound/me
 import { OutboxMessageProducerTypeOrm } from "../../../../src/adapters/outbound/message-broker/outbox-message-producer-typeorm.js";
 import { DomainEventRepositoryTypeOrm } from "../../../../src/adapters/outbound/repository/domain-event-repository-typeorm.js";
 import { SnapshotRepositoryTypeOrm } from "../../../../src/adapters/outbound/repository/snapshot-repository-typeorm.js";
-import { DomainEventEntity } from "../../../../src/infrastructure/db/entities/domain-event.entity.js";
-import { OutboxEntity } from "../../../../src/infrastructure/db/entities/outbox-entity.js";
-import { SnapshotEntity } from "../../../../src/infrastructure/db/entities/snapshot.entity.js";
+import { activeDriver } from "../drivers/active-driver.js";
 import { dataSource } from "../setup/data-source.js";
 import { Logger } from "./logger.js";
 
@@ -20,9 +18,11 @@ export class AggregateManagerTypeOrm<
     constructor(options: AggregateManagerTypeOrmOptions<TAggregateRootClass>) {
         super({
             ...options,
-            domainEventRepository: new DomainEventRepositoryTypeOrm(dataSource.getRepository(DomainEventEntity)),
-            snapshotRepository: new SnapshotRepositoryTypeOrm(dataSource.getRepository(SnapshotEntity)),
-            messageProducer: new OutboxMessageProducerTypeOrm(dataSource.getRepository(OutboxEntity)),
+            domainEventRepository: new DomainEventRepositoryTypeOrm(
+                dataSource.getRepository(activeDriver.entities.domainEvent)
+            ),
+            snapshotRepository: new SnapshotRepositoryTypeOrm(dataSource.getRepository(activeDriver.entities.snapshot)),
+            messageProducer: new OutboxMessageProducerTypeOrm(dataSource.getRepository(activeDriver.entities.outbox)),
             outboundMessageMapper: new OutboxMessageMapperTypeOrm(),
             logger: new Logger()
         });
