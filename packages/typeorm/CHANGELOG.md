@@ -1,5 +1,12 @@
 # @dugongjs/typeorm
 
+## 0.0.31
+
+### Patch Changes
+
+- a042dfa: Exported the entities from `@dugongjs/typeorm/driver/postgres` and decoupled the adapters from them
+- 13f2dd9: Added SQLite entities, exported from `@dugongjs/typeorm/driver/sqlite`
+
 ## 0.0.30
 
 ### Patch Changes
