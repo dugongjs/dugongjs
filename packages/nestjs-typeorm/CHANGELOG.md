@@ -1,5 +1,14 @@
 # @dugongjs/nestjs-typeorm
 
+## 0.0.41
+
+### Patch Changes
+
+- 34b5568: Added SQLite support, exported from `@dugongjs/nestjs-typeorm/driver/sqlite`
+- Updated dependencies [a042dfa]
+- Updated dependencies [13f2dd9]
+    - @dugongjs/typeorm@0.0.31
+
 ## 0.0.40
 
 ### Patch Changes
