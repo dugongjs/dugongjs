@@ -1,10 +1,11 @@
 import { runMessageProducerContractTests } from "@dugongjs/testing-contracts";
 import { faker } from "@faker-js/faker";
-import { OutboxEntity, OutboxMessageProducerTypeOrm } from "../../../src/index.js";
+import { OutboxMessageProducerTypeOrm, type OutboxRecord } from "../../../src/index.js";
 import { denormalizeTenantId } from "../../../src/infrastructure/db/no-tenant-id.js";
+import { activeDriver } from "../setup/drivers/active-driver.js";
 import { dataSource } from "../setup/setup/data-source.js";
 
-function createOutboxMessage(overrides: Partial<OutboxEntity> = {}): OutboxEntity {
+function createOutboxMessage(overrides: Partial<OutboxRecord> = {}): OutboxRecord {
     return {
         id: faker.string.uuid(),
         origin: "TestOrigin",
@@ -26,13 +27,13 @@ function createOutboxMessage(overrides: Partial<OutboxEntity> = {}): OutboxEntit
 }
 
 runMessageProducerContractTests(async () => ({
-    producer: new OutboxMessageProducerTypeOrm(dataSource.getRepository(OutboxEntity)),
+    producer: new OutboxMessageProducerTypeOrm(dataSource.getRepository(activeDriver.entities.outbox)),
     cleanup: async () => {
-        await dataSource.getRepository(OutboxEntity).clear();
+        await dataSource.getRepository(activeDriver.entities.outbox).clear();
     },
     createMessage: createOutboxMessage,
     getPublishedMessages: async (messageChannelId) =>
-        dataSource.getRepository(OutboxEntity).find({
+        dataSource.getRepository(activeDriver.entities.outbox).find({
             where: { channelId: messageChannelId },
             order: { sequenceNumber: "ASC" }
         }),
@@ -41,8 +42,8 @@ runMessageProducerContractTests(async () => ({
         channelId: messageChannelId
     }),
     normalizePublishedMessageForComparison: (message) => ({
-        ...(message as OutboxEntity),
-        tenantId: denormalizeTenantId((message as OutboxEntity).tenantId)
+        ...(message as OutboxRecord),
+        tenantId: denormalizeTenantId((message as OutboxRecord).tenantId)
     }),
     normalizeExpectedPublishedMessageForComparison: (message) => message
 }));

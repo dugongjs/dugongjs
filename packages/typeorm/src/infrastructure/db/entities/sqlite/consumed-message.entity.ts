@@ -1,12 +1,13 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import type { ConsumedMessageRecord } from "../../records/consumed-message-record.js";
 
 @Entity("consumed_messages")
 @Unique(["domainEventId", "consumerId", "tenantId"])
-export class ConsumedMessageEntity {
+export class ConsumedMessageEntity implements ConsumedMessageRecord {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ type: "uuid" })
+    @Column({ type: "varchar", length: 36 })
     domainEventId: string;
 
     @Column({ type: "varchar", length: 255 })

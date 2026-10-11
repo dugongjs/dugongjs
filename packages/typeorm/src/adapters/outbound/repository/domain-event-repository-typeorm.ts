@@ -1,10 +1,9 @@
 import type { IDomainEventRepository, SerializedDomainEvent } from "@dugongjs/core";
 import { In, MoreThanOrEqual, type EntityManager, type FindOptionsWhere, type Repository } from "typeorm";
-import { DomainEventEntity } from "../../../infrastructure/db/entities/domain-event.entity.js";
 import { denormalizeTenantId, normalizeTenantId } from "../../../infrastructure/db/no-tenant-id.js";
 
 export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
-    constructor(private readonly domainEventRepository: Repository<DomainEventEntity>) {}
+    constructor(private readonly domainEventRepository: Repository<SerializedDomainEvent>) {}
 
     public async getAggregateDomainEvents(
         transactionContext: EntityManager | null,
@@ -14,10 +13,9 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
         tenantId?: string | null,
         fromSequenceNumber?: number
     ): Promise<SerializedDomainEvent[]> {
-        const domainEventRepository =
-            transactionContext?.getRepository(DomainEventEntity) ?? this.domainEventRepository;
+        const domainEventRepository = this.resolveRepository(transactionContext);
 
-        const where: FindOptionsWhere<DomainEventEntity> = {
+        const where: FindOptionsWhere<SerializedDomainEvent> = {
             origin,
             aggregateType,
             aggregateId,
@@ -44,8 +42,7 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
         aggregateType: string,
         tenantId?: string | null
     ): Promise<string[]> {
-        const domainEventRepository =
-            transactionContext?.getRepository(DomainEventEntity) ?? this.domainEventRepository;
+        const domainEventRepository = this.resolveRepository(transactionContext);
 
         const aggregateIds = await domainEventRepository
             .createQueryBuilder("domainEvent")
@@ -63,8 +60,7 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
         transactionContext: EntityManager | null,
         events: SerializedDomainEvent[]
     ): Promise<void> {
-        const domainEventRepository =
-            transactionContext?.getRepository(DomainEventEntity) ?? this.domainEventRepository;
+        const domainEventRepository = this.resolveRepository(transactionContext);
 
         if (events.length === 0) {
             return;
@@ -96,5 +92,9 @@ export class DomainEventRepositoryTypeOrm implements IDomainEventRepository {
         );
 
         await domainEventRepository.insert(domainEventEntities);
+    }
+
+    private resolveRepository(transactionContext: EntityManager | null): Repository<SerializedDomainEvent> {
+        return transactionContext?.getRepository(this.domainEventRepository.target) ?? this.domainEventRepository;
     }
 }

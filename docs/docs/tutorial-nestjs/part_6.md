@@ -67,7 +67,7 @@ export class BankAccountQueryModelEntity implements BankAccountQueryModel {
 Make sure to include this entity in `data-source-options.ts`:
 
 ```typescript title="src/db/data-source-options.ts" showLineNumbers
-import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm";
+import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm/driver/postgres";
 import type { DataSourceOptions } from "typeorm";
 import { BankAccountQueryModelEntity } from "../bank-account/adapters/repository/bank-account-query-model.entity.js";
 

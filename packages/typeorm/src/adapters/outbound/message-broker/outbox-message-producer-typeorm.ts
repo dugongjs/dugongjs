@@ -1,19 +1,19 @@
 import type { IMessageProducer } from "@dugongjs/core";
 import * as changeCase from "change-case";
 import type { EntityManager, Repository } from "typeorm";
-import { OutboxEntity } from "../../../infrastructure/db/entities/outbox-entity.js";
+import type { OutboxRecord } from "../../../infrastructure/db/records/outbox-record.js";
 
-export class OutboxMessageProducerTypeOrm implements IMessageProducer<OutboxEntity> {
-    constructor(private readonly outboxRepository: Repository<OutboxEntity>) {}
+export class OutboxMessageProducerTypeOrm implements IMessageProducer<OutboxRecord> {
+    constructor(private readonly outboxRepository: Repository<OutboxRecord>) {}
 
     public async publishMessage(
         transactionContext: EntityManager | null,
         messageChannelId: string,
-        message: OutboxEntity
+        message: OutboxRecord
     ): Promise<void> {
-        const outboxRepository = transactionContext?.getRepository(OutboxEntity) ?? this.outboxRepository;
+        const outboxRepository = this.resolveRepository(transactionContext);
 
-        const outboxEntry: OutboxEntity = {
+        const outboxEntry: OutboxRecord = {
             ...message,
             tenantId: (message.tenantId ?? null) as any,
             channelId: messageChannelId
@@ -25,11 +25,11 @@ export class OutboxMessageProducerTypeOrm implements IMessageProducer<OutboxEnti
     public async publishMessages(
         transactionContext: EntityManager | null,
         messageChannelId: string,
-        messages: OutboxEntity[]
+        messages: OutboxRecord[]
     ): Promise<void> {
-        const outboxRepository = transactionContext?.getRepository(OutboxEntity) ?? this.outboxRepository;
+        const outboxRepository = this.resolveRepository(transactionContext);
 
-        const outboxEntries: OutboxEntity[] = messages.map((message) => ({
+        const outboxEntries: OutboxRecord[] = messages.map((message) => ({
             ...message,
             tenantId: (message.tenantId ?? null) as any,
             channelId: messageChannelId
@@ -43,5 +43,9 @@ export class OutboxMessageProducerTypeOrm implements IMessageProducer<OutboxEnti
         const aggregateTypeKebab = changeCase.kebabCase(aggregateType);
 
         return `${originKebab}-${aggregateTypeKebab}`;
+    }
+
+    private resolveRepository(transactionContext: EntityManager | null): Repository<OutboxRecord> {
+        return transactionContext?.getRepository(this.outboxRepository.target) ?? this.outboxRepository;
     }
 }

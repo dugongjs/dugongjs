@@ -1,29 +1,33 @@
 import { IMessageProducer, IOutboundMessageMapper } from "@dugongjs/core";
-import { OutboxEntity } from "@dugongjs/typeorm";
 import { Module, type DynamicModule } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import type { TypeOrmEntities, TypeOrmFeatureModule } from "../../types/index.js";
 import { OutboxMessageMapperTypeOrmService } from "./outbox-message-mapper-typeorm.service.js";
 import { OutboxMessageProducerTypeOrmService } from "./outbox-message-producer-typeorm.service.js";
 
-@Module({
-    imports: [TypeOrmModule.forFeature([OutboxEntity])],
-    providers: [
-        {
-            provide: IMessageProducer,
-            useClass: OutboxMessageProducerTypeOrmService
-        },
-        {
-            provide: IOutboundMessageMapper,
-            useClass: OutboxMessageMapperTypeOrmService
+export function createOutboxMessageProducerTypeOrmModule(entities: TypeOrmEntities): TypeOrmFeatureModule {
+    @Module({
+        imports: [TypeOrmModule.forFeature([entities.outbox])],
+        providers: [
+            {
+                provide: IMessageProducer,
+                useClass: OutboxMessageProducerTypeOrmService
+            },
+            {
+                provide: IOutboundMessageMapper,
+                useClass: OutboxMessageMapperTypeOrmService
+            }
+        ],
+        exports: [IMessageProducer, IOutboundMessageMapper]
+    })
+    class OutboxMessageProducerTypeOrmModule {
+        public static forRoot(): DynamicModule {
+            return {
+                module: OutboxMessageProducerTypeOrmModule,
+                global: true
+            };
         }
-    ],
-    exports: [IMessageProducer, IOutboundMessageMapper]
-})
-export class OutboxMessageProducerTypeOrmModule {
-    public static forRoot(): DynamicModule {
-        return {
-            module: OutboxMessageProducerTypeOrmModule,
-            global: true
-        };
     }
+
+    return OutboxMessageProducerTypeOrmModule;
 }

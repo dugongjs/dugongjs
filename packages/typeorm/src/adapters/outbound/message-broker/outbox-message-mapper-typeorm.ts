@@ -1,8 +1,8 @@
 import type { IOutboundMessageMapper, SerializedDomainEvent } from "@dugongjs/core";
-import type { OutboxEntity } from "../../../infrastructure/db/entities/outbox-entity.js";
+import type { OutboxRecord } from "../../../infrastructure/db/records/outbox-record.js";
 
-export class OutboxMessageMapperTypeOrm implements IOutboundMessageMapper<OutboxEntity> {
-    public map(domainEvent: SerializedDomainEvent): OutboxEntity {
-        return { ...domainEvent, channelId: "" } as OutboxEntity;
+export class OutboxMessageMapperTypeOrm implements IOutboundMessageMapper<OutboxRecord> {
+    public map(domainEvent: SerializedDomainEvent): OutboxRecord {
+        return { ...domainEvent, channelId: "" } as OutboxRecord;
     }
 }

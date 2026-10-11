@@ -1,52 +1,27 @@
 import { IMessageProducer, IOutboundMessageMapper } from "@dugongjs/core";
 import { runMessageProducerContractTests } from "@dugongjs/testing-contracts";
-import { OutboxEntity } from "@dugongjs/typeorm";
-import { Test, type TestingModule } from "@nestjs/testing";
-import { TypeOrmModule } from "@nestjs/typeorm";
+import type { OutboxRecord } from "@dugongjs/typeorm";
 import { randomUUID } from "node:crypto";
-import { DataSource } from "typeorm";
-import { OutboxMessageProducerTypeOrmModule } from "../../../src/modules/outbox-message-producer-typeorm/outbox-message-producer-typeorm.module.js";
+import { clearAllEntities, createTestingApp, type TestingApp } from "../setup/app/testing-app.js";
+import { activeDriver } from "../setup/drivers/active-driver.js";
 
-let app: TestingModule | undefined;
-let dataSource: DataSource | undefined;
+let testingApp: TestingApp | undefined;
 
-async function getApp(): Promise<TestingModule> {
-    if (!app) {
-        app = await Test.createTestingModule({
-            imports: [
-                TypeOrmModule.forRoot({
-                    type: "postgres",
-                    schema: "public",
-                    port: +process.env.DB_PORT!,
-                    host: process.env.DB_HOST!,
-                    username: process.env.DB_USERNAME!,
-                    password: process.env.DB_PASSWORD!,
-                    database: process.env.DB_NAME!,
-                    entities: [OutboxEntity],
-                    synchronize: true
-                }),
-                OutboxMessageProducerTypeOrmModule.forRoot()
-            ]
-        }).compile();
+async function getTestingApp(): Promise<TestingApp> {
+    testingApp ??= await createTestingApp([activeDriver.modules.outboxMessageProducer.forRoot()]);
 
-        dataSource = app.get(DataSource);
-    }
-
-    return app;
+    return testingApp;
 }
 
 runMessageProducerContractTests(async () => {
-    const nestApp = await getApp();
-    const producer = nestApp.get(IMessageProducer);
+    const { app, dataSource } = await getTestingApp();
 
-    expect(nestApp.get(IOutboundMessageMapper)).toBeDefined();
+    expect(app.get(IOutboundMessageMapper)).toBeDefined();
 
     return {
-        producer,
-        cleanup: async () => {
-            await dataSource!.getRepository(OutboxEntity).clear();
-        },
-        createMessage: (overrides?: Partial<OutboxEntity>): OutboxEntity => ({
+        producer: app.get(IMessageProducer),
+        cleanup: () => clearAllEntities(dataSource),
+        createMessage: (overrides?: Partial<OutboxRecord>): OutboxRecord => ({
             id: randomUUID(),
             origin: "TestOrigin",
             aggregateType: "TestAggregate",
@@ -65,25 +40,25 @@ runMessageProducerContractTests(async () => {
             ...overrides
         }),
         getPublishedMessages: async (messageChannelId: string) =>
-            dataSource!.getRepository(OutboxEntity).find({
+            dataSource.getRepository(activeDriver.entities.outbox).find({
                 where: { channelId: messageChannelId },
                 order: { sequenceNumber: "ASC" }
             }),
-        mapExpectedPublishedMessage: (message: OutboxEntity, messageChannelId: string) => ({
+        mapExpectedPublishedMessage: (message: OutboxRecord, messageChannelId: string) => ({
             ...message,
             channelId: messageChannelId
         }),
         normalizePublishedMessageForComparison: (message) => ({
-            ...(message as OutboxEntity),
-            tenantId: (message as OutboxEntity).tenantId ?? null
+            ...(message as OutboxRecord),
+            tenantId: (message as OutboxRecord).tenantId ?? null
         }),
         normalizeExpectedPublishedMessageForComparison: (message) => ({
-            ...(message as OutboxEntity),
-            tenantId: (message as OutboxEntity).tenantId ?? null
+            ...(message as OutboxRecord),
+            tenantId: (message as OutboxRecord).tenantId ?? null
         })
     };
 });
 
 afterAll(async () => {
-    await app?.close();
+    await testingApp?.app.close();
 });

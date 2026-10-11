@@ -25,5 +25,6 @@ export {
 
 export {
     runTransactionManagerContractTests,
+    type TransactionManagerContractOptions,
     type TransactionManagerFixture
 } from "./transaction-manager/transaction-manager.contracts.js";

@@ -24,12 +24,39 @@ To get started, install the following packages:
 npm install typeorm @dugongjs/typeorm
 ```
 
+### Database drivers
+
+The adapters are database agnostic, but the entity definitions differ between databases. Each supported database therefore has its own entity set, with a dedicated import:
+
+| Database   | Import                              | Driver package   |
+| ---------- | ----------------------------------- | ---------------- |
+| PostgreSQL | `@dugongjs/typeorm/driver/postgres` | `pg`             |
+| SQLite     | `@dugongjs/typeorm/driver/sqlite`   | `better-sqlite3` |
+
+The entity classes are named the same in both, so moving between databases changes only the import path:
+
+```typescript
+import { DomainEventEntity } from "@dugongjs/typeorm/driver/postgres";
+// or
+import { DomainEventEntity } from "@dugongjs/typeorm/driver/sqlite";
+```
+
+Install the driver package for your database alongside TypeORM, as you would for any TypeORM project:
+
+```bash npm2yarn
+npm install better-sqlite3
+```
+
+:::info
+Importing entities directly from `@dugongjs/typeorm` resolves to PostgreSQL by default.
+:::
+
 ### Configuring `DataSource`
 
 Follow the TypeORM documentation to get started. When you create your `DataSource`, add the following entities:
 
 ```typescript
-import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm";
+import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm/driver/postgres";
 import { DataSource, type DataSourceOptions } from "typeorm";
 
 const dataSourceOptions: DataSourceOptions = {

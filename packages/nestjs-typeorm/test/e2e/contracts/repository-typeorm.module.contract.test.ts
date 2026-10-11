@@ -1,53 +1,25 @@
 import { IDomainEventRepository } from "@dugongjs/core";
 import { runDomainEventRepositoryContractTests } from "@dugongjs/testing-contracts";
-import { ConsumedMessageEntity, DomainEventEntity, SnapshotEntity } from "@dugongjs/typeorm";
-import { Test, type TestingModule } from "@nestjs/testing";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
-import { RepositoryTypeOrmModule } from "../../../src/modules/repository-typeorm/repository-typeorm.module.js";
+import { activeDriver } from "../setup/drivers/active-driver.js";
+import { clearAllEntities, createTestingApp, type TestingApp } from "../setup/app/testing-app.js";
 
-let app: TestingModule | undefined;
-let dataSource: DataSource | undefined;
+let testingApp: TestingApp | undefined;
 
-async function getApp(): Promise<TestingModule> {
-    if (!app) {
-        app = await Test.createTestingModule({
-            imports: [
-                TypeOrmModule.forRoot({
-                    type: "postgres",
-                    schema: "public",
-                    port: +process.env.DB_PORT!,
-                    host: process.env.DB_HOST!,
-                    username: process.env.DB_USERNAME!,
-                    password: process.env.DB_PASSWORD!,
-                    database: process.env.DB_NAME!,
-                    entities: [DomainEventEntity, SnapshotEntity, ConsumedMessageEntity],
-                    synchronize: true
-                }),
-                RepositoryTypeOrmModule.forRoot()
-            ]
-        }).compile();
+async function getTestingApp(): Promise<TestingApp> {
+    testingApp ??= await createTestingApp([activeDriver.modules.repository.forRoot()]);
 
-        dataSource = app.get(DataSource);
-    }
-
-    return app;
+    return testingApp;
 }
 
 runDomainEventRepositoryContractTests(async () => {
-    const nestApp = await getApp();
-    const repository = nestApp.get<IDomainEventRepository>(IDomainEventRepository);
+    const { app, dataSource } = await getTestingApp();
 
     return {
-        repository,
-        cleanup: async () => {
-            await dataSource!.getRepository(DomainEventEntity).clear();
-            await dataSource!.getRepository(SnapshotEntity).clear();
-            await dataSource!.getRepository(ConsumedMessageEntity).clear();
-        }
+        repository: app.get<IDomainEventRepository>(IDomainEventRepository),
+        cleanup: () => clearAllEntities(dataSource)
     };
 });
 
 afterAll(async () => {
-    await app?.close();
+    await testingApp?.app.close();
 });

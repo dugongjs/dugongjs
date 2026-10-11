@@ -1,4 +1,9 @@
-import { ConsumedMessageEntity, DomainEventEntity, OutboxEntity, SnapshotEntity } from "@dugongjs/typeorm";
+import {
+    ConsumedMessageEntity,
+    DomainEventEntity,
+    OutboxEntity,
+    SnapshotEntity
+} from "@dugongjs/typeorm/driver/postgres";
 import type { DataSourceOptions } from "typeorm";
 import { BankAccountQueryModelEntity } from "../bank-account/adapters/repository/bank-account-query-model.entity.js";
 

@@ -12,7 +12,9 @@
     ],
     "type": "module",
     "exports": {
-        ".": "./src/index.ts"
+        ".": "./src/index.ts",
+        "./driver/postgres": "./src/driver/postgres/index.ts",
+        "./driver/sqlite": "./src/driver/sqlite/index.ts"
     },
     "publishConfig": {
         "access": "public",
@@ -21,8 +23,9 @@
     },
     "scripts": {
         "test:typecheck": "tsc --noEmit",
-        "test:e2e:run": "DEBUG=testcontainers* vitest run --config vitest.config.e2e.ts",
+        "test:e2e:run": "DEBUG=testcontainers* vitest run --config vitest.config.e2e.ts && vitest run --config vitest.config.e2e.sqlite.ts",
         "test:e2e:watch": "DEBUG=testcontainers* vitest watch --ui --config vitest.config.e2e.ts",
+        "test:e2e:watch:sqlite": "vitest watch --ui --config vitest.config.e2e.sqlite.ts",
         "lint": "eslint .",
         "build": "vite-node ./scripts/build.ts",
         "prepublishOnly": "pnpm build"
@@ -44,10 +47,12 @@
         "@swc/core": "^1.11.21",
         "@swc/helpers": "^0.5.17",
         "@testcontainers/postgresql": "catalog:",
+        "@types/better-sqlite3": "^9.6.0",
         "@types/node": "^24.5.1",
         "@types/pg": "^8.11.14",
         "@types/uuid": "^9.0.8",
         "@vitest/ui": "catalog:",
+        "better-sqlite3": "^13.0.3",
         "dotenv": "^16.5.0",
         "eslint": "catalog:",
         "pg": "^8.15.6",
