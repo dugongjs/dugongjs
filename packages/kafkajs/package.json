@@ -47,7 +47,7 @@
         "@swc/helpers": "^0.5.17",
         "@testcontainers/kafka": "catalog:",
         "@testcontainers/postgresql": "catalog:",
-        "@types/node": "^24.5.1",
+        "@types/node": "^26.6.5",
         "@types/pg": "^8.11.14",
         "@vitest/ui": "catalog:",
         "dotenv": "^16.5.0",
