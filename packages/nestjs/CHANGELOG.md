@@ -1,5 +1,14 @@
 # @dugongjs/nestjs
 
+## 0.0.42
+
+### Patch Changes
+
+- aa25ed7: Added a `requireTenantScope` option to `DugongModule`, which rejects aggregate operations that state no tenancy
+- Updated dependencies [e6d4c65]
+- Updated dependencies [8feb169]
+    - @dugongjs/core@0.0.25
+
 ## 0.0.41
 
 ### Patch Changes
