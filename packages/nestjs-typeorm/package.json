@@ -58,7 +58,7 @@
         "@swc/helpers": "^0.5.17",
         "@testcontainers/postgresql": "catalog:",
         "@types/better-sqlite3": "^9.6.0",
-        "@types/node": "^24.5.1",
+        "@types/node": "^26.6.5",
         "@types/pg": "^8.11.14",
         "@vitest/ui": "catalog:",
         "better-sqlite3": "^13.0.3",

@@ -39,7 +39,7 @@
         "@faker-js/faker": "^10.5.0",
         "@swc/core": "^1.11.21",
         "@swc/helpers": "^0.5.17",
-        "@types/node": "^24.5.1",
+        "@types/node": "^26.6.5",
         "eslint": "catalog:",
         "fast-check": "^4.10.2",
         "reflect-metadata": "catalog:",
