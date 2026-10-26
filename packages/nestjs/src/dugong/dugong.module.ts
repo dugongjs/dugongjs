@@ -22,6 +22,7 @@ import { AggregateDomainEventConsumerModule } from "../aggregate-domain-event-co
 import { EventIssuerModule } from "../event-issuer/event-issuer.module.js";
 import { ILoggerFactory } from "../logger/i-logger-factory.js";
 import type { ModuleInjectables } from "../providers/module-providers.js";
+import { TenancyModule } from "../tenancy/tenancy.module.js";
 import type { DugongAdapters } from "./dugong-adapter.js";
 
 export type DugongExternalOriginsOptions = {
@@ -36,6 +37,7 @@ export type DugongModuleOptions = {
     currentOrigin: string;
     adapters: DugongAdapters;
     aggregateDomainEventConsumers?: boolean;
+    requireTenantScope?: boolean;
     externalOrigins?: DugongExternalOriginsOptions;
 };
 
@@ -69,6 +71,7 @@ export class DugongModule {
             module: DugongModule,
             imports: [
                 EventIssuerModule.forRoot({ currentOrigin: options.currentOrigin }),
+                TenancyModule.forRoot({ requireTenantScope: options.requireTenantScope ?? false }),
                 ...(options.externalOrigins?.module?.imports ?? []),
                 ...(includeAggregateDomainEventConsumers ? [AggregateDomainEventConsumerModule] : []),
                 ...(adapters.imports ?? [])

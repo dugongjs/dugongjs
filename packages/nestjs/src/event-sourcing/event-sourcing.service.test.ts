@@ -1,4 +1,4 @@
-import { Aggregate, AggregateContext, AggregateManagerNotAvailableError } from "@dugongjs/core";
+import { Aggregate, AggregateContext, AggregateManagerNotAvailableError, TenantScopeNotSetError } from "@dugongjs/core";
 import "reflect-metadata";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { EventSourcingService } from "./event-sourcing.service.js";
@@ -23,76 +23,128 @@ describe("EventSourcingService", () => {
         );
     }
 
-    it("should delegate transaction to transaction manager", async () => {
-        const runInTransaction = vi.fn(async () => 42);
-        const transaction = vi.fn(async (callback: any) => callback({ tx: true }));
-        const service = new EventSourcingService(
+    function createServiceWithTenantScopeRequired(requireTenantScope: boolean) {
+        return new EventSourcingService(
             "CurrentOrigin",
-            { transaction } as any,
-            {} as any,
+            { transaction: vi.fn(async () => null) } as any,
+            { getAggregateDomainEvents: vi.fn(async () => []) } as any,
             {} as any,
             undefined,
             undefined,
-            undefined
+            undefined,
+            undefined,
+            requireTenantScope
         );
+    }
 
-        const result = await service.transaction(runInTransaction);
+    describe("transaction", () => {
+        it("should delegate transaction to transaction manager", async () => {
+            const runInTransaction = vi.fn(async () => 42);
+            const transaction = vi.fn(async (callback: any) => callback({ tx: true }));
+            const service = new EventSourcingService(
+                "CurrentOrigin",
+                { transaction } as any,
+                {} as any,
+                {} as any,
+                undefined,
+                undefined,
+                undefined
+            );
 
-        expect(transaction).toHaveBeenCalledWith(runInTransaction);
-        expect(result).toBe(42);
+            const result = await service.transaction(runInTransaction);
+
+            expect(transaction).toHaveBeenCalledWith(runInTransaction);
+            expect(result).toBe(42);
+        });
     });
 
-    it("should set transaction context on factory and manager", () => {
-        const service = createService();
-        const setFactoryTransactionContext = vi.fn();
-        const setManagerTransactionContext = vi.fn();
+    describe("createAggregateContext", () => {
+        it("should set transaction context on factory and manager", () => {
+            const service = createService();
+            const setFactoryTransactionContext = vi.fn();
+            const setManagerTransactionContext = vi.fn();
 
-        vi.spyOn(AggregateContext.prototype, "getFactory").mockReturnValue({
-            setTransactionContext: setFactoryTransactionContext
-        } as any);
-        vi.spyOn(AggregateContext.prototype, "getManager").mockReturnValue({
-            setTransactionContext: setManagerTransactionContext
-        } as any);
+            vi.spyOn(AggregateContext.prototype, "getFactory").mockReturnValue({
+                setTransactionContext: setFactoryTransactionContext
+            } as any);
+            vi.spyOn(AggregateContext.prototype, "getManager").mockReturnValue({
+                setTransactionContext: setManagerTransactionContext
+            } as any);
 
-        const transactionContext = { id: "tx-1" } as any;
+            const transactionContext = { id: "tx-1" } as any;
 
-        const context = service.createAggregateContext(transactionContext, TestAggregate as any);
+            const context = service.createAggregateContext(transactionContext, TestAggregate as any);
 
-        expect(context).toBeInstanceOf(AggregateContext);
-        expect(setFactoryTransactionContext).toHaveBeenCalledWith(transactionContext);
-        expect(setManagerTransactionContext).toHaveBeenCalledWith(transactionContext);
-    });
-
-    it("should skip the manager context for aggregates that have no manager, but still set factory context", () => {
-        const service = createService();
-        const setFactoryTransactionContext = vi.fn();
-
-        vi.spyOn(AggregateContext.prototype, "getFactory").mockReturnValue({
-            setTransactionContext: setFactoryTransactionContext
-        } as any);
-        vi.spyOn(AggregateContext.prototype, "getManager").mockImplementation(() => {
-            throw new AggregateManagerNotAvailableError();
+            expect(context).toBeInstanceOf(AggregateContext);
+            expect(setFactoryTransactionContext).toHaveBeenCalledWith(transactionContext);
+            expect(setManagerTransactionContext).toHaveBeenCalledWith(transactionContext);
         });
 
-        const transactionContext = { id: "tx-2" } as any;
+        it("should skip the manager context for aggregates that have no manager, but still set factory context", () => {
+            const service = createService();
+            const setFactoryTransactionContext = vi.fn();
 
-        expect(() => service.createAggregateContext(transactionContext, TestAggregate as any)).not.toThrow();
-        expect(setFactoryTransactionContext).toHaveBeenCalledWith(transactionContext);
-    });
+            vi.spyOn(AggregateContext.prototype, "getFactory").mockReturnValue({
+                setTransactionContext: setFactoryTransactionContext
+            } as any);
+            vi.spyOn(AggregateContext.prototype, "getManager").mockImplementation(() => {
+                throw new AggregateManagerNotAvailableError();
+            });
 
-    it("should surface manager errors that are not AggregateManagerNotAvailableError", () => {
-        const service = createService();
-        const unexpectedError = new Error("manager blew up");
+            const transactionContext = { id: "tx-2" } as any;
 
-        vi.spyOn(AggregateContext.prototype, "getFactory").mockReturnValue({
-            setTransactionContext: vi.fn()
-        } as any);
-        vi.spyOn(AggregateContext.prototype, "getManager").mockImplementation(() => {
-            throw unexpectedError;
+            expect(() => service.createAggregateContext(transactionContext, TestAggregate as any)).not.toThrow();
+            expect(setFactoryTransactionContext).toHaveBeenCalledWith(transactionContext);
         });
 
-        expect(() => service.createAggregateContext({ id: "tx-3" } as any, TestAggregate as any)).toThrow(
-            unexpectedError
-        );
+        it("should surface manager errors that are not AggregateManagerNotAvailableError", () => {
+            const service = createService();
+            const unexpectedError = new Error("manager blew up");
+
+            vi.spyOn(AggregateContext.prototype, "getFactory").mockReturnValue({
+                setTransactionContext: vi.fn()
+            } as any);
+            vi.spyOn(AggregateContext.prototype, "getManager").mockImplementation(() => {
+                throw unexpectedError;
+            });
+
+            expect(() => service.createAggregateContext({ id: "tx-3" } as any, TestAggregate as any)).toThrow(
+                unexpectedError
+            );
+        });
+
+        it("should reject an operation that states no tenancy when a tenant scope is required", async () => {
+            const context = createServiceWithTenantScopeRequired(true).createAggregateContext(
+                null,
+                TestAggregate as any
+            );
+
+            await expect(context.build("11111111-1111-1111-1111-111111111111")).rejects.toThrow(TenantScopeNotSetError);
+        });
+
+        it("should allow an operation scoped to a tenant when a tenant scope is required", async () => {
+            const context = createServiceWithTenantScopeRequired(true)
+                .createAggregateContext(null, TestAggregate as any)
+                .withTenantId("TestTenant");
+
+            await expect(context.build("11111111-1111-1111-1111-111111111111")).resolves.toBeNull();
+        });
+
+        it("should allow an explicitly unscoped operation when a tenant scope is required", async () => {
+            const context = createServiceWithTenantScopeRequired(true)
+                .createAggregateContext(null, TestAggregate as any)
+                .withoutTenantId();
+
+            await expect(context.build("11111111-1111-1111-1111-111111111111")).resolves.toBeNull();
+        });
+
+        it("should allow an operation that states no tenancy when no tenant scope is required", async () => {
+            const context = createServiceWithTenantScopeRequired(false).createAggregateContext(
+                null,
+                TestAggregate as any
+            );
+
+            await expect(context.build("11111111-1111-1111-1111-111111111111")).resolves.toBeNull();
+        });
     });
 });

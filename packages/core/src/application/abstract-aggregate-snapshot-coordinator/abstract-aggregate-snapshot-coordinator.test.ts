@@ -175,7 +175,7 @@ describe("AbstractAggregateSnapshotCoordinator", () => {
         it("should pass tenantId to snapshot transformer when provided", async () => {
             const tenantId = faker.string.uuid();
 
-            const coordinator = createCoordinator({ tenantId });
+            const coordinator = createCoordinator({ tenantScope: { type: "tenant", tenantId } });
             const aggregate = new MockAggregate();
 
             aggregate.setCurrentDomainEventSequenceNumber(10);

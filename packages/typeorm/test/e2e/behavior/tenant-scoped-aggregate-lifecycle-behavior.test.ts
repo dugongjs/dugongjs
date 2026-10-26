@@ -15,14 +15,14 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
         userFactory = new AggregateFactoryTypeOrm({
             aggregateClass: User,
             currentOrigin: "IAM-UserService",
-            tenantId: "TestTenant",
+            tenantScope: { type: "tenant", tenantId: "TestTenant" },
             transactionManager: mock<ITransactionManager>()
         });
 
         userManager = new AggregateManagerTypeOrm({
             aggregateClass: User,
             currentOrigin: "IAM-UserService",
-            tenantId: "TestTenant",
+            tenantScope: { type: "tenant", tenantId: "TestTenant" },
             transactionManager: mock<ITransactionManager>()
         });
     });
