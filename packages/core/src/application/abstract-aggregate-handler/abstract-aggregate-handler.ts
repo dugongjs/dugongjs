@@ -4,14 +4,16 @@ import type { ITransactionManager } from "../../ports/index.js";
 import { AbstractTransactionCoordinator } from "../abstract-transaction-coordinator/abstract-transaction-coordinator.js";
 import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggregate-metadata-not-found.error.js";
 import type { ILogger } from "../logger/i-logger.js";
-import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
 import { VoidLogger } from "../logger/void-logger.js";
+import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
+import { TenantScopeNotSetError } from "./errors/tenant-scope-not-set.error.js";
 
 export type AbstractAggregateHandlerOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = {
     aggregateClass: TAggregateRootClass;
     transactionManager: ITransactionManager;
     currentOrigin: string;
     tenantScope?: TenantScope;
+    requireTenantScope?: boolean;
     logger?: ILogger;
 };
 
@@ -28,6 +30,7 @@ export abstract class AbstractAggregateHandler<
     protected readonly currentOrigin: string;
     protected readonly tenantScope: TenantScope | undefined;
     protected readonly tenantId: string | undefined;
+    protected readonly requireTenantScope: boolean;
     protected readonly isInternalAggregate: boolean;
     protected readonly aggregateOrigin: string;
     protected readonly aggregateType: string;
@@ -48,6 +51,7 @@ export abstract class AbstractAggregateHandler<
         this.currentOrigin = options.currentOrigin;
         this.tenantScope = options.tenantScope;
         this.tenantId = options.tenantScope?.type === "tenant" ? options.tenantScope.tenantId : undefined;
+        this.requireTenantScope = options.requireTenantScope ?? false;
         const isInternalAggregate = aggregateMetadata.isInternal;
         this.isInternalAggregate = isInternalAggregate;
         this.aggregateOrigin = isInternalAggregate ? options.currentOrigin : aggregateMetadata.origin;
@@ -70,5 +74,11 @@ export abstract class AbstractAggregateHandler<
             ...this.logContext,
             aggregateId
         };
+    }
+
+    protected assertTenantScopeIsSet(operation: string): void {
+        if (this.requireTenantScope && !this.tenantScope) {
+            throw new TenantScopeNotSetError(operation);
+        }
     }
 }

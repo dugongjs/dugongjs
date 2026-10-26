@@ -12,6 +12,7 @@ import type { IDomainEventRepository } from "../../ports/outbound/repository/i-d
 import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggregate-metadata-not-found.error.js";
 import type { ILogger } from "../logger/i-logger.js";
+import { TenantScopeNotSetError } from "../abstract-aggregate-handler/errors/tenant-scope-not-set.error.js";
 import { AggregateManager, type AggregateManagerOptions } from "./aggregate-manager.js";
 import { MissingProducerOrMapperError } from "./errors/missing-producer-or-mapper.error.js";
 
@@ -93,9 +94,24 @@ describe("AggregateManager", () => {
 
             expect(aggregateDomainEventApplier.applyStagedDomainEventsToAggregate).toHaveBeenCalledWith(aggregate);
         });
+
+        it("should not require a tenant scope, since it touches no tenant-scoped storage", () => {
+            const manager = createManager({ requireTenantScope: true });
+            const aggregate = new MockAggregate();
+
+            expect(() => manager.applyStagedDomainEvents(aggregate)).not.toThrow();
+        });
     });
 
     describe("commitStagedDomainEvents", () => {
+        it("should throw TenantScopeNotSetError if a tenant scope is required but not set", async () => {
+            const manager = createManager({ requireTenantScope: true });
+            const aggregate = new MockAggregate();
+
+            await expect(manager.commitStagedDomainEvents(aggregate)).rejects.toThrow(TenantScopeNotSetError);
+            expect(mockDomainEventRepository.saveDomainEvents).not.toHaveBeenCalled();
+        });
+
         it("should do nothing if there are no staged domain events", async () => {
             const manager = createManager();
             const aggregate = new MockAggregate();
@@ -144,6 +160,22 @@ describe("AggregateManager", () => {
             expect(mockMessageProducer.publishMessages).toHaveBeenCalled();
 
             expect(aggregate.getStagedDomainEvents().length).toBe(0);
+        });
+    });
+    describe("applyAndCommitStagedDomainEvents", () => {
+        it("should throw TenantScopeNotSetError if a tenant scope is required but not set", async () => {
+            const manager = createManager({ requireTenantScope: true });
+            const aggregate = new MockAggregate();
+
+            await expect(manager.applyAndCommitStagedDomainEvents(aggregate)).rejects.toThrow(TenantScopeNotSetError);
+        });
+
+        it("should not apply the staged domain events when the tenant scope check fails", async () => {
+            const manager = createManager({ requireTenantScope: true });
+            const aggregate = new MockAggregate();
+
+            await expect(manager.applyAndCommitStagedDomainEvents(aggregate)).rejects.toThrow(TenantScopeNotSetError);
+            expect(aggregateDomainEventApplier.applyStagedDomainEventsToAggregate).not.toHaveBeenCalled();
         });
     });
 });

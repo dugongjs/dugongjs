@@ -68,6 +68,8 @@ export class AggregateManager<
         aggregate: InstanceType<TAggregateRootClass>,
         options: CommitOptions = {}
     ): Promise<void> {
+        this.assertTenantScopeIsSet("commitStagedDomainEvents");
+
         const aggregateId = aggregate.getId();
 
         const logCtx = this.getLogContext(aggregateId);
@@ -106,6 +108,8 @@ export class AggregateManager<
         aggregate: InstanceType<TAggregateRootClass>,
         options: CommitOptions = {}
     ): Promise<void> {
+        this.assertTenantScopeIsSet("applyAndCommitStagedDomainEvents");
+
         this.applyStagedDomainEvents(aggregate);
         await this.commitStagedDomainEvents(aggregate, options);
     }

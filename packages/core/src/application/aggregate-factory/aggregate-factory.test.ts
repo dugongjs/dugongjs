@@ -13,6 +13,7 @@ import type { ISnapshotRepository, SerializedSnapshot } from "../../ports/outbou
 import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import type { ILogger } from "../logger/i-logger.js";
+import { TenantScopeNotSetError } from "../abstract-aggregate-handler/errors/tenant-scope-not-set.error.js";
 import { AggregateFactory, type AggregateFactoryOptions } from "./aggregate-factory.js";
 import { AggregateMetadataNotFoundError } from "./errors/aggregate-metadata-not-found.error.js";
 
@@ -56,6 +57,7 @@ describe("AggregateFactory", () => {
         vi.clearAllMocks();
 
         aggregateMetadataRegistry.getAggregateMetadata = vi.fn(() => mockAggregateMetadata);
+        aggregateMetadataRegistry.getAggregateSnapshotMetadata = vi.fn(() => null);
 
         vi.spyOn(aggregateSnapshotTransformer, "restoreFromSnapshot");
         vi.spyOn(domainEventDeserializer, "deserializeDomainEvents");
@@ -88,6 +90,30 @@ describe("AggregateFactory", () => {
         it("should construct a valid instance", () => {
             const factory = createFactory();
             expect(factory).toBeDefined();
+        });
+    });
+
+    describe("build", () => {
+        it("should throw TenantScopeNotSetError if a tenant scope is required but not set", async () => {
+            const aggregateId = faker.string.uuid();
+            const factory = createFactory({ requireTenantScope: true });
+
+            await expect(factory.build(aggregateId)).rejects.toThrow(TenantScopeNotSetError);
+        });
+
+        it("should reject without the error being swallowed by the snapshot path", async () => {
+            aggregateMetadataRegistry.getAggregateSnapshotMetadata = vi.fn(() => ({
+                isSnapshotable: true,
+                snapshotInterval: 10
+            }));
+
+            const aggregateId = faker.string.uuid();
+            const factory = createFactory({ requireTenantScope: true });
+
+            await expect(factory.build(aggregateId)).rejects.toThrow(TenantScopeNotSetError);
+
+            expect(mockLogger.error).not.toHaveBeenCalled();
+            expect(mockSnapshotRepository.getLatestSnapshot).not.toHaveBeenCalled();
         });
     });
 
@@ -132,6 +158,13 @@ describe("AggregateFactory", () => {
             expect(domainEventDeserializer.deserializeDomainEvents).toHaveBeenCalledWith(...mockSerializedEvents);
             expect(aggregateDomainEventApplier.applyDomainEventToAggregate).toHaveBeenCalledTimes(2);
             expect(result).toBeDefined();
+        });
+
+        it("should throw TenantScopeNotSetError if a tenant scope is required but not set", async () => {
+            const aggregateId = faker.string.uuid();
+            const factory = createFactory({ requireTenantScope: true });
+
+            await expect(factory.buildFromEventLog(aggregateId)).rejects.toThrow(TenantScopeNotSetError);
         });
 
         it("should return null if no events are found in event log", async () => {
@@ -180,6 +213,13 @@ describe("AggregateFactory", () => {
             expect(domainEventDeserializer.deserializeDomainEvents).toHaveBeenCalledWith(...mockSerializedEvents);
             expect(aggregateDomainEventApplier.applyDomainEventToAggregate).toHaveBeenCalledTimes(2);
             expect(result).toBe(mockAggregateInstance);
+        });
+
+        it("should throw TenantScopeNotSetError if a tenant scope is required but not set", async () => {
+            const aggregateId = faker.string.uuid();
+            const factory = createFactory({ requireTenantScope: true });
+
+            await expect(factory.buildFromLatestSnapshot(aggregateId)).rejects.toThrow(TenantScopeNotSetError);
         });
 
         it("should return null if no snapshot is found", async () => {

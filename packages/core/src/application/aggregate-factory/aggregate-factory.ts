@@ -54,6 +54,7 @@ export class AggregateFactory<
         options: BuildOptions = {}
     ): Promise<InstanceType<TAggregateRootClass> | null> {
         this.validateAggregateId(aggregateId);
+        this.assertTenantScopeIsSet("build");
 
         const logCtx = this.getLogContext(aggregateId);
 
@@ -95,6 +96,7 @@ export class AggregateFactory<
         options: BuildFromEventLogOptions = {}
     ): Promise<InstanceType<TAggregateRootClass> | null> {
         this.validateAggregateId(aggregateId);
+        this.assertTenantScopeIsSet("buildFromEventLog");
 
         const logCtx = this.getLogContext(aggregateId);
 
@@ -143,6 +145,7 @@ export class AggregateFactory<
      */
     public async buildFromLatestSnapshot(aggregateId: string): Promise<InstanceType<TAggregateRootClass> | null> {
         this.validateAggregateId(aggregateId);
+        this.assertTenantScopeIsSet("buildFromLatestSnapshot");
 
         const logCtx = this.getLogContext(aggregateId);
 
