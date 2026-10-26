@@ -1,5 +1,12 @@
 # @dugongjs/core
 
+## 0.0.25
+
+### Patch Changes
+
+- e6d4c65: Added a `requireTenantScope` option that rejects aggregate reads and writes which state no tenancy
+- 8feb169: Added `AggregateContext.withoutTenantId()` and replaced the `tenantId` handler option with `tenantScope`
+
 ## 0.0.24
 
 ### Patch Changes
