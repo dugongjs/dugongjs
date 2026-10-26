@@ -17,6 +17,7 @@ export { InjectDomainEventRepository } from "./decorators/inject-domain-event-re
 export { InjectLoggerFactory } from "./decorators/inject-logger-factory.decorator.js";
 export { InjectMessageConsumer } from "./decorators/inject-message-consumer.decorator.js";
 export { InjectMessageProducer } from "./decorators/inject-message-producer.decorator.js";
+export { InjectRequireTenantScope } from "./decorators/inject-require-tenant-scope.decorator.js";
 export { InjectSnapshotRepository } from "./decorators/inject-snapshot-repository.decorator.js";
 export { InjectTransactionManager } from "./decorators/inject-transaction-manager.decorator.js";
 export { ON_DOMAIN_EVENT_TOKEN, OnDomainEvent } from "./decorators/on-domain-event.decorator.js";
@@ -62,6 +63,7 @@ export { ConsumedMessageRepositoryInMemoryService } from "./repository-in-memory
 export { DomainEventRepositoryInMemoryService } from "./repository-in-memory/domain-event-repository-in-memory.service.js";
 export { RepositoryInMemoryModule } from "./repository-in-memory/repository-in-memory.module.js";
 export { SnapshotRepositoryInMemoryService } from "./repository-in-memory/snapshot-repository-in-memory.service.js";
+export { TenancyModule, type TenancyModuleOptions } from "./tenancy/tenancy.module.js";
 export { TransactionManagerInMemoryModule } from "./transaction-manager-in-memory/transaction-manager-in-memory.module.js";
 export { TransactionManagerInMemoryService } from "./transaction-manager-in-memory/transaction-manager-in-memory.service.js";
 export { WaitForMessageConsumerService } from "./wait-for-message-consumer/wait-for-message-consumer.service.js";
