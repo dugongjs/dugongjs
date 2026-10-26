@@ -21,6 +21,7 @@ import { InjectExternalOriginMap } from "../decorators/inject-external-origin-ma
 import { InjectLoggerFactory } from "../decorators/inject-logger-factory.decorator.js";
 import { InjectMessageProducer } from "../decorators/inject-message-producer.decorator.js";
 import { InjectOutboundMessageMapper } from "../decorators/inject-outbound-message-mapper.decorator.js";
+import { InjectRequireTenantScope } from "../decorators/inject-require-tenant-scope.decorator.js";
 import { InjectSnapshotRepository } from "../decorators/inject-snapshot-repository.decorator.js";
 import { InjectTransactionManager } from "../decorators/inject-transaction-manager.decorator.js";
 import type { ILoggerFactory } from "../logger/i-logger-factory.js";
@@ -37,7 +38,8 @@ export class EventSourcingService {
         @Optional() @InjectExternalOriginMap() private readonly externalOriginMap?: IExternalOriginMap,
         @Optional() @InjectMessageProducer() private readonly messageProducer?: IMessageProducer<any>,
         @Optional() @InjectOutboundMessageMapper() private readonly outboundMessageMapper?: IOutboundMessageMapper<any>,
-        @Optional() @InjectLoggerFactory() loggerFactory?: ILoggerFactory
+        @Optional() @InjectLoggerFactory() loggerFactory?: ILoggerFactory,
+        @Optional() @InjectRequireTenantScope() private readonly requireTenantScope?: boolean
     ) {
         this.logger = loggerFactory?.createLogger(AggregateContext.name);
     }
@@ -55,6 +57,7 @@ export class EventSourcingService {
             outboundMessageMapper: this.outboundMessageMapper,
             externalOriginMap: this.externalOriginMap,
             currentOrigin: this.currentOrigin,
+            requireTenantScope: this.requireTenantScope ?? false,
             logger: this.logger
         };
 

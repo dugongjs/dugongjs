@@ -52,7 +52,7 @@ export class AggregateQueryService implements IAggregateQueryService {
             transactionManager: { transaction: (fn) => fn({}) },
             domainEventRepository: this.domainEventRepository,
             currentOrigin: this.currentOrigin,
-            tenantId,
+            tenantScope: tenantId ? { type: "tenant", tenantId } : undefined,
             logger: this.logger
         });
 

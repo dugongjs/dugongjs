@@ -13,6 +13,8 @@ import { Injectable } from "@nestjs/common";
 import "reflect-metadata";
 import { AggregateDomainEventConsumerModule } from "../aggregate-domain-event-consumer/aggregate-domain-event-consumer.module.js";
 import { EventIssuerModule } from "../event-issuer/event-issuer.module.js";
+import { TenancyModule } from "../tenancy/tenancy.module.js";
+import { REQUIRE_TENANT_SCOPE_TOKEN } from "../tenancy/tenancy.tokens.js";
 import { ILoggerFactory } from "../logger/i-logger-factory.js";
 import { DugongModule } from "./dugong.module.js";
 
@@ -189,6 +191,30 @@ describe("DugongModule", () => {
         const eventIssuerImport = (module.imports as any[]).find((entry) => entry?.module === EventIssuerModule);
 
         expect(eventIssuerImport).toBeDefined();
+    });
+
+    it("should always include TenancyModule, defaulting to not requiring a tenant scope", () => {
+        const module = DugongModule.register({
+            currentOrigin: "CurrentOrigin",
+            adapters: {}
+        });
+
+        const tenancyImport = (module.imports as any[]).find((entry) => entry?.module === TenancyModule);
+
+        expect(tenancyImport).toBeDefined();
+        expect(tenancyImport.providers).toEqual([{ provide: REQUIRE_TENANT_SCOPE_TOKEN, useValue: false }]);
+    });
+
+    it("should provide the requireTenantScope option through TenancyModule when enabled", () => {
+        const module = DugongModule.register({
+            currentOrigin: "CurrentOrigin",
+            adapters: {},
+            requireTenantScope: true
+        });
+
+        const tenancyImport = (module.imports as any[]).find((entry) => entry?.module === TenancyModule);
+
+        expect(tenancyImport.providers).toEqual([{ provide: REQUIRE_TENANT_SCOPE_TOKEN, useValue: true }]);
     });
 
     it("should mark module as global when using forRoot", () => {

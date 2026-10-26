@@ -82,6 +82,87 @@ describe("AggregateContext", () => {
         });
     });
 
+    describe("tenant scope tracking", () => {
+        it("should leave the tenant scope unset when neither method is called", () => {
+            const aggregateContext = createAggregateContext();
+
+            expect(aggregateContext.getFactory()["tenantScope"]).toBeUndefined();
+            expect(aggregateContext.getManager()["tenantScope"]).toBeUndefined();
+        });
+
+        it("should record a tenant scope when scoped to a tenant", () => {
+            const newContext = createAggregateContext().withTenantId("TestTenant");
+
+            expect(newContext.getFactory()["tenantScope"]).toEqual({ type: "tenant", tenantId: "TestTenant" });
+            expect(newContext.getManager()["tenantScope"]).toEqual({ type: "tenant", tenantId: "TestTenant" });
+        });
+
+        it("should record an unscoped decision when explicitly unscoped", () => {
+            const newContext = createAggregateContext().withoutTenantId();
+
+            expect(newContext.getFactory()["tenantScope"]).toEqual({ type: "unscoped" });
+            expect(newContext.getManager()["tenantScope"]).toEqual({ type: "unscoped" });
+        });
+
+        it("should distinguish an unset scope from an explicitly unscoped one", () => {
+            const unset = createAggregateContext();
+            const unscoped = unset.withoutTenantId();
+
+            expect(unset.getFactory()["tenantScope"]).toBeUndefined();
+            expect(unscoped.getFactory()["tenantScope"]).toEqual({ type: "unscoped" });
+        });
+
+        it("should resolve no tenant ID for both an unset and an explicitly unscoped context", () => {
+            const unset = createAggregateContext();
+            const unscoped = unset.withoutTenantId();
+
+            expect(unset.getFactory()["tenantId"]).toBeUndefined();
+            expect(unscoped.getFactory()["tenantId"]).toBeUndefined();
+        });
+
+        it("should allow a scoped context to be made explicitly unscoped", () => {
+            const newContext = createAggregateContext().withTenantId("TestTenant").withoutTenantId();
+
+            expect(newContext.getFactory()["tenantScope"]).toEqual({ type: "unscoped" });
+            expect(newContext.getFactory()["tenantId"]).toBeUndefined();
+        });
+    });
+
+    describe("withoutTenantId", () => {
+        it("should return a new AggregateContext rather than mutating the current one", () => {
+            const aggregateContext = createAggregateContext();
+
+            const newContext = aggregateContext.withoutTenantId();
+
+            expect(newContext).toBeInstanceOf(AggregateContext);
+            expect(newContext).not.toBe(aggregateContext);
+            expect(aggregateContext.getFactory()["tenantScope"]).toBeUndefined();
+        });
+
+        it("should preserve the transaction context set on the factory and manager", () => {
+            const aggregateContext = createAggregateContext();
+
+            const mockTransactionContext = { id: "test-transaction" };
+            aggregateContext.getFactory().setTransactionContext(mockTransactionContext);
+            aggregateContext.getManager().setTransactionContext(mockTransactionContext);
+
+            const newContext = aggregateContext.withoutTenantId();
+
+            expect(newContext.getFactory().getTransactionContext()).toBe(mockTransactionContext);
+            expect(newContext.getManager().getTransactionContext()).toBe(mockTransactionContext);
+        });
+
+        it("should not throw for an AbstractEventSourcedAggregateRoot, which has no manager", () => {
+            const aggregateContext = createAggregateContext({
+                aggregateClass: TestEventSourcedAggregate,
+                snapshotRepository: mockSnapshotRepository
+            });
+
+            expect(() => aggregateContext.withoutTenantId()).not.toThrow();
+            expect(aggregateContext.withoutTenantId().getFactory()["tenantScope"]).toEqual({ type: "unscoped" });
+        });
+    });
+
     describe("withTenantId", () => {
         it("should return a new AggregateContext with the specified tenantId", () => {
             const aggregateContext = createAggregateContext();
