@@ -1,5 +1,11 @@
 # @dugongjs/nestjs
 
+## 0.0.43
+
+### Patch Changes
+
+- df44a72: Fixed query model projection consumers failing under `requireTenantScope` when the domain event carries no tenant ID
+
 ## 0.0.42
 
 ### Patch Changes
