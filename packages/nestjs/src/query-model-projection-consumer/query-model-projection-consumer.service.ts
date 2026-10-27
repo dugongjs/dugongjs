@@ -23,7 +23,9 @@ export class QueryModelProjectionConsumerService {
             this.queryModelProjectionHandler.getAggregateClass()
         );
 
-        const aggregateContext = tenantId ? baseAggregateContext.withTenantId(tenantId) : baseAggregateContext;
+        const aggregateContext = tenantId
+            ? baseAggregateContext.withTenantId(tenantId)
+            : baseAggregateContext.withoutTenantId();
 
         const aggregateId = context.domainEvent.getAggregateId();
 
