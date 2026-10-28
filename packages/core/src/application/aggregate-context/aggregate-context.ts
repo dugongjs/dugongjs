@@ -1,6 +1,7 @@
 import { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
 import type { AggregateRoot } from "../../domain/abstract-aggregate-root/aggregate-root.js";
 import type { EventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/event-sourced-aggregate-root.js";
+import { aggregateMetadataRegistry } from "../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
 import {
     AggregateFactory,
     type AggregateFactoryOptions,
@@ -11,6 +12,8 @@ import {
     type AggregateManagerOptions,
     type CommitOptions
 } from "../aggregate-manager/aggregate-manager.js";
+import { AggregateForbidsTenantScopeError } from "../abstract-aggregate-handler/errors/aggregate-forbids-tenant-scope.error.js";
+import { AggregateRequiresTenantScopeError } from "../abstract-aggregate-handler/errors/aggregate-requires-tenant-scope.error.js";
 import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
 import { AggregateManagerNotAvailableError } from "./errors/aggregate-manager-not-available-error.js";
 
@@ -66,6 +69,8 @@ export class AggregateContext<TAggregateRootClass extends EventSourcedAggregateR
      * @returns A new instance of `AggregateContext` scoped to the given tenant.
      */
     public withTenantId(tenantId: string): AggregateContext<TAggregateRootClass> {
+        this.assertTenancyModeAllows("tenant", "withTenantId");
+
         return this.withTenantScope({ type: "tenant", tenantId });
     }
 
@@ -75,7 +80,22 @@ export class AggregateContext<TAggregateRootClass extends EventSourcedAggregateR
      * @returns A new instance of `AggregateContext` that is explicitly unscoped.
      */
     public withoutTenantId(): AggregateContext<TAggregateRootClass> {
+        this.assertTenancyModeAllows("unscoped", "withoutTenantId");
+
         return this.withTenantScope({ type: "unscoped" });
+    }
+
+    private assertTenancyModeAllows(scopeType: TenantScope["type"], operation: string): void {
+        const aggregateClass = this.options.aggregateClass;
+        const tenancyMode = aggregateMetadataRegistry.getAggregateTenancyMetadata(aggregateClass)?.mode;
+
+        if (tenancyMode === "always" && scopeType === "unscoped") {
+            throw new AggregateRequiresTenantScopeError(aggregateClass.name, operation);
+        }
+
+        if (tenancyMode === "never" && scopeType === "tenant") {
+            throw new AggregateForbidsTenantScopeError(aggregateClass.name, operation);
+        }
     }
 
     private withTenantScope(tenantScope: TenantScope): AggregateContext<TAggregateRootClass> {

@@ -1,12 +1,14 @@
 import { mock } from "vitest-mock-extended";
 import { AbstractAggregateRoot } from "../../domain/abstract-aggregate-root/abstract-aggregate-root.js";
-import { AbstractEventSourcedAggregateRoot, Aggregate, ExternalAggregate } from "../../domain/index.js";
+import { AbstractEventSourcedAggregateRoot, Aggregate, ExternalAggregate, TenantScoped } from "../../domain/index.js";
 import { ISnapshotRepository } from "../../ports/index.js";
 import type { IDomainEventRepository } from "../../ports/outbound/repository/i-domain-event-repository.js";
 import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { AggregateFactory } from "../aggregate-factory/aggregate-factory.js";
 import { AggregateManager } from "../aggregate-manager/aggregate-manager.js";
 import { AggregateContext, type AggregateContextOptions } from "./aggregate-context.js";
+import { AggregateForbidsTenantScopeError } from "../abstract-aggregate-handler/errors/aggregate-forbids-tenant-scope.error.js";
+import { AggregateRequiresTenantScopeError } from "../abstract-aggregate-handler/errors/aggregate-requires-tenant-scope.error.js";
 import { AggregateManagerNotAvailableError } from "./errors/aggregate-manager-not-available-error.js";
 
 @Aggregate("TestAggregate")
@@ -14,6 +16,14 @@ class TestAggregate extends AbstractAggregateRoot {}
 
 @ExternalAggregate("TestEventSourcedAggregate", "TestExternalOrigin")
 class TestEventSourcedAggregate extends AbstractEventSourcedAggregateRoot {}
+
+@Aggregate("AlwaysScopedContextAggregate")
+@TenantScoped.Always()
+class AlwaysScopedContextAggregate extends AbstractAggregateRoot {}
+
+@Aggregate("NeverScopedContextAggregate")
+@TenantScoped.Never()
+class NeverScopedContextAggregate extends AbstractAggregateRoot {}
 
 describe("AggregateContext", () => {
     const mockTransactionManager = mock<ITransactionManager>({
@@ -125,6 +135,39 @@ describe("AggregateContext", () => {
 
             expect(newContext.getFactory()["tenantScope"]).toEqual({ type: "unscoped" });
             expect(newContext.getFactory()["tenantId"]).toBeUndefined();
+        });
+    });
+
+    describe("tenancy declarations", () => {
+        it("should reject withoutTenantId when the aggregate declares always", () => {
+            const aggregateContext = createAggregateContext({ aggregateClass: AlwaysScopedContextAggregate });
+
+            expect(() => aggregateContext.withoutTenantId()).toThrow(AggregateRequiresTenantScopeError);
+        });
+
+        it("should allow withTenantId when the aggregate declares always", () => {
+            const aggregateContext = createAggregateContext({ aggregateClass: AlwaysScopedContextAggregate });
+
+            expect(() => aggregateContext.withTenantId("TestTenant")).not.toThrow();
+        });
+
+        it("should reject withTenantId when the aggregate declares never", () => {
+            const aggregateContext = createAggregateContext({ aggregateClass: NeverScopedContextAggregate });
+
+            expect(() => aggregateContext.withTenantId("TestTenant")).toThrow(AggregateForbidsTenantScopeError);
+        });
+
+        it("should allow withoutTenantId when the aggregate declares never", () => {
+            const aggregateContext = createAggregateContext({ aggregateClass: NeverScopedContextAggregate });
+
+            expect(() => aggregateContext.withoutTenantId()).not.toThrow();
+        });
+
+        it("should name the aggregate and the attempted call in the error", () => {
+            const aggregateContext = createAggregateContext({ aggregateClass: NeverScopedContextAggregate });
+
+            expect(() => aggregateContext.withTenantId("TestTenant")).toThrow(/NeverScopedContextAggregate/);
+            expect(() => aggregateContext.withTenantId("TestTenant")).toThrow(/withTenantId/);
         });
     });
 

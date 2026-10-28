@@ -23,13 +23,16 @@ export { CreationProcess } from "./aggregate-decorators/creation-process.js";
 export { ExternalAggregate } from "./aggregate-decorators/external-aggregate.js";
 export { Process, type ProcessOptions } from "./aggregate-decorators/process.js";
 export { Snapshotable } from "./aggregate-decorators/snapshotable.js";
+export { TenantScoped } from "./aggregate-decorators/tenant-scoped.js";
 export { aggregateDomainEventApplier } from "./aggregate-domain-event-applier/aggregate-domain-event-applier.js";
 export { AggregateIdMismatchError } from "./aggregate-domain-event-applier/errors/aggregate-id-mismatch.error.js";
 export {
     aggregateMetadataRegistry,
     type AggregateDomainEventApplier,
     type AggregateMetadata,
-    type AggregateSnapshotMetadata
+    type AggregateSnapshotMetadata,
+    type AggregateTenancyMetadata,
+    type AggregateTenancyMode
 } from "./aggregate-metadata-registry/aggregate-metadata-registry.js";
 export { AggregateAlreadyRegisteredError } from "./aggregate-metadata-registry/errors/aggregate-already-registered.error.js";
 export { DomainEvent } from "./domain-event-decorators/domain-event.js";
