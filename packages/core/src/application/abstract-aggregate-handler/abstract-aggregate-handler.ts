@@ -1,11 +1,16 @@
 import type { EventSourcedAggregateRoot } from "../../domain/abstract-event-sourced-aggregate-root/event-sourced-aggregate-root.js";
-import { aggregateMetadataRegistry } from "../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
+import {
+    aggregateMetadataRegistry,
+    type AggregateTenancyMode
+} from "../../domain/aggregate-metadata-registry/aggregate-metadata-registry.js";
 import type { ITransactionManager } from "../../ports/index.js";
 import { AbstractTransactionCoordinator } from "../abstract-transaction-coordinator/abstract-transaction-coordinator.js";
 import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggregate-metadata-not-found.error.js";
 import type { ILogger } from "../logger/i-logger.js";
 import { VoidLogger } from "../logger/void-logger.js";
 import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
+import { AggregateForbidsTenantScopeError } from "./errors/aggregate-forbids-tenant-scope.error.js";
+import { AggregateRequiresTenantScopeError } from "./errors/aggregate-requires-tenant-scope.error.js";
 import { TenantScopeNotSetError } from "./errors/tenant-scope-not-set.error.js";
 
 export type AbstractAggregateHandlerOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = {
@@ -31,6 +36,7 @@ export abstract class AbstractAggregateHandler<
     protected readonly tenantScope: TenantScope | undefined;
     protected readonly tenantId: string | undefined;
     protected readonly requireTenantScope: boolean;
+    protected readonly tenancyMode: AggregateTenancyMode | undefined;
     protected readonly isInternalAggregate: boolean;
     protected readonly aggregateOrigin: string;
     protected readonly aggregateType: string;
@@ -49,8 +55,9 @@ export abstract class AbstractAggregateHandler<
         }
 
         this.currentOrigin = options.currentOrigin;
-        this.tenantScope = options.tenantScope;
-        this.tenantId = options.tenantScope?.type === "tenant" ? options.tenantScope.tenantId : undefined;
+        this.tenancyMode = aggregateMetadataRegistry.getAggregateTenancyMetadata(this.aggregateClass)?.mode;
+        this.tenantScope = this.resolveTenantScope(options.tenantScope);
+        this.tenantId = this.tenantScope?.type === "tenant" ? this.tenantScope.tenantId : undefined;
         this.requireTenantScope = options.requireTenantScope ?? false;
         const isInternalAggregate = aggregateMetadata.isInternal;
         this.isInternalAggregate = isInternalAggregate;
@@ -77,8 +84,32 @@ export abstract class AbstractAggregateHandler<
     }
 
     protected assertTenantScopeIsSet(operation: string): void {
-        if (this.requireTenantScope && !this.tenantScope) {
+        if (this.tenancyMode === "always") {
+            if (this.tenantScope?.type !== "tenant") {
+                throw new AggregateRequiresTenantScopeError(this.aggregateType, operation);
+            }
+
+            return;
+        }
+
+        if (this.tenancyMode === "never") {
+            if (this.tenantScope?.type === "tenant") {
+                throw new AggregateForbidsTenantScopeError(this.aggregateType, operation);
+            }
+
+            return;
+        }
+
+        if (!this.tenantScope && (this.tenancyMode === "optional" || this.requireTenantScope)) {
             throw new TenantScopeNotSetError(operation);
         }
+    }
+
+    private resolveTenantScope(tenantScope: TenantScope | undefined): TenantScope | undefined {
+        if (!tenantScope && this.tenancyMode === "never") {
+            return { type: "unscoped" };
+        }
+
+        return tenantScope;
     }
 }
