@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.26
+
+### Patch Changes
+
+- 9039fc6: Added `@TenantScoped.Always()`, `@TenantScoped.Never()` and `@TenantScoped.Optional()` to declare an aggregate's tenancy, which is enforced on every read and write
+
 ## 0.0.25
 
 ### Patch Changes
