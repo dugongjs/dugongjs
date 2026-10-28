@@ -8,9 +8,9 @@ import {
 import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { AbstractAggregateHandler, type AbstractAggregateHandlerOptions } from "./abstract-aggregate-handler.js";
 import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
-import { AggregateForbidsTenantScopeError } from "./errors/aggregate-forbids-tenant-scope.error.js";
-import { AggregateRequiresTenantScopeError } from "./errors/aggregate-requires-tenant-scope.error.js";
-import { TenantScopeNotSetError } from "./errors/tenant-scope-not-set.error.js";
+import { AggregateForbidsTenantScopeError } from "../tenant-scope/errors/aggregate-forbids-tenant-scope.error.js";
+import { AggregateRequiresTenantScopeError } from "../tenant-scope/errors/aggregate-requires-tenant-scope.error.js";
+import { TenantScopeNotSetError } from "../tenant-scope/errors/tenant-scope-not-set.error.js";
 
 describe("AbstractAggregateHandler", () => {
     class MockAggregate extends AbstractAggregateRoot {}

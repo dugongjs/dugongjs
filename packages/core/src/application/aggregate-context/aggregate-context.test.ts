@@ -7,8 +7,8 @@ import type { ITransactionManager } from "../../ports/outbound/transaction-manag
 import { AggregateFactory } from "../aggregate-factory/aggregate-factory.js";
 import { AggregateManager } from "../aggregate-manager/aggregate-manager.js";
 import { AggregateContext, type AggregateContextOptions } from "./aggregate-context.js";
-import { AggregateForbidsTenantScopeError } from "../abstract-aggregate-handler/errors/aggregate-forbids-tenant-scope.error.js";
-import { AggregateRequiresTenantScopeError } from "../abstract-aggregate-handler/errors/aggregate-requires-tenant-scope.error.js";
+import { AggregateForbidsTenantScopeError } from "../tenant-scope/errors/aggregate-forbids-tenant-scope.error.js";
+import { AggregateRequiresTenantScopeError } from "../tenant-scope/errors/aggregate-requires-tenant-scope.error.js";
 import { AggregateManagerNotAvailableError } from "./errors/aggregate-manager-not-available-error.js";
 
 @Aggregate("TestAggregate")

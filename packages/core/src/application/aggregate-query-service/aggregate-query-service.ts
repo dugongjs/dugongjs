@@ -3,22 +3,28 @@ import type { IAggregateQueryService } from "../../ports/common/ipc/i-aggregate-
 import type { IDomainEventRepository } from "../../ports/index.js";
 import { AggregateFactory } from "../aggregate-factory/aggregate-factory.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
+import type { Constructor } from "../../types/constructor.type.js";
 import type { ILogger } from "../logger/i-logger.js";
+import { tenantScopeResolver } from "../tenant-scope/tenant-scope-resolver.js";
+import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
 
 export type AggregateQueryServiceOptions = {
     currentOrigin: string;
     domainEventRepository: IDomainEventRepository;
+    requireTenantScope?: boolean;
     logger?: ILogger;
 };
 
 export class AggregateQueryService implements IAggregateQueryService {
     private readonly currentOrigin: string;
     private readonly domainEventRepository: IDomainEventRepository;
+    private readonly requireTenantScope: boolean;
     private readonly logger?: ILogger;
 
     constructor(options: AggregateQueryServiceOptions) {
         this.currentOrigin = options.currentOrigin;
         this.domainEventRepository = options.domainEventRepository;
+        this.requireTenantScope = options.requireTenantScope ?? false;
         this.logger = options.logger;
     }
 
@@ -31,7 +37,14 @@ export class AggregateQueryService implements IAggregateQueryService {
         aggregateType: string,
         tenantId?: string | null
     ): Promise<string[]> {
-        return this.domainEventRepository.getAggregateIds(null, origin ?? this.currentOrigin, aggregateType, tenantId);
+        const tenantScope = this.resolveAndAssertTenantScope(origin, aggregateType, tenantId, "getAggregateIds");
+
+        return this.domainEventRepository.getAggregateIds(
+            null,
+            origin ?? this.currentOrigin,
+            aggregateType,
+            tenantScopeResolver.toTenantId(tenantScope)
+        );
     }
 
     public async getAggregate(
@@ -41,7 +54,9 @@ export class AggregateQueryService implements IAggregateQueryService {
         tenantId?: string | null,
         toSequenceNumber?: number
     ): Promise<object | null> {
-        const aggregateClass = aggregateMetadataRegistry.getAggregateClass(aggregateType, origin ?? undefined);
+        const tenantScope = this.resolveAndAssertTenantScope(origin, aggregateType, tenantId, "getAggregate");
+
+        const aggregateClass = this.resolveAggregateClass(origin, aggregateType);
 
         if (!aggregateClass) {
             return null;
@@ -52,7 +67,7 @@ export class AggregateQueryService implements IAggregateQueryService {
             transactionManager: { transaction: (fn) => fn({}) },
             domainEventRepository: this.domainEventRepository,
             currentOrigin: this.currentOrigin,
-            tenantScope: tenantId ? { type: "tenant", tenantId } : undefined,
+            tenantScope,
             logger: this.logger
         });
 
@@ -84,12 +99,53 @@ export class AggregateQueryService implements IAggregateQueryService {
         aggregateId: string,
         tenantId?: string | null
     ): Promise<SerializedDomainEvent[]> {
+        const tenantScope = this.resolveAndAssertTenantScope(
+            origin,
+            aggregateType,
+            tenantId,
+            "getDomainEventsForAggregate"
+        );
+
         return this.domainEventRepository.getAggregateDomainEvents(
             null,
             origin ?? this.currentOrigin,
             aggregateType,
             aggregateId,
-            tenantId
+            tenantScopeResolver.toTenantId(tenantScope)
         );
+    }
+
+    private resolveAggregateClass(origin: string | null, aggregateType: string): Constructor | null {
+        return (
+            aggregateMetadataRegistry.getAggregateClass(aggregateType, origin ?? undefined) ??
+            aggregateMetadataRegistry.getAggregateClass(aggregateType, undefined)
+        );
+    }
+
+    private resolveAndAssertTenantScope(
+        origin: string | null,
+        aggregateType: string,
+        tenantId: string | null | undefined,
+        operation: string
+    ): TenantScope | undefined {
+        const aggregateClass = this.resolveAggregateClass(origin, aggregateType);
+        const tenancyMode = aggregateClass
+            ? aggregateMetadataRegistry.getAggregateTenancyMetadata(aggregateClass)?.mode
+            : undefined;
+
+        const tenantScope = tenantScopeResolver.resolve(
+            tenantId ? { type: "tenant", tenantId } : undefined,
+            tenancyMode
+        );
+
+        tenantScopeResolver.assert({
+            aggregateType,
+            operation,
+            tenancyMode,
+            tenantScope,
+            requireTenantScope: this.requireTenantScope
+        });
+
+        return tenantScope;
     }
 }

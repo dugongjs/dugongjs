@@ -8,10 +8,8 @@ import { AbstractTransactionCoordinator } from "../abstract-transaction-coordina
 import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggregate-metadata-not-found.error.js";
 import type { ILogger } from "../logger/i-logger.js";
 import { VoidLogger } from "../logger/void-logger.js";
+import { tenantScopeResolver } from "../tenant-scope/tenant-scope-resolver.js";
 import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
-import { AggregateForbidsTenantScopeError } from "./errors/aggregate-forbids-tenant-scope.error.js";
-import { AggregateRequiresTenantScopeError } from "./errors/aggregate-requires-tenant-scope.error.js";
-import { TenantScopeNotSetError } from "./errors/tenant-scope-not-set.error.js";
 
 export type AbstractAggregateHandlerOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = {
     aggregateClass: TAggregateRootClass;
@@ -56,7 +54,7 @@ export abstract class AbstractAggregateHandler<
 
         this.currentOrigin = options.currentOrigin;
         this.tenancyMode = aggregateMetadataRegistry.getAggregateTenancyMetadata(this.aggregateClass)?.mode;
-        this.tenantScope = this.resolveTenantScope(options.tenantScope);
+        this.tenantScope = tenantScopeResolver.resolve(options.tenantScope, this.tenancyMode);
         this.tenantId = this.tenantScope?.type === "tenant" ? this.tenantScope.tenantId : undefined;
         this.requireTenantScope = options.requireTenantScope ?? false;
         const isInternalAggregate = aggregateMetadata.isInternal;
@@ -84,32 +82,12 @@ export abstract class AbstractAggregateHandler<
     }
 
     protected assertTenantScopeIsSet(operation: string): void {
-        if (this.tenancyMode === "always") {
-            if (this.tenantScope?.type !== "tenant") {
-                throw new AggregateRequiresTenantScopeError(this.aggregateType, operation);
-            }
-
-            return;
-        }
-
-        if (this.tenancyMode === "never") {
-            if (this.tenantScope?.type === "tenant") {
-                throw new AggregateForbidsTenantScopeError(this.aggregateType, operation);
-            }
-
-            return;
-        }
-
-        if (!this.tenantScope && (this.tenancyMode === "optional" || this.requireTenantScope)) {
-            throw new TenantScopeNotSetError(operation);
-        }
-    }
-
-    private resolveTenantScope(tenantScope: TenantScope | undefined): TenantScope | undefined {
-        if (!tenantScope && this.tenancyMode === "never") {
-            return { type: "unscoped" };
-        }
-
-        return tenantScope;
+        tenantScopeResolver.assert({
+            aggregateType: this.aggregateType,
+            operation,
+            tenancyMode: this.tenancyMode,
+            tenantScope: this.tenantScope,
+            requireTenantScope: this.requireTenantScope
+        });
     }
 }

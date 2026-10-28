@@ -12,8 +12,8 @@ import {
     type AggregateManagerOptions,
     type CommitOptions
 } from "../aggregate-manager/aggregate-manager.js";
-import { AggregateForbidsTenantScopeError } from "../abstract-aggregate-handler/errors/aggregate-forbids-tenant-scope.error.js";
-import { AggregateRequiresTenantScopeError } from "../abstract-aggregate-handler/errors/aggregate-requires-tenant-scope.error.js";
+import { AggregateForbidsTenantScopeError } from "../tenant-scope/errors/aggregate-forbids-tenant-scope.error.js";
+import { AggregateRequiresTenantScopeError } from "../tenant-scope/errors/aggregate-requires-tenant-scope.error.js";
 import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
 import { AggregateManagerNotAvailableError } from "./errors/aggregate-manager-not-available-error.js";
 
