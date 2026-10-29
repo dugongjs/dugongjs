@@ -39,7 +39,7 @@
         "@nestjs/core": "^12.0.1",
         "@nestjs/microservices": "^12.0.1",
         "@tanstack/react-query": "^5.89.0",
-        "chalk": "^5.4.1",
+        "chalk": "^6.0.1",
         "commander": "^13.1.0",
         "figures": "^6.1.0",
         "fullscreen-ink": "^0.1.0",
