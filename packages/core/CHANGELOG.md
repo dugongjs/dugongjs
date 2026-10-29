@@ -1,5 +1,12 @@
 # @dugongjs/core
 
+## 0.0.27
+
+### Patch Changes
+
+- 0f4f63f: Aggregate queries now take an options object with a `tenantScope` instead of a `tenantId` argument
+- 579fc04: Aggregate queries now enforce the aggregate's tenancy declaration on every operation, where previously only `getAggregate` did
+
 ## 0.0.26
 
 ### Patch Changes
