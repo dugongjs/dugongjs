@@ -12,7 +12,7 @@ import type { IDomainEventRepository } from "../../ports/outbound/repository/i-d
 import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggregate-metadata-not-found.error.js";
 import type { ILogger } from "../logger/i-logger.js";
-import { TenantScopeNotSetError } from "../abstract-aggregate-handler/errors/tenant-scope-not-set.error.js";
+import { TenantScopeNotSetError } from "../tenant-scope/errors/tenant-scope-not-set.error.js";
 import { AggregateManager, type AggregateManagerOptions } from "./aggregate-manager.js";
 import { MissingProducerOrMapperError } from "./errors/missing-producer-or-mapper.error.js";
 

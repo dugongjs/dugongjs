@@ -1,3 +1,4 @@
+import type { TenantScope } from "@dugongjs/core";
 import type { IAggregateQueryService } from "@dugongjs/core";
 import { Box, Text, useInput } from "ink";
 import React from "react";
@@ -22,6 +23,7 @@ import { Sidebar } from "./panes/sidebar.js";
 export type MainViewProps = {
     preselectedType?: string;
     preselectedId?: string;
+    tenantScope?: TenantScope;
 };
 
 const FocusIndex = {
@@ -55,7 +57,7 @@ function maxReachablePos(hasSelectedId: boolean, order: FocusIndex[]) {
     return order.indexOf(maxTarget);
 }
 
-export function MainView({ preselectedType, preselectedId }: MainViewProps) {
+export function MainView({ preselectedType, preselectedId, tenantScope }: MainViewProps) {
     const [cols, rows] = useStdoutDimensions();
     const [focusIndex, setFocusIndex] = React.useState<FocusIndex>(FocusIndex.SIDEBAR);
     const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(true);
@@ -143,14 +145,14 @@ export function MainView({ preselectedType, preselectedId }: MainViewProps) {
         isLoading: idsLoading,
         isError: idsError,
         error: idsErrObj
-    } = useAggregateIds(adapter, selectedType);
+    } = useAggregateIds(adapter, selectedType, tenantScope);
 
     const {
         data: domainEvents,
         isLoading: eventsLoading,
         isError: eventsError,
         error: eventsErrObj
-    } = useDomainEvents(adapter, selectedType, selectedId);
+    } = useDomainEvents(adapter, selectedType, selectedId, tenantScope);
 
     React.useEffect(() => {
         if (!domainEvents || domainEvents.length === 0) {
@@ -174,13 +176,13 @@ export function MainView({ preselectedType, preselectedId }: MainViewProps) {
         isLoading: aggregateLoading,
         isError: aggregateError,
         error: aggregateErrObj
-    } = useAggregate(adapter, selectedType, selectedId, currentSeq);
+    } = useAggregate(adapter, selectedType, selectedId, currentSeq, tenantScope);
 
     const {
         data: previousAggregate,
         isLoading: prevAggLoading,
         isError: prevAggError
-    } = useAggregate(adapter, selectedType, selectedId, prevSeq);
+    } = useAggregate(adapter, selectedType, selectedId, prevSeq, tenantScope);
 
     return (
         <Box width={cols} height={rows - 1} marginTop={1} flexDirection="row">

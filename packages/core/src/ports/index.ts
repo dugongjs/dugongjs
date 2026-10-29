@@ -1,4 +1,8 @@
-export { IAggregateQueryService } from "./common/ipc/i-aggregate-query-service.js";
+export {
+    IAggregateQueryService,
+    type AggregateQueryOptions,
+    type GetAggregateOptions
+} from "./common/ipc/i-aggregate-query-service.js";
 export type { IMessageChannelParticipant } from "./common/message-broker/i-message-channel-participant.js";
 export { IInboundMessageMapper } from "./inbound/message-broker/i-inbound-message-mapper.js";
 export { IMessageConsumer } from "./inbound/message-broker/i-message-consumer.js";

@@ -235,7 +235,7 @@ export class AggregateFactory<
                 this.aggregateOrigin,
                 this.aggregateType,
                 aggregateId,
-                this.tenantId
+                { tenantScope: this.tenantScope }
             );
 
             this.logger.verbose(

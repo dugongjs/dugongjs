@@ -9,6 +9,7 @@
         "DB_PASSWORD",
         "DB_PORT",
         "DB_USERNAME",
+        "DUGONG_CONFIG_DIR",
         "KAFKA_BOOTSTRAP_SERVER",
         "KAFKA_BROKERS",
         "TCP_PORT"

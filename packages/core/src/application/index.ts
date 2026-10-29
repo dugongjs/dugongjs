@@ -2,9 +2,9 @@ export {
     AbstractAggregateHandler,
     type AbstractAggregateHandlerOptions
 } from "./abstract-aggregate-handler/abstract-aggregate-handler.js";
-export { AggregateForbidsTenantScopeError } from "./abstract-aggregate-handler/errors/aggregate-forbids-tenant-scope.error.js";
-export { AggregateRequiresTenantScopeError } from "./abstract-aggregate-handler/errors/aggregate-requires-tenant-scope.error.js";
-export { TenantScopeNotSetError } from "./abstract-aggregate-handler/errors/tenant-scope-not-set.error.js";
+export { AggregateForbidsTenantScopeError } from "./tenant-scope/errors/aggregate-forbids-tenant-scope.error.js";
+export { AggregateRequiresTenantScopeError } from "./tenant-scope/errors/aggregate-requires-tenant-scope.error.js";
+export { TenantScopeNotSetError } from "./tenant-scope/errors/tenant-scope-not-set.error.js";
 export { AggregateContext, type AggregateContextOptions } from "./aggregate-context/aggregate-context.js";
 export { AggregateManagerNotAvailableError } from "./aggregate-context/errors/aggregate-manager-not-available-error.js";
 export {
@@ -38,7 +38,7 @@ export {
 export { aggregateSnapshotTransformer } from "./aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 export type { ILogger } from "./logger/i-logger.js";
 export { VoidLogger } from "./logger/void-logger.js";
-export type { TenantScope } from "./tenant-scope/tenant-scope.type.js";
+export type { TenantScope } from "../domain/tenant-scope/tenant-scope.type.js";
 export {
     WaitForMessageConsumer,
     type WaitForMessageConsumerOptions

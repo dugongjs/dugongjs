@@ -24,6 +24,7 @@ export { ExternalAggregate } from "./aggregate-decorators/external-aggregate.js"
 export { Process, type ProcessOptions } from "./aggregate-decorators/process.js";
 export { Snapshotable } from "./aggregate-decorators/snapshotable.js";
 export { TenantScoped } from "./aggregate-decorators/tenant-scoped.js";
+export type { TenantScope } from "./tenant-scope/tenant-scope.type.js";
 export { aggregateDomainEventApplier } from "./aggregate-domain-event-applier/aggregate-domain-event-applier.js";
 export { AggregateIdMismatchError } from "./aggregate-domain-event-applier/errors/aggregate-id-mismatch.error.js";
 export {
