@@ -59,19 +59,25 @@ describe("AggregateQueryService", () => {
 
         it("should reject a tenant-scoped query when the aggregate declares never", async () => {
             await expect(
-                createService().getAggregateIds("CurrentOrigin", "NeverScopedQueryAggregate", "TestTenant")
+                createService().getAggregateIds("CurrentOrigin", "NeverScopedQueryAggregate", {
+                    tenantScope: { type: "tenant", tenantId: "TestTenant" }
+                })
             ).rejects.toThrow(AggregateForbidsTenantScopeError);
             expect(mockDomainEventRepository.getAggregateIds).not.toHaveBeenCalled();
         });
 
         it("should allow a tenant-scoped query when the aggregate declares always", async () => {
             await expect(
-                createService().getAggregateIds("CurrentOrigin", "AlwaysScopedQueryAggregate", "TestTenant")
+                createService().getAggregateIds("CurrentOrigin", "AlwaysScopedQueryAggregate", {
+                    tenantScope: { type: "tenant", tenantId: "TestTenant" }
+                })
             ).resolves.toEqual([]);
         });
 
         it("should pass the requested tenant ID through to the repository", async () => {
-            await createService().getAggregateIds("CurrentOrigin", "AlwaysScopedQueryAggregate", "TestTenant");
+            await createService().getAggregateIds("CurrentOrigin", "AlwaysScopedQueryAggregate", {
+                tenantScope: { type: "tenant", tenantId: "TestTenant" }
+            });
 
             expect(mockDomainEventRepository.getAggregateIds).toHaveBeenCalledWith(
                 null,
@@ -123,7 +129,7 @@ describe("AggregateQueryService", () => {
                     "CurrentOrigin",
                     "NeverScopedQueryAggregate",
                     "aggregate-1",
-                    "TestTenant"
+                    { tenantScope: { type: "tenant", tenantId: "TestTenant" } }
                 )
             ).rejects.toThrow(AggregateForbidsTenantScopeError);
         });
@@ -134,7 +140,7 @@ describe("AggregateQueryService", () => {
                     "CurrentOrigin",
                     "AlwaysScopedQueryAggregate",
                     "aggregate-1",
-                    "TestTenant"
+                    { tenantScope: { type: "tenant", tenantId: "TestTenant" } }
                 )
             ).resolves.toEqual([]);
         });
@@ -144,7 +150,7 @@ describe("AggregateQueryService", () => {
                 "CurrentOrigin",
                 "AlwaysScopedQueryAggregate",
                 "aggregate-1",
-                "TestTenant"
+                { tenantScope: { type: "tenant", tenantId: "TestTenant" } }
             );
 
             expect(mockDomainEventRepository.getAggregateDomainEvents).toHaveBeenCalledWith(
@@ -166,7 +172,9 @@ describe("AggregateQueryService", () => {
 
         it("should reject a tenant-scoped query when the aggregate declares never", async () => {
             await expect(
-                createService().getAggregate("CurrentOrigin", "NeverScopedQueryAggregate", "aggregate-1", "TestTenant")
+                createService().getAggregate("CurrentOrigin", "NeverScopedQueryAggregate", "aggregate-1", {
+                    tenantScope: { type: "tenant", tenantId: "TestTenant" }
+                })
             ).rejects.toThrow(AggregateForbidsTenantScopeError);
         });
     });

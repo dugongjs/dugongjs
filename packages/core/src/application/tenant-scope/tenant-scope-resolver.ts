@@ -2,7 +2,7 @@ import type { AggregateTenancyMode } from "../../domain/aggregate-metadata-regis
 import { AggregateForbidsTenantScopeError } from "./errors/aggregate-forbids-tenant-scope.error.js";
 import { AggregateRequiresTenantScopeError } from "./errors/aggregate-requires-tenant-scope.error.js";
 import { TenantScopeNotSetError } from "./errors/tenant-scope-not-set.error.js";
-import type { TenantScope } from "./tenant-scope.type.js";
+import type { TenantScope } from "../../domain/tenant-scope/tenant-scope.type.js";
 
 export type TenantScopeAssertion = {
     aggregateType: string;

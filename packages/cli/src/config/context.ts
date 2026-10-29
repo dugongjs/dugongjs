@@ -4,12 +4,12 @@ import { join } from "path";
 import type { Config } from "../types/config.js";
 import type { Context } from "../types/context.js";
 
-const CONFIG_DIR = join(homedir(), ".dugong");
+const CONFIG_DIR = process.env.DUGONG_CONFIG_DIR ?? join(homedir(), ".dugong");
 const CONFIG_FILE = join(CONFIG_DIR, "config.json");
 
 function ensureConfigDir() {
     if (!existsSync(CONFIG_DIR)) {
-        mkdirSync(CONFIG_DIR);
+        mkdirSync(CONFIG_DIR, { recursive: true });
     }
 }
 

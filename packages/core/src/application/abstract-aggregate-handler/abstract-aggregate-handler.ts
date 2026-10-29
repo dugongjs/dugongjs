@@ -9,7 +9,7 @@ import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggr
 import type { ILogger } from "../logger/i-logger.js";
 import { VoidLogger } from "../logger/void-logger.js";
 import { tenantScopeResolver } from "../tenant-scope/tenant-scope-resolver.js";
-import type { TenantScope } from "../tenant-scope/tenant-scope.type.js";
+import type { TenantScope } from "../../domain/tenant-scope/tenant-scope.type.js";
 
 export type AbstractAggregateHandlerOptions<TAggregateRootClass extends EventSourcedAggregateRoot> = {
     aggregateClass: TAggregateRootClass;
