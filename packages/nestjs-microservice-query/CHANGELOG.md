@@ -1,5 +1,15 @@
 # @dugongjs/nestjs-microservice-query
 
+## 0.0.46
+
+### Patch Changes
+
+- 0f4f63f: Aggregate queries now take an options object with a `tenantScope` instead of a `tenantId` argument
+- Updated dependencies [0f4f63f]
+- Updated dependencies [579fc04]
+    - @dugongjs/core@0.0.27
+    - @dugongjs/nestjs@0.0.45
+
 ## 0.0.45
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @dugongjs/nestjs
 
+## 0.0.45
+
+### Patch Changes
+
+- 579fc04: Aggregate queries now enforce the aggregate's tenancy declaration on every operation, where previously only `getAggregate` did
+- Updated dependencies [0f4f63f]
+- Updated dependencies [579fc04]
+    - @dugongjs/core@0.0.27
+
 ## 0.0.44
 
 ### Patch Changes
