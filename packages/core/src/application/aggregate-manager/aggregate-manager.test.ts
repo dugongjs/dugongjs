@@ -19,6 +19,17 @@ import { MissingProducerOrMapperError } from "./errors/missing-producer-or-mappe
 describe("AggregateManager", () => {
     class MockAggregate extends AbstractAggregateRoot {}
 
+    class MockCommittedDomainEvent extends AbstractDomainEvent {
+        public readonly origin = "TestOrigin";
+        public readonly aggregateType = "TestType";
+        public readonly type = "MockCommittedDomainEvent";
+        public readonly version = 1;
+
+        public onCommit(): void {
+            this.setMetadata({ committed: true });
+        }
+    }
+
     const mockTransactionManager = mock<ITransactionManager>({
         transaction: (fn) => fn({})
     });
@@ -161,7 +172,24 @@ describe("AggregateManager", () => {
 
             expect(aggregate.getStagedDomainEvents().length).toBe(0);
         });
+
+        it("should call the onCommit lifecycle hook on each staged domain event before they are serialized", async () => {
+            const manager = createManager();
+
+            const aggregate = new MockAggregate();
+            aggregate[IsInProcessContext] = true;
+            const domainEvent = new MockCommittedDomainEvent(faker.string.uuid());
+            aggregate.stageDomainEvent(domainEvent);
+            aggregate[IsInProcessContext] = false;
+
+            await manager.commitStagedDomainEvents(aggregate);
+
+            expect(mockDomainEventRepository.saveDomainEvents).toHaveBeenCalledWith(manager.getTransactionContext(), [
+                expect.objectContaining({ metadata: { committed: true } })
+            ]);
+        });
     });
+
     describe("applyAndCommitStagedDomainEvents", () => {
         it("should throw TenantScopeNotSetError if a tenant scope is required but not set", async () => {
             const manager = createManager({ requireTenantScope: true });
