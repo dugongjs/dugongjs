@@ -83,6 +83,8 @@ export class AggregateManager<
 
         for (const domainEvent of stagedDomainEvents) {
             this.injectDomainEventMetadata(domainEvent, options);
+
+            domainEvent.onCommit?.();
         }
 
         const domainEvents = stagedDomainEvents.map((domainEvent) => domainEvent.serialize());
