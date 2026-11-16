@@ -1,5 +1,12 @@
 # @dugongjs/nestjs
 
+## 0.0.46
+
+### Patch Changes
+
+- Updated dependencies [97c84c9]
+    - @dugongjs/core@0.0.28
+
 ## 0.0.45
 
 ### Patch Changes

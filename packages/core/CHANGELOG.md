@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.28
+
+### Patch Changes
+
+- 97c84c9: Fixed an issue where the `onCommit` and `onApply` domain event lifecycle hooks were never called
+
 ## 0.0.27
 
 ### Patch Changes
