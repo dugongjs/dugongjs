@@ -1,5 +1,49 @@
 # @dugongjs/nestjs-typeorm
 
+## 0.0.47
+
+### Patch Changes
+
+- Updated dependencies [0755884]
+    - @dugongjs/core@0.0.29
+    - @dugongjs/nestjs@0.0.47
+    - @dugongjs/typeorm@0.0.36
+
+## 0.0.46
+
+### Patch Changes
+
+- Updated dependencies [97c84c9]
+    - @dugongjs/core@0.0.28
+    - @dugongjs/nestjs@0.0.46
+    - @dugongjs/typeorm@0.0.35
+
+## 0.0.45
+
+### Patch Changes
+
+- Updated dependencies [0f4f63f]
+- Updated dependencies [579fc04]
+    - @dugongjs/core@0.0.27
+    - @dugongjs/nestjs@0.0.45
+    - @dugongjs/typeorm@0.0.34
+
+## 0.0.44
+
+### Patch Changes
+
+- Updated dependencies [9039fc6]
+    - @dugongjs/core@0.0.26
+    - @dugongjs/nestjs@0.0.44
+    - @dugongjs/typeorm@0.0.33
+
+## 0.0.43
+
+### Patch Changes
+
+- Updated dependencies [df44a72]
+    - @dugongjs/nestjs@0.0.43
+
 ## 0.0.42
 
 ### Patch Changes

@@ -95,7 +95,7 @@ describe("aggregate query read behavior", () => {
 
             await userManager.commitStagedDomainEvents(user);
 
-            const aggregate: any = await service.getAggregate(null, "User", user.getId(), null, 1);
+            const aggregate: any = await service.getAggregate(null, "User", user.getId(), { toSequenceNumber: 1 });
 
             expect(aggregate.username).toEqual(initialUsername);
             expect(aggregate.email).toEqual(initialEmail);

@@ -22,6 +22,12 @@ export type AggregateSnapshotMetadata = {
     snapshotInterval?: number;
 };
 
+export type AggregateTenancyMode = "always" | "never" | "optional";
+
+export type AggregateTenancyMetadata = {
+    mode: AggregateTenancyMode;
+};
+
 export type AggregateDomainEventApplier = (event: InstanceType<typeof AbstractDomainEvent>) => void;
 
 type AggregateDomainEventApplierMap = Map<Constructor, AggregateDomainEventApplier[]>;
@@ -29,6 +35,7 @@ type AggregateDomainEventApplierMap = Map<Constructor, AggregateDomainEventAppli
 class AggregateMetadataRegistry {
     private aggregateMetadataMap: Map<Constructor, AggregateMetadata> = new Map();
     private aggregateSnapshotMetadataMap: Map<Constructor, AggregateSnapshotMetadata> = new Map();
+    private aggregateTenancyMetadataMap: Map<Constructor, AggregateTenancyMetadata> = new Map();
     private aggregateDomainEventAppliers: Map<Constructor, AggregateDomainEventApplierMap> = new Map();
     private aggregateDefaultDomainEventAppliers: Map<Constructor, AggregateDomainEventApplier[]> = new Map();
 
@@ -62,6 +69,14 @@ class AggregateMetadataRegistry {
         this.validateAggregateSnapshotMetadata(aggregateClass);
 
         this.aggregateSnapshotMetadataMap.set(aggregateClass, metadata);
+
+        return this;
+    }
+
+    public registerAggregateTenancyMetadata(aggregateClass: Constructor, metadata: AggregateTenancyMetadata): this {
+        this.validateAggregateTenancyMetadata(aggregateClass);
+
+        this.aggregateTenancyMetadataMap.set(aggregateClass, metadata);
 
         return this;
     }
@@ -110,6 +125,12 @@ class AggregateMetadataRegistry {
     public getAggregateSnapshotMetadata(aggregateClass: Constructor): AggregateSnapshotMetadata | null {
         return (
             this.traversePrototypeChain(aggregateClass, (cls) => this.aggregateSnapshotMetadataMap.get(cls))[0] ?? null
+        );
+    }
+
+    public getAggregateTenancyMetadata(aggregateClass: Constructor): AggregateTenancyMetadata | null {
+        return (
+            this.traversePrototypeChain(aggregateClass, (cls) => this.aggregateTenancyMetadataMap.get(cls))[0] ?? null
         );
     }
 
@@ -169,6 +190,12 @@ class AggregateMetadataRegistry {
 
     private validateAggregateSnapshotMetadata(aggregateClass: Constructor): void {
         if (this.aggregateSnapshotMetadataMap.has(aggregateClass)) {
+            throw new AggregateAlreadyRegisteredError(aggregateClass.constructor.name);
+        }
+    }
+
+    private validateAggregateTenancyMetadata(aggregateClass: Constructor): void {
+        if (this.aggregateTenancyMetadataMap.has(aggregateClass)) {
             throw new AggregateAlreadyRegisteredError(aggregateClass.constructor.name);
         }
     }

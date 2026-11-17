@@ -36,13 +36,11 @@ class AggregateDomainEventApplier {
             domainEvent.constructor as Constructor
         );
 
-        if (!appliers || appliers.length === 0) {
-            return aggregate;
-        }
-
-        for (const applier of appliers) {
+        for (const applier of appliers ?? []) {
             applier.call(aggregate, domainEvent);
         }
+
+        domainEvent.onApply?.();
 
         return aggregate;
     }

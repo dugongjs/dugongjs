@@ -1,5 +1,30 @@
 # @dugongjs/core
 
+## 0.0.29
+
+### Patch Changes
+
+- 0755884: Added an `upcast` lifecycle hook to `AbstractDomainEvent`, which is followed on deserialization to replay events stored at an older version as their latest version
+
+## 0.0.28
+
+### Patch Changes
+
+- 97c84c9: Fixed an issue where the `onCommit` and `onApply` domain event lifecycle hooks were never called
+
+## 0.0.27
+
+### Patch Changes
+
+- 0f4f63f: Aggregate queries now take an options object with a `tenantScope` instead of a `tenantId` argument
+- 579fc04: Aggregate queries now enforce the aggregate's tenancy declaration on every operation, where previously only `getAggregate` did
+
+## 0.0.26
+
+### Patch Changes
+
+- 9039fc6: Added `@TenantScoped.Always()`, `@TenantScoped.Never()` and `@TenantScoped.Optional()` to declare an aggregate's tenancy, which is enforced on every read and write
+
 ## 0.0.25
 
 ### Patch Changes

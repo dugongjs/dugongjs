@@ -1,5 +1,49 @@
 # @dugongjs/nestjs-kafkajs
 
+## 0.0.44
+
+### Patch Changes
+
+- Updated dependencies [0755884]
+    - @dugongjs/core@0.0.29
+    - @dugongjs/kafkajs@0.0.35
+    - @dugongjs/nestjs@0.0.47
+
+## 0.0.43
+
+### Patch Changes
+
+- Updated dependencies [97c84c9]
+    - @dugongjs/core@0.0.28
+    - @dugongjs/kafkajs@0.0.34
+    - @dugongjs/nestjs@0.0.46
+
+## 0.0.42
+
+### Patch Changes
+
+- Updated dependencies [0f4f63f]
+- Updated dependencies [579fc04]
+    - @dugongjs/core@0.0.27
+    - @dugongjs/nestjs@0.0.45
+    - @dugongjs/kafkajs@0.0.33
+
+## 0.0.41
+
+### Patch Changes
+
+- Updated dependencies [9039fc6]
+    - @dugongjs/core@0.0.26
+    - @dugongjs/kafkajs@0.0.32
+    - @dugongjs/nestjs@0.0.44
+
+## 0.0.40
+
+### Patch Changes
+
+- Updated dependencies [df44a72]
+    - @dugongjs/nestjs@0.0.43
+
 ## 0.0.39
 
 ### Patch Changes

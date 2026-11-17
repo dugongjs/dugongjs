@@ -1,5 +1,41 @@
 # @dugongjs/nestjs
 
+## 0.0.47
+
+### Patch Changes
+
+- Updated dependencies [0755884]
+    - @dugongjs/core@0.0.29
+
+## 0.0.46
+
+### Patch Changes
+
+- Updated dependencies [97c84c9]
+    - @dugongjs/core@0.0.28
+
+## 0.0.45
+
+### Patch Changes
+
+- 579fc04: Aggregate queries now enforce the aggregate's tenancy declaration on every operation, where previously only `getAggregate` did
+- Updated dependencies [0f4f63f]
+- Updated dependencies [579fc04]
+    - @dugongjs/core@0.0.27
+
+## 0.0.44
+
+### Patch Changes
+
+- Updated dependencies [9039fc6]
+    - @dugongjs/core@0.0.26
+
+## 0.0.43
+
+### Patch Changes
+
+- df44a72: Fixed query model projection consumers failing under `requireTenantScope` when the domain event carries no tenant ID
+
 ## 0.0.42
 
 ### Patch Changes

@@ -38,7 +38,9 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.commitStagedDomainEvents(user);
 
-            const outbox = await dataSource.getRepository(activeDriver.entities.outbox).find({});
+            const outbox = await dataSource
+                .getRepository(activeDriver.entities.outbox)
+                .find({ where: { aggregateId: user.getId() } });
             const userCreatedOutboxMessage = outbox[0];
 
             expect(userCreatedOutboxMessage.id).toBeDefined();
@@ -101,7 +103,9 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
-            const persistedEvents = await dataSource.getRepository(activeDriver.entities.domainEvent).find({});
+            const persistedEvents = await dataSource
+                .getRepository(activeDriver.entities.domainEvent)
+                .find({ where: { aggregateId: userId } });
 
             expect(persistedEvents).toHaveLength(2);
             expect(user.getEmail()).toBe(newEmail);
@@ -126,9 +130,13 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
-            const persistedEvents = await dataSource.getRepository(activeDriver.entities.domainEvent).find({});
+            const persistedEvents = await dataSource
+                .getRepository(activeDriver.entities.domainEvent)
+                .find({ where: { aggregateId: userId } });
 
-            const snapshots = await dataSource.getRepository(activeDriver.entities.snapshot).find({});
+            const snapshots = await dataSource
+                .getRepository(activeDriver.entities.snapshot)
+                .find({ where: { aggregateId: userId } });
             const snapshot = snapshots[0];
 
             expect(persistedEvents).toHaveLength(10);
@@ -165,7 +173,9 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
-            const snapshots = await dataSource.getRepository(activeDriver.entities.snapshot).find({});
+            const snapshots = await dataSource
+                .getRepository(activeDriver.entities.snapshot)
+                .find({ where: { aggregateId: userId } });
 
             expect(snapshots).toHaveLength(1);
 
@@ -203,7 +213,9 @@ describe("tenant-scoped aggregate lifecycle behavior", () => {
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
-            const snapshots = await dataSource.getRepository(activeDriver.entities.snapshot).find({});
+            const snapshots = await dataSource
+                .getRepository(activeDriver.entities.snapshot)
+                .find({ where: { aggregateId: userId } });
 
             expect(snapshots).toHaveLength(1);
 

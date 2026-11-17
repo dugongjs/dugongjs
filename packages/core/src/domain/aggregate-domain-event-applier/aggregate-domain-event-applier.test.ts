@@ -18,11 +18,32 @@ class MockDomainEvent<TPayload extends DomainEventPayload = null> extends Abstra
     public readonly version = 1;
 }
 
+class MockAppliedDomainEvent extends AbstractDomainEvent {
+    public readonly origin = "MockOrigin";
+    public readonly aggregateType = "MockAggregateType";
+    public readonly type = "MockAppliedDomainEvent";
+    public readonly version = 1;
+
+    public onApply = vi.fn();
+}
+
+class MockUnappliedDomainEvent extends AbstractDomainEvent {
+    public readonly origin = "MockOrigin";
+    public readonly aggregateType = "MockAggregateType";
+    public readonly type = "MockUnappliedDomainEvent";
+    public readonly version = 1;
+
+    public onApply = vi.fn();
+}
+
 class MockEventSourcedAggregateRoot extends AbstractEventSourcedAggregateRoot {
     @Apply(MockDomainEvent)
     public applyMockDomainEvent(domainEvent: MockDomainEvent): void {
         expect(domainEvent).toBeInstanceOf(MockDomainEvent);
     }
+
+    @Apply(MockAppliedDomainEvent)
+    public applyMockAppliedDomainEvent(): void {}
 }
 
 class MockAggregateRoot extends AbstractAggregateRoot {
@@ -33,7 +54,7 @@ class MockAggregateRoot extends AbstractAggregateRoot {
 }
 
 describe("AggregateDomainEventApplier", () => {
-    describe("applyStagedDomainEventsToAggregate", () => {
+    describe("applyDomainEventToAggregate", () => {
         it("should apply domain event to aggregate when sequence numbers match", () => {
             const aggregate = new MockEventSourcedAggregateRoot();
             const domainEvent = new MockDomainEvent(faker.string.uuid()).setSequenceNumber(1);
@@ -52,6 +73,34 @@ describe("AggregateDomainEventApplier", () => {
                 aggregateDomainEventApplier.applyDomainEventToAggregate(aggregate, domainEvent);
             }).toThrowError(DomainEventSequenceNumberMismatchError);
             expect.assertions(1);
+        });
+
+        it("should call the onApply lifecycle hook on the domain event", () => {
+            const aggregate = new MockEventSourcedAggregateRoot();
+            const domainEvent = new MockAppliedDomainEvent(faker.string.uuid()).setSequenceNumber(1);
+
+            aggregateDomainEventApplier.applyDomainEventToAggregate(aggregate, domainEvent);
+
+            expect(domainEvent.onApply).toHaveBeenCalledOnce();
+        });
+
+        it("should call the onApply lifecycle hook when no applier is registered for the domain event", () => {
+            const aggregate = new MockEventSourcedAggregateRoot();
+            const domainEvent = new MockUnappliedDomainEvent(faker.string.uuid()).setSequenceNumber(1);
+
+            aggregateDomainEventApplier.applyDomainEventToAggregate(aggregate, domainEvent);
+
+            expect(domainEvent.onApply).toHaveBeenCalledOnce();
+        });
+
+        it("should not call the onApply lifecycle hook when sequence numbers do not match", () => {
+            const aggregate = new MockEventSourcedAggregateRoot();
+            const domainEvent = new MockAppliedDomainEvent(faker.string.uuid()).setSequenceNumber(2);
+
+            expect(() => {
+                aggregateDomainEventApplier.applyDomainEventToAggregate(aggregate, domainEvent);
+            }).toThrowError(DomainEventSequenceNumberMismatchError);
+            expect(domainEvent.onApply).not.toHaveBeenCalled();
         });
     });
 

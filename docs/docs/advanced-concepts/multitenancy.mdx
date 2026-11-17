@@ -5,13 +5,7 @@ sidebar_position: 3
 
 In a multitenant application, multiple tenants (e.g., customers, organizations) share the same application instance while keeping their data isolated. Multitenancy is a common requirement in SaaS applications and can be implemented in various ways, ranging from soft multitenancy (where data is logically separated) to hard multitenancy (where data is physically separated).
 
-DugongJS provides built-in support for soft multitenancy by allowing a tenant ID to be passed to all adapters during persistence and message broker operations. By default, the built-in adapters handle this at a logical level. However, while not currently provided as a feature, it is also possible to implement custom adapters that enforce hard multitenancy.
-
-import Admonition from "@theme/Admonition";
-
-<Admonition type="tip" icon="⭐" title="PRs welcome!">
-    PRs implementing hard multitenancy adapters are welcome!
-</Admonition>
+DugongJS provides built-in support for soft multitenancy by allowing a tenant ID to be passed to all adapters during persistence and message broker operations. By default, the built-in adapters handle this at a logical level. However, while not currently provided as a feature, it is also possible to implement custom adapters that enforce harder multitenancy.
 
 ## Tenant ID Injection
 
@@ -75,6 +69,7 @@ import type { WithdrawMoneyCommand } from "../../domain/commands/withdraw-money.
 export class BankAccountCommandService {
     constructor(private readonly eventSourcingService: EventSourcingService) {}
 
+    //highlight-next-line
     public async openAccount(tenantId: string, command: OpenAccountCommand): Promise<BankAccount> {
         return this.eventSourcingService.transaction(async (transaction) => {
             // highlight-start
@@ -93,6 +88,7 @@ export class BankAccountCommandService {
         });
     }
 
+    //highlight-next-line
     public async depositMoney(tenantId: string, command: DepositMoneyCommand): Promise<void> {
         return this.eventSourcingService.transaction(async (transaction) => {
             // highlight-start
@@ -119,3 +115,98 @@ These changes lead to two important outcomes:
 2. When retrieving aggregate instances using the `accountContext.getById` method, only events and snapshots associated with the specified tenant ID will be considered. If the aggregate instance does not exist for that tenant, an error will be thrown.
 
 Note that there is no built-in mechanism for extracting the tenant ID from incoming requests. It is up to the controller layer (or middlewares, guards, interceptors, etc.) to extract the tenant ID from the request context and pass it down to the application layer. This can be done using various strategies, such as extracting the tenant ID from request headers, JWT tokens, or session data.
+
+:::tip
+In the NestJS ecosystem, [NestJS CLS](https://papooch.github.io/nestjs-cls/) is a popular choice to handle tenant propagation.
+:::
+
+## Multitenancy Control Mechanisms
+
+By default, tenant scoping is declared at every call site where the `AggregateContext` is created. This default is permissive and makes it possible to create an operation that incorrectly writes to the "no tenant" scope by accident by forgetting to call `withTenantId`. Without a control mechanism in place, adding tenant IDs is a developer convention, rather than something that can be centrally enforced.
+
+DugongJS provides two mechanisms to enable multitenancy control. Both mechanisms can be enabled simultaneously for maximum assurance.
+
+The control is enforced by the following methods:
+
+- `AggregateFactory.build`
+- `AggregateFactory.buildFromEventLog`
+- `AggregateFactory.buildFromLatestSnapshot`
+- `AggregateManager.commitStagedDomainEvents`
+- `AggregateManager.applyAndCommitStagedDomainEvents`
+
+### Global Tenant Scope Control
+
+The first mechanism is the `requireTenantScope` property on the `DugongModule` (for the NestJS integration):
+
+```typescript title="src/app.module.ts" showLineNumbers
+@Module({
+    imports: [
+        DugongModule.forRoot({
+            currentOrigin: "BankingContext-AccountService",
+            // highlight-next-line
+            requireTenantScope: true,
+            adapters: new DugongAdapterBuilder()
+                .register(loggerAdapter)
+                .register(repositoryTypeOrmAdapter)
+                .register(transactionManagerTypeOrmAdapter)
+                .build()
+        })
+    ]
+})
+export class AppModule {}
+```
+
+When enabled, calling one of these methods without declaring the tenant scope throws `TenantScopeNotSetError`. A tenant scope is declared either by calling `withTenantId` or by explicitly declaring `withoutTenantId`:
+
+```typescript
+const accountContext = this.eventSourcingService
+    .createAggregateContext(transaction, BankAccount)
+    // highlight-next-line
+    .withoutTenantId();
+```
+
+At runtime this behaves exactly like leaving the tenant unset, but it records it as a deliberate decision and doesn't throw.
+
+### Per Aggregate Tenant Scope Control
+
+The global tenant scope control only enforces that the tenant scope decision is _deliberate_ for the specific call site. In practice, an aggregate is often entirely tenant scoped or entirely unscoped. In some cases, it could make sense to allow both options.
+
+The `@TenantScoped` decorator provides a second control mechanism that can be applied to an aggregate to make a decision about its tenant scope. The decorator has three modes:
+
+- **`@TenantScoped.Always()`** — the aggregate only exists within a tenant. Operating without a tenant ID throws an `AggregateRequiresTenantScopeError`.
+- **`@TenantScoped.Never()`** — the aggregate is shared across all tenants. Calling `withTenantId` throws an `AggregateForbidsTenantScopeError`.
+- **`@TenantScoped.Optional()`** — either scope is valid, but one must be chosen. Leaving it unset throws a `TenantScopeNotSetError`.
+
+The decorator is applied to the aggregate class:
+
+```typescript title="src/bank-account/domain/bank-account.aggregate.ts"
+@Aggregate("BankAccount")
+// highlight-next-line
+@TenantScoped.Always()
+export class BankAccount extends AbstractAggregateRoot {
+    // Rest of the aggregate...
+}
+```
+
+:::tip
+The `TenantScoped` decorator is imported from `@dugongjs/core`.
+:::
+
+### How Both Mechanisms Interact
+
+An aggregate's own declaration always takes precedence over the application-wide flag, which only governs aggregates that have no declaration of their own. The following table shows the different permutations, where:
+
+- ✅ - allowed
+- ❌ - an error is thrown
+
+| Aggregate decorator        | `requireTenantScope` | Not declared | `withTenantId` | `withoutTenantId` |
+| -------------------------- | -------------------- | ------------ | -------------- | ----------------- |
+| `@TenantScoped.Always()`   | N/A                  | ❌           | ✅             | ❌                |
+| `@TenantScoped.Never()`    | N/A                  | ✅           | ❌             | ✅                |
+| `@TenantScoped.Optional()` | N/A                  | ❌           | ✅             | ✅                |
+| None                       | `false`              | ✅           | ✅             | ✅                |
+| None                       | `true`               | ❌           | ✅             | ✅                |
+
+:::tip
+Note that with `@TenantScoped.Never()`, you do not need to repeatedly pass `withoutTenantId`, even when `requireTenantScope` is `true`.
+:::

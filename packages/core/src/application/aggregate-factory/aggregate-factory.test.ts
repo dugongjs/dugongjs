@@ -13,7 +13,7 @@ import type { ISnapshotRepository, SerializedSnapshot } from "../../ports/outbou
 import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { aggregateSnapshotTransformer } from "../aggregate-snapshot-transformer/aggregate-snapshot-transformer.js";
 import type { ILogger } from "../logger/i-logger.js";
-import { TenantScopeNotSetError } from "../abstract-aggregate-handler/errors/tenant-scope-not-set.error.js";
+import { TenantScopeNotSetError } from "../tenant-scope/errors/tenant-scope-not-set.error.js";
 import { AggregateFactory, type AggregateFactoryOptions } from "./aggregate-factory.js";
 import { AggregateMetadataNotFoundError } from "./errors/aggregate-metadata-not-found.error.js";
 

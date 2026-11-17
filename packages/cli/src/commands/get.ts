@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { getAggregateQueryAdapter } from "../adapters/resolver.js";
+import { resolveTenantScope } from "../utils/resolve-tenant-scope.js";
 import formatAggregate from "../utils/format-aggregate.js";
 
 const get = new Command("get").description("Get a resource from the server");
@@ -34,9 +35,11 @@ get.command("aggregate-ids")
     .argument("<aggregateType>", "The aggregate type to get IDs for")
     .action(async (aggregateType, options) => {
         try {
-            const { origin, tenantId } = options;
+            const { origin } = options;
             const { adapter, close } = getAggregateQueryAdapter();
-            const aggregateIds = await adapter.getAggregateIds(origin, aggregateType, tenantId);
+            const aggregateIds = await adapter.getAggregateIds(origin, aggregateType, {
+                tenantScope: resolveTenantScope(options)
+            });
             await close?.();
 
             if (aggregateIds.length === 0) {
@@ -64,9 +67,12 @@ get.command("aggregate")
     .option("-s, --sequence-number <sequenceNumber>", "The sequence number to build the aggregate up to", parseInt)
     .action(async (aggregateType, aggregateId, options) => {
         try {
-            const { origin, tenantId, sequenceNumber } = options;
+            const { origin, sequenceNumber } = options;
             const { adapter, close } = getAggregateQueryAdapter();
-            const aggregate = await adapter.getAggregate(origin, aggregateType, aggregateId, tenantId, sequenceNumber);
+            const aggregate = await adapter.getAggregate(origin, aggregateType, aggregateId, {
+                tenantScope: resolveTenantScope(options),
+                toSequenceNumber: sequenceNumber
+            });
             await close?.();
 
             if (!aggregate) {
@@ -97,14 +103,11 @@ get.command("domain-events")
     .option("-f, --format <format>", "The format of the output", "json")
     .action(async (aggregateType, aggregateId, options) => {
         try {
-            const { origin, tenantId, format } = options;
+            const { origin, format } = options;
             const { adapter, close } = getAggregateQueryAdapter();
-            const domainEvents = await adapter.getDomainEventsForAggregate(
-                origin,
-                aggregateType,
-                aggregateId,
-                tenantId
-            );
+            const domainEvents = await adapter.getDomainEventsForAggregate(origin, aggregateType, aggregateId, {
+                tenantScope: resolveTenantScope(options)
+            });
             await close?.();
 
             if (domainEvents.length === 0) {

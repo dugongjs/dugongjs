@@ -76,6 +76,11 @@ export abstract class AbstractDomainEvent<TPayload extends DomainEventPayload = 
      */
     public onApply?(): void;
 
+    /**
+     * Lifecycle method called when the event is deserialized. Must return the event at its next version.
+     */
+    public upcast?(): AbstractDomainEvent<any>;
+
     public getOrigin(): string {
         return this.origin;
     }

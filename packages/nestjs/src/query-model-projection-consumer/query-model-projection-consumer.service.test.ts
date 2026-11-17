@@ -1,8 +1,53 @@
+import { AbstractAggregateRoot, Aggregate } from "@dugongjs/core";
+import { Module } from "@nestjs/common";
+import { Test } from "@nestjs/testing";
 import "reflect-metadata";
 import { describe, expect, it, vi } from "vitest";
+import { repositoryInMemoryAdapter } from "../adapters/repository-in-memory.adapter.js";
+import { transactionManagerInMemoryAdapter } from "../adapters/transaction-manager-in-memory.adapter.js";
+import { DugongAdapterBuilder } from "../dugong/dugong-adapter.js";
+import { DugongModule } from "../dugong/dugong.module.js";
+import { EventSourcingModule } from "../event-sourcing/event-sourcing.module.js";
+import { IQueryModelProjectionHandler } from "./i-query-model-projection-handler.js";
 import { QueryModelProjectionConsumerService } from "./query-model-projection-consumer.service.js";
 
 class TestAggregate {}
+
+@Aggregate("TenantScopeProbeAggregate")
+class TenantScopeProbeAggregate extends AbstractAggregateRoot {}
+
+async function createAppWithTenantScopeRequired() {
+    @Module({
+        imports: [
+            DugongModule.forRoot({
+                currentOrigin: "TestOrigin",
+                requireTenantScope: true,
+                adapters: new DugongAdapterBuilder()
+                    .registerMany(repositoryInMemoryAdapter, transactionManagerInMemoryAdapter)
+                    .build()
+            }),
+            EventSourcingModule
+        ],
+        providers: [
+            QueryModelProjectionConsumerService,
+            {
+                provide: IQueryModelProjectionHandler,
+                useValue: {
+                    getAggregateClass: () => TenantScopeProbeAggregate,
+                    updateQueryModel: vi.fn(async () => undefined),
+                    deleteQueryModel: vi.fn(async () => undefined)
+                }
+            }
+        ]
+    })
+    class TestModule {}
+
+    const app = await Test.createTestingModule({ imports: [TestModule] }).compile();
+
+    await app.init();
+
+    return app;
+}
 
 const defaultTransactionContext = { id: "tx" } as any;
 
@@ -10,10 +55,11 @@ function makeAggregate(overrides: { isDeleted?: boolean } = {}) {
     return { isDeleted: vi.fn(() => overrides.isDeleted ?? false) } as any;
 }
 
-function makeAggregateContext(aggregate: any, tenantScopedContext?: any) {
+function makeAggregateContext(aggregate: any, derivedContext?: any) {
     return {
         build: vi.fn(async () => aggregate),
-        withTenantId: vi.fn(() => tenantScopedContext ?? makeAggregateContext(aggregate))
+        withTenantId: vi.fn(() => derivedContext ?? makeAggregateContext(aggregate)),
+        withoutTenantId: vi.fn(() => derivedContext ?? makeAggregateContext(aggregate))
     } as any;
 }
 
@@ -59,7 +105,8 @@ describe("QueryModelProjectionConsumerService", () => {
     });
 
     it("should do nothing when aggregate cannot be built", async () => {
-        const aggregateContext = makeAggregateContext(null);
+        const unscopedAggregateContext = makeAggregateContext(null);
+        const aggregateContext = makeAggregateContext(null, unscopedAggregateContext);
         const eventSourcingService = makeEventSourcingService(aggregateContext);
         const queryModelProjectionHandler = makeProjectionHandler();
 
@@ -71,7 +118,7 @@ describe("QueryModelProjectionConsumerService", () => {
             defaultTransactionContext,
             TestAggregate
         );
-        expect(aggregateContext.build).toHaveBeenCalledWith("aggregate-1", { returnDeleted: true });
+        expect(unscopedAggregateContext.build).toHaveBeenCalledWith("aggregate-1", { returnDeleted: true });
         expect(queryModelProjectionHandler.updateQueryModel).not.toHaveBeenCalled();
         expect(queryModelProjectionHandler.deleteQueryModel).not.toHaveBeenCalled();
     });
@@ -121,5 +168,32 @@ describe("QueryModelProjectionConsumerService", () => {
         expect(aggregateContext.withTenantId).toHaveBeenCalledWith("tenant-a");
         expect(tenantScopedAggregateContext.build).toHaveBeenCalledWith("aggregate-4", { returnDeleted: true });
         expect(queryModelProjectionHandler.updateQueryModel).toHaveBeenCalledWith(defaultTransactionContext, aggregate);
+    });
+
+    it("should declare the aggregate context unscoped when the domain event has no tenant ID", async () => {
+        const aggregate = makeAggregate();
+        const unscopedAggregateContext = makeAggregateContext(aggregate);
+        const aggregateContext = makeAggregateContext(aggregate, unscopedAggregateContext);
+        const eventSourcingService = makeEventSourcingService(aggregateContext);
+        const queryModelProjectionHandler = makeProjectionHandler();
+
+        const service = new QueryModelProjectionConsumerService(eventSourcingService, queryModelProjectionHandler);
+
+        await service.updateQueryModel(makeHandleMessageContext("aggregate-5"));
+
+        expect(aggregateContext.withoutTenantId).toHaveBeenCalled();
+        expect(aggregateContext.withTenantId).not.toHaveBeenCalled();
+        expect(unscopedAggregateContext.build).toHaveBeenCalledWith("aggregate-5", { returnDeleted: true });
+    });
+
+    it("should project an untenanted domain event when the application requires a tenant scope", async () => {
+        const app = await createAppWithTenantScopeRequired();
+        const service = app.get(QueryModelProjectionConsumerService);
+
+        await expect(
+            service.updateQueryModel(makeHandleMessageContext("11111111-1111-1111-1111-111111111111", undefined, null))
+        ).resolves.toBeUndefined();
+
+        await app.close();
     });
 });

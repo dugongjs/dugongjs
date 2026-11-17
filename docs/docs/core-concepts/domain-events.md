@@ -7,6 +7,7 @@ tags:
     - Domain event
     - Standard Schema
     - Validation
+    - Upcast
 ---
 
 ## Introduction
@@ -86,7 +87,7 @@ The `aggregateType` is a label that identifies the aggregate to which the event 
 
 ### Version
 
-The `version` property specifies the version of the event schema. As your application evolves, you may need to introduce breaking changes to events. By versioning events appropriately, you can manage these changes without disrupting consumers.
+The `version` property specifies the version of the event schema. As your application evolves, you may need to introduce breaking changes to events. By versioning events appropriately, you can manage these changes without disrupting consumers. See [Upcasting](#upcasting) for how to replay events that were stored at an older version.
 
 ### Type
 
@@ -201,6 +202,7 @@ You can define lifecycle hooks for domain events by implementing any of the foll
 - `onStage(): void`: Called when a domain event is staged by an aggregate.
 - `onCommit(): void`: Called when a domain event is committed to the event log.
 - `onApply(): void`: Called when a domain event is applied to an aggregate.
+- `upcast(): AbstractDomainEvent`: Called when a domain event is deserialized, and must return the event at its next version. See [Upcasting](#upcasting).
 
 These hooks can be useful for tasks like payload validation or logging.
 
@@ -354,3 +356,164 @@ export class BankAccount extends AbstractAggregateRoot {
 
 Note that when creating domain events based on a schema, you must use the `createDomainEventAsync` method instead of `createDomainEvent`. This is because the Standard Schema interface is asynchronous, and the schema validation and transformation process may involve asynchronous operations. Whether this actually requires async execution depends on the specific schema library used to implement the Standard Schema interface.
 :::
+
+## Evolving Domain Events (New)
+
+In event sourcing, by definition, events are stored forever in an immutable event log. While this has many clear benefits (which you probably already know and appreciate if you are reading this), there are also some drawbacks. One key challenge is that the event structure might evolve as time progresses. Here, _evolve_ does not refer to the natural way an aggregate instance typically evolves, which is by processing commands and emitting domain events, but rather that the _design_ evolves over time. This could be due to changing design requirements, a bug or issue in the event format, or realizing that we used unfortunate terminology or value types in the initial design.
+
+Whatever the case might be, it is only a matter of time before this problem becomes a reality — you cannot realistically expect to design everything perfectly upfront every time! In that case, especially if you are unfamiliar with event sourcing, it might be tempting to reach for a _database migration_ to rewrite the event log. In general, it is not advised to try to "correct" this in the persistence layer. The reason is that the change is rarely localized to the event log of a single service. You might also have to deal with snapshots, query models, an outbox table, and any number of other projections and event-driven side effects. You likely also have a message broker to think about, as well as one or more consumers. And even if you extended the migration to the consumers, the message broker might have events _in transit_ that are not easily rewritten.
+
+### Backwards compatibility
+
+When evolving domain events, first ask yourself if the change is purely _additive_ (backwards compatible), or if you are making a _breaking change_. The table below shows a list of the different changes that can occur and whether or not they are backwards compatible.
+
+:::info
+The table below is taken from chapter 6 of the book [Microservice Patterns by Chris Richardson](../learning-materials/recommended-reading.mdx).
+:::
+
+| Level                | Change                               | Backwards compatible? |
+| -------------------- | ------------------------------------ | --------------------- |
+| Schema               | Define a new aggregate type          | Yes                   |
+| Remove aggregate     | Remove an existing aggregate         | No                    |
+| Rename aggregate     | Change the name of an aggregate type | No                    |
+| Aggregate            | Add a new event type                 | Yes                   |
+| Remove event         | Remove an event type                 | No                    |
+| Rename event         | Change the name of an event type     | No                    |
+| Event                | Add a new field                      | Yes                   |
+| Delete field         | Delete a field                       | No                    |
+| Rename field         | Rename a field                       | No                    |
+| Change type of field | Change the type of a field           | No                    |
+
+Backwards compatible changes can be added without needing to touch existing events. If you must introduce a non-backwards-compatible event, such as renaming or deleting an event field, the solution is not to modify already written domain events, but rather to introduce a new version and _upcast_ old events to the new format. This is the reason why a `version` field is always required when defining domain events.
+
+### Upcasting
+
+To support upcasting, create a new version of the same domain event and implement the `upcast()` method on the old domain event class which returns an instance of the next one.
+
+Let's look at the `AccountOpenedEvent` defined above. Some time after the initial design, we eventually realize that setting `initialBalance` to be a number without any currency information was a mistake and wish to replace this with an object containing the amount and the currency. We can do that in the following way:
+
+```typescript
+// --------------------------------- V2 ----------------------------------
+@DomainEvent()
+export class AccountOpenedEventV2 extends AbstractBankAccountDomainEvent<{
+    owner: string;
+    // Changed the `initialBalance` field to an object with an amount and a currency
+    initialBalance: {
+        amount: number;
+        currency: string;
+    };
+}> {
+    public readonly type = "AccountOpened";
+    public readonly version = 2;
+}
+
+// --------------------------------- V1 ----------------------------------
+@DomainEvent()
+export class AccountOpenedEventV1 extends AbstractBankAccountDomainEvent<{
+    owner: string;
+    initialBalance: number;
+}> {
+    public readonly type = "AccountOpened";
+    public readonly version = 1;
+
+    public upcast(): AccountOpenedEventV2 {
+        const payload = this.getPayload();
+
+        return new AccountOpenedEventV2(this.getAggregateId(), {
+            ...payload,
+            initialBalance: {
+                amount: payload.initialBalance,
+                currency: "USD"
+            }
+        });
+    }
+}
+```
+
+Since version 1 events never recorded a currency, we need to provide the `currency` field with a default value, here `"USD"`.
+
+:::note
+An `upcast()` hook only needs to produce the payload of the next version. The ID, aggregate ID, sequence number, timestamp, tenant ID, correlation ID, causation fields and metadata are copied from the event being upcast, so setting them in `upcast()` has no effect.
+
+The upcast event must have the same `origin`, `aggregateType` and `type` as the event it is upcast from, and the `version` directly following it, or an error is thrown. Each hook therefore increments exactly one version at a time and cannot skip a version.
+:::
+
+:::warning
+Never remove old domain event classes. Instead, consider them deprecated and stop producing new ones. Removing the class will cause deserialization to fail when rebuilding the aggregate from the event log.
+:::
+
+### Upcast Chaining
+
+`upcast()` is called when the domain event is deserialized, whether it was loaded from the event store or received as a message. If there are multiple versions, `upcast()` is called in a chain until it reaches an event with no `upcast()` method, as illustrated in the diagram below. Each versioned class therefore only needs to know how to reach the version immediately after it.
+
+```mermaid
+
+flowchart LR
+    AccountOpenedEventV1[AccountOpened<br/>EventV1]
+    AccountOpenedEventV2[AccountOpened<br/>EventV2]
+    AccountOpenedEventV3[AccountOpened<br/>EventV3]
+
+    AccountOpenedEventV1 --> |"upcast()"| AccountOpenedEventV2
+    AccountOpenedEventV2 --> |"upcast()"| AccountOpenedEventV3
+
+```
+
+Let's illustrate that by introducing another version. Suppose that some time later, we realize that an account can have multiple owners, and that the `owner` field is better represented by an `owners` array. We introduce a third version:
+
+```typescript
+@DomainEvent()
+export class AccountOpenedEventV3 extends AbstractBankAccountDomainEvent<{
+    // Changed the `owner` field to `owners`
+    owners: string[];
+    initialBalance: {
+        amount: number;
+        currency: string;
+    };
+}> {
+    public readonly type = "AccountOpened";
+    public readonly version = 3;
+}
+```
+
+Now, `AccountOpenedEventV2` must implement `upcast()` as well:
+
+```typescript
+@DomainEvent()
+export class AccountOpenedEventV2 extends AbstractBankAccountDomainEvent<{
+    owner: string;
+    initialBalance: {
+        amount: number;
+        currency: string;
+    };
+}> {
+    public readonly type = "AccountOpened";
+    public readonly version = 2;
+
+    public upcast(): AccountOpenedEventV3 {
+        const { owner, initialBalance } = this.getPayload();
+
+        return new AccountOpenedEventV3(this.getAggregateId(), {
+            owners: [owner],
+            initialBalance
+        });
+    }
+}
+```
+
+### Evolving the Aggregate
+
+The aggregate class only needs to handle the latest version, as older events will be upcast, provided that the aggregate has stopped producing those events:
+
+```typescript
+@Aggregate("BankAccount")
+export class BankAccount extends AbstractAggregateRoot {
+    @Apply(AccountOpenedEventV3)
+    public applyAccountOpened(event: AccountOpenedEventV3): void {
+        // Rest of the method...
+    }
+}
+```
+
+### Limitations of Upcasting
+
+`upcast()` can only use the data recorded on the event it is defined on, so missing fields must be left unset or populated by default values. If that is not acceptable, it is likely that you are introducing a new _type_ of event, not a new version of an old one. If, for example, we wanted to replace the `owner` field with a more appropriate `ownerId`, and the IDs came from a database of users or accounts, we could not solve that by upcasting alone. In that case, a new event type would likely be needed, as well as a batch process or message consumer to append the event to all aggregates without a valid `ownerId`.

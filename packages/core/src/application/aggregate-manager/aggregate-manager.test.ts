@@ -12,12 +12,23 @@ import type { IDomainEventRepository } from "../../ports/outbound/repository/i-d
 import type { ITransactionManager } from "../../ports/outbound/transaction-manager/i-transaction-manager.js";
 import { AggregateMetadataNotFoundError } from "../aggregate-factory/errors/aggregate-metadata-not-found.error.js";
 import type { ILogger } from "../logger/i-logger.js";
-import { TenantScopeNotSetError } from "../abstract-aggregate-handler/errors/tenant-scope-not-set.error.js";
+import { TenantScopeNotSetError } from "../tenant-scope/errors/tenant-scope-not-set.error.js";
 import { AggregateManager, type AggregateManagerOptions } from "./aggregate-manager.js";
 import { MissingProducerOrMapperError } from "./errors/missing-producer-or-mapper.error.js";
 
 describe("AggregateManager", () => {
     class MockAggregate extends AbstractAggregateRoot {}
+
+    class MockCommittedDomainEvent extends AbstractDomainEvent {
+        public readonly origin = "TestOrigin";
+        public readonly aggregateType = "TestType";
+        public readonly type = "MockCommittedDomainEvent";
+        public readonly version = 1;
+
+        public onCommit(): void {
+            this.setMetadata({ committed: true });
+        }
+    }
 
     const mockTransactionManager = mock<ITransactionManager>({
         transaction: (fn) => fn({})
@@ -161,7 +172,24 @@ describe("AggregateManager", () => {
 
             expect(aggregate.getStagedDomainEvents().length).toBe(0);
         });
+
+        it("should call the onCommit lifecycle hook on each staged domain event before they are serialized", async () => {
+            const manager = createManager();
+
+            const aggregate = new MockAggregate();
+            aggregate[IsInProcessContext] = true;
+            const domainEvent = new MockCommittedDomainEvent(faker.string.uuid());
+            aggregate.stageDomainEvent(domainEvent);
+            aggregate[IsInProcessContext] = false;
+
+            await manager.commitStagedDomainEvents(aggregate);
+
+            expect(mockDomainEventRepository.saveDomainEvents).toHaveBeenCalledWith(manager.getTransactionContext(), [
+                expect.objectContaining({ metadata: { committed: true } })
+            ]);
+        });
     });
+
     describe("applyAndCommitStagedDomainEvents", () => {
         it("should throw TenantScopeNotSetError if a tenant scope is required but not set", async () => {
             const manager = createManager({ requireTenantScope: true });

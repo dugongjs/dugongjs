@@ -77,7 +77,7 @@ describe("aggregate query behavior", () => {
 
             await userManager.applyAndCommitStagedDomainEvents(user);
 
-            const aggregate = await client.getAggregate(null, "User", user.getId(), null, 1);
+            const aggregate = await client.getAggregate(null, "User", user.getId(), { toSequenceNumber: 1 });
 
             expect(aggregate).toEqual(
                 expect.objectContaining({
