@@ -1,5 +1,11 @@
 # @dugongjs/core
 
+## 0.0.29
+
+### Patch Changes
+
+- 0755884: Added an `upcast` lifecycle hook to `AbstractDomainEvent`, which is followed on deserialization to replay events stored at an older version as their latest version
+
 ## 0.0.28
 
 ### Patch Changes
