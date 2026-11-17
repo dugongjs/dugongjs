@@ -1,6 +1,7 @@
 import type { AbstractDomainEvent } from "../abstract-domain-event/abstract-domain-event.js";
 import type { SerializedDomainEvent } from "../abstract-domain-event/serialized-domain-event.js";
 import { domainEventRegistry } from "../domain-event-registry/domain-event-registry.js";
+import { domainEventUpcaster } from "../domain-event-upcaster/domain-event-upcaster.js";
 
 class DomainEventDeserializer {
     public deserializeDomainEvents(...serializedDomainEvents: SerializedDomainEvent[]): AbstractDomainEvent<any>[] {
@@ -21,7 +22,7 @@ class DomainEventDeserializer {
                     serializedDomainEvent
                 ) as AbstractDomainEvent<any>;
 
-                return domainEvent;
+                return domainEventUpcaster.upcastDomainEvent(domainEvent);
             })
             .filter((domainEvent) => !!domainEvent);
     }

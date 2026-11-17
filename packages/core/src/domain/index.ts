@@ -40,3 +40,6 @@ export { DomainEvent } from "./domain-event-decorators/domain-event.js";
 export { domainEventDeserializer } from "./domain-event-deserializer/domain-event-deserializer.js";
 export { domainEventRegistry } from "./domain-event-registry/domain-event-registry.js";
 export { DomainEventAlreadyRegisteredError } from "./domain-event-registry/errors/domain-event-already-registered.error.js";
+export { domainEventUpcaster } from "./domain-event-upcaster/domain-event-upcaster.js";
+export { DomainEventUpcastIdentityMismatchError } from "./domain-event-upcaster/errors/domain-event-upcast-identity-mismatch.error.js";
+export { DomainEventUpcastVersionMismatchError } from "./domain-event-upcaster/errors/domain-event-upcast-version-mismatch.error.js";
