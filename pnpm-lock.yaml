@@ -377,7 +377,7 @@ importers:
         version: 0.2.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.2.0)(pg@8.18.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -575,7 +575,7 @@ importers:
         version: 12.5.0(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(@nestjs/microservices@12.5.0)(@nestjs/platform-express@12.5.0)
       '@nestjs/typeorm':
         specifier: ^12.0.0
-        version: 12.0.3(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(better-sqlite3@13.0.3)(pg@8.18.0))
+        version: 12.0.3(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(better-sqlite3@13.2.0)(pg@8.18.0))
       '@swc/core':
         specifier: ^1.11.21
         version: 1.15.11(@swc/helpers@0.5.18)
@@ -629,7 +629,7 @@ importers:
         version: 7.2.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.2.0)(pg@8.18.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -687,7 +687,7 @@ importers:
         version: 12.5.0(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(@nestjs/microservices@12.5.0)(@nestjs/platform-express@12.5.0)
       '@nestjs/typeorm':
         specifier: ^12.0.0
-        version: 12.0.3(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(better-sqlite3@13.0.3)(pg@8.18.0))
+        version: 12.0.3(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(better-sqlite3@13.2.0)(pg@8.18.0))
       '@swc/core':
         specifier: ^1.11.21
         version: 1.15.11(@swc/helpers@0.5.18)
@@ -711,7 +711,7 @@ importers:
         version: 4.1.5(vitest@4.1.5)
       better-sqlite3:
         specifier: ^13.0.3
-        version: 13.0.3
+        version: 13.2.0
       dotenv:
         specifier: ^16.5.0
         version: 16.6.1
@@ -726,7 +726,7 @@ importers:
         version: 0.2.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.2.0)(pg@8.18.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -902,7 +902,7 @@ importers:
         version: 4.1.5(vitest@4.1.5)
       better-sqlite3:
         specifier: ^13.0.3
-        version: 13.0.3
+        version: 13.2.0
       dotenv:
         specifier: ^16.5.0
         version: 16.6.1
@@ -920,7 +920,7 @@ importers:
         version: 0.2.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.2.0)(pg@8.18.0)
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -980,7 +980,7 @@ importers:
         version: 12.5.0(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(rxjs@7.8.2)
       '@nestjs/typeorm':
         specifier: ^12.0.0
-        version: 12.0.3(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(better-sqlite3@13.0.3)(pg@8.18.0))
+        version: 12.0.3(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(better-sqlite3@13.2.0)(pg@8.18.0))
       kafkajs:
         specifier: ^2.2.4
         version: 2.2.4
@@ -992,7 +992,7 @@ importers:
         version: 7.8.2
       typeorm:
         specifier: ^0.3.22
-        version: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
+        version: 0.3.31(better-sqlite3@13.2.0)(pg@8.18.0)
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -4206,8 +4206,8 @@ packages:
     resolution: {integrity: sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g==}
     engines: {node: '>=4'}
 
-  better-sqlite3@13.0.3:
-    resolution: {integrity: sha512-RbOBxmLBG8uvFUc15X9+9SFemKcQ0WBuISBVkpuiaUB2qblC8UWlHEjdWVoZ8AdhSwmoEgsiXKfopX0CQxaACQ==}
+  better-sqlite3@13.2.0:
+    resolution: {integrity: sha512-Z8Q/9x/uNyKxA1v4FNodyItRVRw1TeKBrmj32JhxhR0ceNcBY+wMobt/Bv7M7TzwPAXjnZRtNaEsATnUZSKWZQ==}
     engines: {node: '>=22'}
 
   big.js@5.2.2:
@@ -12882,13 +12882,13 @@ snapshots:
       '@nestjs/microservices': 12.5.0(@grpc/grpc-js@1.14.3)(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 12.5.0(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(rxjs@7.8.2)
 
-  '@nestjs/typeorm@12.0.3(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(better-sqlite3@13.0.3)(pg@8.18.0))':
+  '@nestjs/typeorm@12.0.3(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.5.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(better-sqlite3@13.2.0)(pg@8.18.0))':
     dependencies:
       '@nestjs/common': 12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 12.5.0(@nestjs/common@12.5.0(class-transformer@0.5.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@12.5.0)(@nestjs/platform-express@12.5.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
-      typeorm: 0.3.31(better-sqlite3@13.0.3)(pg@8.18.0)
+      typeorm: 0.3.31(better-sqlite3@13.2.0)(pg@8.18.0)
 
   '@next/eslint-plugin-next@15.5.12':
     dependencies:
@@ -14370,7 +14370,7 @@ snapshots:
     dependencies:
       is-windows: 1.0.2
 
-  better-sqlite3@13.0.3:
+  better-sqlite3@13.2.0:
     dependencies:
       node-addon-api: 8.9.2
 
@@ -20465,7 +20465,7 @@ snapshots:
     dependencies:
       is-typedarray: 1.0.0
 
-  typeorm@0.3.31(better-sqlite3@13.0.3)(pg@8.18.0):
+  typeorm@0.3.31(better-sqlite3@13.2.0)(pg@8.18.0):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 4.4.0
@@ -20483,7 +20483,7 @@ snapshots:
       uuid: 11.1.1
       yargs: 17.7.3
     optionalDependencies:
-      better-sqlite3: 13.0.3
+      better-sqlite3: 13.2.0
       pg: 8.18.0
     transitivePeerDependencies:
       - babel-plugin-macros
